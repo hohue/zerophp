@@ -49,14 +49,14 @@ class Block extends Entity {
                     'rte_enable' => 1,
                     'display_hidden' => 1,
                 ),
-                'library' => array(
-                    'name' => 'library',
+                'class' => array(
+                    'name' => 'class',
                     'title' => zerophp_lang('Class'),
                     'type' => 'input',
                     'display_hidden' => 1,
                 ),
-                'function' => array(
-                    'name' => 'function',
+                'method' => array(
+                    'name' => 'method',
                     'title' => zerophp_lang('Method'),
                     'type' => 'input',
                     'display_hidden' => 1,
