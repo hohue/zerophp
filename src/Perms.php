@@ -1,0 +1,88 @@
+<?php 
+
+namespace ZeroPHP\ZeroPHP;
+
+use ZeroPHP\ZeroPHP\Entity;
+
+class Perms extends Entity {
+
+    function __construct() {
+        parent::__construct();
+
+        
+
+        $this->setStructure(array(
+            'id' => 'perm_id',
+            'name' => 'perms',
+            'title' => zerophp_lang('Permissions'),
+            'fields' => array(
+                'perm_id' => array(
+                    'name' => 'perm_id',
+                    'title' => zerophp_lang('ID'),
+                    'type' => 'hidden',
+                ),
+                'path' => array(
+                    'name' => 'path',
+                    'title' => zerophp_lang('Path'),
+                    'type' => 'input',
+                    'validate' => 'required|max_length[255]',
+                ),
+                'access_key' => array(
+                    'name' => 'access_key',
+                    'title' => zerophp_lang('Access key'),
+                    'type' => 'textarea',
+                    'validate' => 'required',
+                ),
+                'active' => array(
+                    'name' => 'active',
+                    'title' => zerophp_lang('Active'),
+                    'type' => 'radio_build',
+                    'options' => array(
+                        1 => zerophp_lang('Enable'),
+                        0 => zerophp_lang('Disable'),
+                    ),
+                    'default' => 1,
+                    'validate' => 'required|numeric|greater_than[-1]|less_than[2]',
+                ),
+                'weight' => array(
+                    'name' => 'weight',
+                    'title' => zerophp_lang('Weight'),
+                    'type' => 'dropdown_build',
+                    'options' => form_options_make_weight(),
+                    'validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    'fast_edit' => 1,
+                ),
+            ),
+        ));
+    }
+
+    function entity_load_from_path($path, $attributes = array()) {
+        $cache_name = "Perms-entity_load_from_path-" . md5($path);
+        if ($cache = \Cache::get($cache_name)) {
+            return $cache;
+        }
+
+        $attributes['load_all'] = false;
+        $attributes['where']['path'] = $path;
+        $result = reset($this->entity_load_executive(null, $attributes));
+
+        \Cache::forever($cache_name, $result);
+        return $result;
+    }
+
+    function entity_load_all($attributes = array(), &$pager_sum = 0) {
+        if (!isset($attributes['order'])) {
+            $attributes['order'] = array();
+        }
+
+        if (!isset($attributes['order']['path'])) {
+            $attributes['order']['path'] = 'ASC';
+        }
+
+        if (!isset($attributes['order']['perm_id'])) {
+            $attributes['order']['perm_id'] = 'DESC';
+        }
+
+        return parent::entity_load_all($attributes, $pager_sum);
+    }
+}
