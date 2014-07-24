@@ -5,15 +5,10 @@ use ZeroPHP\ZeroPHP\Entity;
 
 class Metadata extends Entity {
     function __construct() {
-        parent::__construct();
-
-        
-
-        $this->CI->lang->load('metadata', config_item('language'));
-
         $this->setStructure(array(
             'id' => 'metadata_id',
             'name' => 'metadata',
+            'class' => 'ZeroPHP\Metadata\Metadata',
             'title' => zerophp_lang('Metadata'),
             'fields' => array(
                 'metadata_id' => array(
@@ -55,10 +50,10 @@ class Metadata extends Entity {
         ));
     }
 
-    function entity_load_from_path($path, $attributes = array()) {
+    function loadEntity_from_path($path, $attributes = array()) {
         $attributes['load_all'] = false;
         $attributes['where']['path'] = $path;
-        return reset($this->entity_load_executive(null, $attributes));
+        return reset($this->loadEntityExecutive(null, $attributes));
     }
 
     function metadata_load() {
@@ -69,7 +64,7 @@ class Metadata extends Entity {
 
         // Load specific metadata (for alias url)
         $alias = $this->CI->uri->alias_string();
-        $metadata = $this->entity_load_from_path($alias);
+        $metadata = $this->loadEntity_from_path($alias);
 
         $metadata_load = false;
         if (!empty($metadata->path_title)) {
@@ -89,7 +84,7 @@ class Metadata extends Entity {
 
         // Load metadata default
         if (!$keywords || !$description) {
-            $metadata = $this->entity_load(1);
+            $metadata = $this->loadEntity(1);
 
             if (!$keywords) {
                 $keywords = $metadata->keywords;

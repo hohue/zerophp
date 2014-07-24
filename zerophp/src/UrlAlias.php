@@ -10,17 +10,13 @@ use ZeroPHP\ZeroPHP\Entity;
 
 class UrlAlias extends Entity {
     function __construct() {
-        parent::__construct();
-
-        
-
         $this->setStructure(array(
-            'id' => 'url_alias_id',
-            'name' => 'url_alias',
+            'id' => 'urlalias_id',
+            'name' => 'urlalias',
             'title' => zerophp_lang('URL alias'),
             'fields' => array(
-                'url_alias_id' => array(
-                    'name' => 'url_alias_id',
+                'urlalias_id' => array(
+                    'name' => 'urlalias_id',
                     'title' => zerophp_lang('ID'),
                     'type' => 'hidden',
                 ),
@@ -34,9 +30,16 @@ class UrlAlias extends Entity {
                     'title' => zerophp_lang('URL alias'),
                     'type' => 'input',
                 ),
-                'updated_date' => array(
-                    'name' => 'updated_date',
-                    'title' => zerophp_lang('Updated date'),
+                'created_at' => array(
+                    'name' => 'created_at',
+                    'title' => zerophp_lang('Created At'),
+                    'type' => 'input',
+                    'widget' => 'date_timestamp',
+                    'form_hidden' => 1,
+                ),
+                'updated_at' => array(
+                    'name' => 'updated_at',
+                    'title' => zerophp_lang('Updated At'),
                     'type' => 'input',
                     'widget' => 'date_timestamp',
                     'form_hidden' => 1,
@@ -45,39 +48,64 @@ class UrlAlias extends Entity {
         ));
     }
 
-    function entity_load_all($attributes = array(), &$pager_sum = 0) {
+    function loadEntityAll($attributes = array()) {
         if (!isset($attributes['order'])) {
             $attributes['order'] = array();
         }
 
-        if (!isset($attributes['order']['updated_date'])) {
-            $attributes['order']['updated_date'] = 'DESC';
+        if (!isset($attributes['order']['updated_at'])) {
+            $attributes['order']['updated_at'] = 'DESC';
         }
 
-        if (!isset($attributes['order']['url_real'])) {
-            $attributes['order']['url_real'] = 'ASC';
-        }
-
-        return parent::entity_load_all($attributes, $pager_sum);
+        return parent::loadEntityAll($attributes);
     }
 
-    function url_alias_verify_alias($url_real, $url_alias, $validate = true) {
+    function loadEntityByAlias($path) {
+        $attributes = array(
+            'where' => array(
+                'url_alias' => $path,
+            )
+        );
+        $url_alias = $this->loadEntityExecutive(null, $attributes);
+
+        if (count($url_alias)) {
+            $url_alias = reset($url_alias);
+        }
+    }
+
+    function loadEntityByReal($path) {
+        $attributes = array(
+            'where' => array(
+                'url_real' => $path,
+            )
+        );
+        $url_real = $this->loadEntityExecutive(null, $attributes);
+
+        if (count($url_real)) {
+            $url_real = reset($url_real);
+        }
+    }
+
+    function verify($url_real, $url_alias, $validate = true) {
         // Remove unexpected characters
-        $url_alias = $validate ? uri_validate($url_alias) : $url_alias;
+        $url_alias = $validate ? zerophp_uri_validate($url_alias) : $url_alias;
 
         // Check url alias exists
-        $this->CI->load->model('url_alias_model');
-        $alias = $this->CI->url_alias_model->get_from_alias($url_real, $url_alias);
-        if (!empty($alias->url_alias)) {
-            $this->CI->load->helper('string');
-            $url_alias .= '-' . strtolower(random_string('alnum', 4));
+        $alias = $this->loadEntityByAlias($url_alias);
+        if (!empty($alias->url_alias) && $alias->url_real != $url_real) {
+            $url_alias .= '-' . strtolower(str_random(4));
 
             // Re-check with new url alias
-            $url_alias = $this->url_alias_verify_alias($url_real, $url_alias, false);
+            $url_alias = $this->verify($url_real, $url_alias, false);
         }
 
         return $url_alias;
     }
+
+
+
+
+
 
     function url_alias_create($url_real, $url_alias, $prefix = '') {
         $prefix = $prefix ? $prefix : fw_variable_get('url alias all prefix', '');
@@ -121,7 +149,7 @@ class UrlAlias extends Entity {
         $new = true;
         // Create url alias cache file
         if (!empty($form_values['url_alias_id'])) {
-            $url = $this->entity_load($form_values['url_alias_id'], array('cache' => false));
+            $url = $this->loadEntity($form_values['url_alias_id'], array('cache' => false));
             @$this->CI->cachef->del_url_alias($url->url_alias);
             @$this->CI->cachef->del_url_real($url->url_real);
             $new = false;
@@ -138,7 +166,7 @@ class UrlAlias extends Entity {
     function crud_delete_form_submit($form_id, $form, &$form_values, $message = '') {
         // Delete url alias cache file
         foreach ($form_values['#delete'] as $url_id) {
-            $url = $this->entity_load($url_id, array('cache' => false));
+            $url = $this->loadEntity($url_id, array('cache' => false));
             @$this->CI->cachef->del_url_alias($url->url_alias);
             @$this->CI->cachef->del_url_real($url->url_real);
         }

@@ -6,13 +6,11 @@ use ZeroPHP\ZeroPHP\Entity;
 class Hook extends Entity {
 
     function __construct() {
-        parent::__construct();
-
-        
 
         $this->setStructure(array(
             'id' => 'hook_id',
             'name' => 'hook',
+            'class' => 'ZeroPHP\ZeroPHP\Hook',
             'title' => zerophp_lang('Hook'),
             'fields' => array(
                 'hook_id' => array(
@@ -82,7 +80,7 @@ class Hook extends Entity {
         );
     }
 
-    function entity_load_all($attributes = array(), &$pager_sum = 0) {
+    function loadEntity_all($attributes = array(), &$pager_sum = 0) {
         if (!isset($attributes['order'])) {
             $attributes['order'] = array();
         }
@@ -99,7 +97,7 @@ class Hook extends Entity {
             $attributes['order']['hook_condition'] = 'ASC';
         }
 
-        return parent::entity_load_all($attributes, $pager_sum);
+        return parent::loadEntity_all($attributes, $pager_sum);
     }
 
     function hook_get_all($hook_type, $hook_condition = '#all') {
@@ -107,7 +105,7 @@ class Hook extends Entity {
 
         if (empty($cache)) {
             $entity = Entity::loadEntityObject('hook');
-            $hooks = $this->CI->hook->entity_load_all();
+            $hooks = $this->CI->hook->loadEntity_all();
             $cache = array();
             foreach ($hooks as $hook) {
                 if (empty($hook->hook_condition)) {

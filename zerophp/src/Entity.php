@@ -36,17 +36,23 @@ class Entity {
     }
 
     public static function loadEntityObject($entity) {
-        $loaded = zerophp_static(__METHOD__);
+        $zerophp =& zerophp_get_instance();
 
         $entity_name = zerophp_uri_validate($entity);
         $entity_name = str_replace('-', '_', $entity_name);
 
-        if (!isset($loaded[$entity_name])) {
-            $loaded[$entity_name] = new $entity;
+        if (isset($zerophp->entity['zerophp_zerophp_languagetranslate'])) {
+            zerophp_devel_print($zerophp->entity, $entity_name);
         }
 
-        zerophp_static(__METHOD__, $loaded);
-        return $loaded[$entity_name];
+        if (!isset($zerophp->entity[$entity_name])) {
+            $zerophp->entity[$entity_name] = new $entity;
+        }
+        else {
+            zerophp_devel_print($zerophp->entity);
+        }
+
+        return $zerophp->entity[$entity_name];
     }
 
     function loadEntityAll($attributes = array()) {
@@ -168,6 +174,84 @@ class Entity {
         return $result;
     }
 
+    function loadEntity($entity_id, $attributes = array()) {
+        // entity load default
+        $cached = false;
+        if (is_numeric($entity_id) && !count($attributes)) {
+            $cached = true;
+            $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['name'];
+            if ($cache = \Cache::get($cache_name)) {
+                return $cache;
+            }
+        }
+
+        $attributes['load_all'] = false;
+        $entity = $this->loadEntityExecutive($entity_id, $attributes);
+
+        $result = reset($entity);
+
+        if ($cached) {
+            \Cache::forever($cache_name, $result);
+        }
+        return $result;
+    }
+
+    function saveEntity($entity) {
+        $reference = array();
+        foreach ($this->structure['fields'] as $field) {
+            // Save Reference fields to temp
+            if (!empty($field['reference']) && isset($entity->{$field['name']})) {
+                if (!is_array($entity->{$field['name']})) {
+                    $reference_field = array(
+                        $entity->{$field['name']},
+                    );
+                }
+                else {
+                    $reference_field = $entity->{$field['name']};
+                }
+                $reference[$field['name']] = $reference_field;
+
+                if (empty($field['reference']['type']) || $field['reference']['type'] != 'internal') {
+                    unset($entity->{$field['name']});
+                }
+            }
+        }
+
+        $update = false;
+        if (isset($entity->{$this->structure['id']}) && $entity->{$this->structure['id']}) {
+            $entity_old = $this->loadEntity($entity->{$this->structure['id']}, array(
+                'check_active' => false,
+                'cache' => false,
+            ));
+
+            if (!empty($entity_old->{$this->structure['id']})) {
+                $entity_id = EntityModel::update($entity, $this->structure);
+
+                $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['name'];
+                \Cache::forget($cache_name);
+
+                $update = true;
+
+                unset($entity->{$this->structure['id']});
+            }
+        }
+
+        if (!$update) {
+            $entity_id = EntityModel::create($entity, $this->structure);
+        }
+
+        // Save reference fields from temp to database
+        if (count($reference)) {
+            $this->saveEntityReference($reference, $entity_id);
+        }
+
+        return $entity_id;
+    }
+
+    function saveEntityReference($reference, $entity_id) {
+        EntityModel::saveReference($reference, $entity_id, $this->structure);
+    }
+
 
 
 
@@ -190,7 +274,7 @@ class Entity {
         }
 
         $pager_sum = 1;
-        $entities = $this->entity_load_all($attributes, $pager_sum);
+        $entities = $this->loadEntity_all($attributes, $pager_sum);
 
         $data = array(
             'form_id' => $this->crud_list_form($entities, $url_prefix, $page),
@@ -479,7 +563,7 @@ class Entity {
             if (!isset($entity->{$value['name']}) && isset($value['default'])) {
                 if (isset($value['reference'])) {
                     $entity = Entity::loadEntityObject($value['reference']);
-                    $value['default'] = $this->CI->{$value['reference']}->entity_load($value['default']);
+                    $value['default'] = $this->CI->{$value['reference']}->loadEntity($value['default']);
                 }
 
                 $entity->{$value['name']} = $value['default'];
@@ -823,89 +907,9 @@ class Entity {
         $this->CI->cachef->clean();
     }
 
-    function entity_load($entity_id, $attributes = array()) {
-        // entity load default
-        $cached = false;
-        if (is_numeric($entity_id) && !count($attributes)) {
-            $cached = true;
-            $cache_name = "Entity-entity_load-$entity_id-" . $this->structure['name'];
-            if ($cache = $this->CI->cachef->get_file($cache_name)) {
-                return $cache;
-            }
-        }
-
-        $attributes['load_all'] = false;
-        $entity = $this->entity_load_executive($entity_id, $attributes);
-
-        $result = reset($entity);
-
-        if ($cached) {
-            $this->CI->cachef->set_file($cache_name, $result);
-        }
-        return $result;
-    }
-
-    function entity_save($entity) {
-        
-
-        $reference = array();
-        foreach ($this->structure['fields'] as $field) {
-            // Save Reference fields to temp
-            if (!empty($field['reference']) && isset($entity->{$field['name']})) {
-                if (!is_array($entity->{$field['name']})) {
-                    $reference_field = array(
-                        $entity->{$field['name']},
-                    );
-                }
-                else {
-                    $reference_field = $entity->{$field['name']};
-                }
-                $reference[$field['name']] = $reference_field;
-
-                if (empty($field['reference']['type']) || $field['reference']['type'] != 'internal') {
-                    unset($entity->{$field['name']});
-                }
-            }
-        }
-
-        $update = false;
-        if (isset($entity->{$this->structure['id']}) && $entity->{$this->structure['id']}) {
-            $entity_old = $this->entity_load($entity->{$this->structure['id']}, array(
-                'check_active' => false,
-                'cache' => false,
-            ));
-
-            if (!empty($entity_old->{$this->structure['id']})) {
-                $entity_id = $this->CI->entity_model->update($entity, $this->structure);
-                $update = true;
-
-                unset($entity->{$this->structure['id']});
-            }
-        }
-
-        if (!$update) {
-            $entity_id = $this->CI->entity_model->create($entity, $this->structure);
-        }
-
-        // Save reference fields from temp to database
-        if (count($reference)) {
-            $this->entity_save_reference($reference, $entity_id);
-        }
-
-        $cache_name = "Entity-entity_load-$entity_id-" . $this->structure['name'];
-        $this->CI->cachef->del_file($cache_name);
-
-        return $entity_id;
-    }
-
-    function entity_save_reference($reference, $entity_id) {
-        
-        $this->CI->entity_model->save_reference($reference, $entity_id, $this->structure);
-    }
-
     function entity_update_all($entities, $where_key = null) {
         
-        $this->CI->entity_model->update_all($entities, $this->structure, $where_key);
+        EntityModel::update_all($entities, $this->structure, $where_key);
     }
 
     function entity_name_exists($entity_name = '') {
@@ -927,7 +931,7 @@ class Entity {
             return false;
         }
 
-        $entity = $this->entity_load($entity_id, array('check_active' => $active, 'cache' => $cache));
+        $entity = $this->loadEntity($entity_id, array('check_active' => $active, 'cache' => $cache));
 
         if (isset($entity->{$this->structure['id']}) && $entity->{$this->structure['id']}) {
             return $entity;
@@ -943,7 +947,7 @@ class Entity {
         }
 
         $entity = Entity::loadEntityObject('modules');
-        $entity_list = $this->CI->modules->entity_load_all();
+        $entity_list = $this->CI->modules->loadEntity_all();
 
         $entity = array();
         foreach ($entity_list as $value) {
@@ -1095,7 +1099,7 @@ class Entity {
 
     function access_own_entity($path) {
         $entity = Entity::loadEntityObject($path[2]);
-        $entity = $this->CI->{$path[2]}->entity_load($path[3]);
+        $entity = $this->CI->{$path[2]}->loadEntity($path[3]);
 
         if (isset($entity->created_by) && $entity->created_by == user_current()) {
             return true;

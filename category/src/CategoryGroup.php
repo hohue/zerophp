@@ -8,6 +8,7 @@ class CategoryGroup extends Entity {
         $this->setStructure(array(
             'id' => 'category_group_id',
             'name' => 'category_group',
+            'class' => 'ZeroPHP\Category\CategoryGroup',
             'title' => zerophp_lang('Category group'),
             'fields' => array(
                 'category_group_id' => array(
@@ -46,13 +47,13 @@ class CategoryGroup extends Entity {
         ));
     }
 
-    function entity_load_executive($entity_id = 0, $attributes = array(), &$pager_sum = 1) {
-        $cache_name = "Category_group-entity_load_executive-$entity_id" . serialize($attributes);
+    function loadEntityExecutive($entity_id = 0, $attributes = array(), &$pager_sum = 1) {
+        $cache_name = "Category_group-loadEntityExecutive-$entity_id" . serialize($attributes);
         if ($cache = \Cache::get($cache_name)) {
             return $cache;
        }
 
-        $result = parent::entity_load_executive($entity_id, $attributes, $pager_sum);
+        $result = parent::loadEntityExecutive($entity_id, $attributes, $pager_sum);
 
         \Cache::forever($cache_name, $result);
         return $result;

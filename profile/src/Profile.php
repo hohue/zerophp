@@ -5,12 +5,10 @@ use ZeroPHP\ZeroPHP\Entity;
 
 class Profile extends Entity {
     function __construct() {
-        parent::__construct();
-        $this->CI =& get_instance();
-        $this->CI->lang->load('users_profile', config_item('language'));
         $this->setStructure(array(
             'id' => 'user_id',
-            'name' => 'users_profile', //ten bang
+            'name' => 'profile', //ten bang
+            'class' => 'ZeroPHP\Profile\Profile',
             'title' => zerophp_lang('Users profile'),
             'fields' => array(
                 'user_id' => array(
@@ -137,20 +135,20 @@ class Profile extends Entity {
             return false;
         }
 
-        $entity = $this->entity_load($entity_id, array('cache' => $cache));
+        $entity = $this->loadEntity($entity_id, array('cache' => $cache));
 
         if (!empty($entity->user_id)) {
             return $entity;
         }
         else {
             // Create a new profile for user if not exists
-            $user = $this->CI->users->entity_load($entity_id);
+            $user = $this->CI->users->loadEntity($entity_id);
             if (!empty($user->user_id)) {
                 $entity = new stdClass();
                 $entity->user_id = $user->user_id;
                 $entity_id = $this->entity_save($entity);
 
-                return $this->entity_load($entity_id);
+                return $this->loadEntity($entity_id);
             }
         }
 
@@ -180,7 +178,7 @@ class Profile extends Entity {
                     'title' => 'ASC',
                 )
             );
-            $categories = $this->CI->category->entity_load_all_from_parent($group, $attributes);
+            $categories = $this->CI->category->loadEntity_all_from_parent($group, $attributes);
 
             //fw_devel_print($categories);
             if (count($categories) > 1) {

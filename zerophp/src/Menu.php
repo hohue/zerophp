@@ -7,12 +7,13 @@ class Menu extends Entity {
 
     function __construct() {
         $this->setStructure(array(
-            'id' => 'block_id',
-            'name' => 'block',
-            'title' => zerophp_lang('Block'),
+            'id' => 'menu_id',
+            'name' => 'menu',
+            'class' => 'ZeroPHP\ZeroPHP\Menu',
+            'title' => zerophp_lang('Menu'),
             'fields' => array(
-                'block_id' => array(
-                    'name' => 'block_id',
+                'menu_id' => array(
+                    'name' => 'menu_id',
                     'title' => zerophp_lang('ID'),
                     'type' => 'hidden',
                 ),
@@ -47,7 +48,7 @@ class Menu extends Entity {
                 'access' => array(
                     'name' => 'access',
                     'title' => zerophp_lang('Access'),
-                    'type' => 'input',
+                    'type' => 'textarea',
                     'display_hidden' => 1,
                 ),
                 'weight' => array(
@@ -81,5 +82,26 @@ class Menu extends Entity {
 
         \Cache::forever(__METHOD__, $menus);
         return $menus;
+    }
+
+    function loadEntityByPath($path) {
+        $cache_name = __METHOD__ . md5($path);
+        if ($cache = \Cache::get($cache_name)) {
+            return $cache;
+        }
+
+        $attributes = array(
+            'where' => array(
+                'path' => $path,
+            )
+        );
+        $menu = $this->loadEntityExecutive(null, $attributes);
+
+        if (count($menu)) {
+            $menu = reset($menu);
+        }
+
+        \Cache::forever($cache_name, $menu);
+        return $menu;
     }
 }

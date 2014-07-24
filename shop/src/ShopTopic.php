@@ -10,6 +10,7 @@ class ShopTopic extends Entity {
         $this->setStructure(array(
             'id' => 'shop_topic_id',
             'name' => 'shop_topic',
+            'class' => 'ZeroPHP\Shop\ShopTopic',
             'title' => 'Shop topic',
             'fields' => array(
                 'shop_topic_id' => array(
@@ -164,7 +165,7 @@ class ShopTopic extends Entity {
         );
 
         $option = array();
-        $category = $this->CI->category->entity_load_all_from_group($level, $attributes);
+        $category = $this->CI->category->loadEntity_all_from_group($level, $attributes);
         //fw_devel_print($category);
         if (count($category)) {
             foreach ($category as $key => $val) {
@@ -296,13 +297,13 @@ class ShopTopic extends Entity {
         if (count($categories)) {
             $entity = Entity::loadEntityObject('category');
             foreach ($categories as $value) {
-                $category = $this->CI->category->entity_load($value->category_id);
+                $category = $this->CI->category->loadEntity($value->category_id);
                 if (!empty($category->title)) {
                     $title = $category->title;
                     if (count($category->parent)) {
                         $parent = reset($category->parent)->category_id;
                         while ($parent) {
-                            $category_parent = $this->CI->category->entity_load($parent);
+                            $category_parent = $this->CI->category->loadEntity($parent);
                             if (!empty($category_parent->title)) {
                                 $title = $category_parent->title . ' » ' . $title;
                                 $parent = count($category_parent->parent) ? reset($category_parent->parent)->category_id : 0;

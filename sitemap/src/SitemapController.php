@@ -5,7 +5,7 @@ class SitemapController extends Controller {
     function category_product() {
     
             $this->load->library('category');
-            $level1 = $this->category->entity_load_all_from_group(1);
+            $level1 = $this->category->loadEntity_all_from_group(1);
             
             $result = array();
             foreach ($level1 as $key => $value) {
@@ -14,7 +14,7 @@ class SitemapController extends Controller {
                     '#children' => array(),
                 );
                 
-                $children = $this->category->entity_load_all_from_parent($key);
+                $children = $this->category->loadEntity_all_from_parent($key);
                 foreach ($children as $k => $v) {
                     $result[$key]['#children'][$k] = $v->title;
                 }

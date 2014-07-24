@@ -5,15 +5,10 @@ use ZeroPHP\ZeroPHP\Entity;
 
 class Contact extends Entity {
     function __construct() {
-        parent::__construct();
-
-        
-
-        $this->CI->lang->load('contact', config_item('language'));
-
         $this->setStructure(array(
             'id' => 'contact_id',
             'name' => 'contact',
+            'class' => 'ZeroPHP\Contact\Contact',
             'title' => zerophp_lang('Contact Us'),
             'fields' => array(
                 'contact_id' => array(

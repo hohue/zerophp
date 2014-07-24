@@ -8,6 +8,7 @@ class Shop extends Entity {
         $this->setStructure(array(
             'id' => 'shop_id',
             'name' => 'shop',
+            'class' => 'ZeroPHP\Shop\Shop',
             'title' => zerophp_lang('Shop'),
             'fields' => array(
                 'shop_id' => array(
@@ -156,30 +157,30 @@ class Shop extends Entity {
         ));
     }
 
-    function entity_load_by_user($user_id, $attributes = array()) {
+    function loadEntity_by_user($user_id, $attributes = array()) {
         $attributes['where']['created_by'] = $user_id;
 
         if (!isset($attributes['check_active'])) {
             $attributes['check_active'] = false;
         }
 
-        return reset($this->entity_load_executive(null, $attributes));
+        return reset($this->loadEntityExecutive(null, $attributes));
     }
 
-    function entity_load_by_url_alias($path, $attributes = array()) {
+    function loadEntity_by_url_alias($path, $attributes = array()) {
         $attributes['where']['url_alias'] = $path;
 
         if (!isset($attributes['check_active'])) {
             $attributes['check_active'] = false;
         }
 
-        return reset($this->entity_load_executive(null, $attributes));
+        return reset($this->loadEntityExecutive(null, $attributes));
     }
 
     function shop_create_form_alter($form_id, &$form) {
         if ($form_id == 'entity_crud_create_shop') {
             // Check shop registered
-            $shop = $this->entity_load_by_user(zerophp_user_current());
+            $shop = $this->loadEntity_by_user(zerophp_user_current());
             if (!empty($shop->shop_id)) {
                 $this->CI->theme->messages_add('Bạn chỉ có thể mở một shop.', 'error');
                 redirect();
@@ -237,7 +238,7 @@ class Shop extends Entity {
         $role_id = reset(fw_variable_get('shop roles salesman', array()));
 
         if ($role_id) {
-            $user = $this->CI->users->entity_load(zerophp_user_current());
+            $user = $this->CI->users->loadEntity(zerophp_user_current());
             $user->roles[] = $role_id;
             $this->CI->users->entity_save($user);
         }
@@ -250,7 +251,7 @@ class Shop extends Entity {
         $this->shop_create_form_alter($form_id, $form);
 
         // Check shop updated
-        $shop = $this->entity_load_by_user(zerophp_user_current());
+        $shop = $this->loadEntity_by_user(zerophp_user_current());
         if (empty($shop->shop_id) || $shop->shop_id != $form['shop_id']['#item']['shop_id']) {
             $this->CI->theme->messages_add('Bạn không có quyền truy cập vào trang này', 'error');
             redirect();
@@ -265,7 +266,7 @@ class Shop extends Entity {
         if (isset($attributes['entity_id']) && $attributes['entity_id'] == 'me') {
             $attributes['entity_id'] = 0;
 
-            $shop = $this->entity_load_by_user(zerophp_user_current());
+            $shop = $this->loadEntity_by_user(zerophp_user_current());
             if (!empty($shop->shop_id)) {
                 $attributes['entity_id'] = $shop->shop_id;
             }
@@ -283,8 +284,8 @@ class Shop extends Entity {
         $shop_id = $block->shop_id;
 
         $entity = Entity::loadEntityObject('shop');
-        $shop = $this->CI->shop->entity_load($shop_id);
-        $saleman = $this->CI->users->entity_load($shop->created_by);
+        $shop = $this->CI->shop->loadEntity($shop_id);
+        $saleman = $this->CI->users->loadEntity($shop->created_by);
 
        //fw_devel_print($shop);
 
@@ -321,8 +322,8 @@ class Shop extends Entity {
             && isset($uri[3]) && is_numeric($uri[3])
         ) {
             $entity = Entity::loadEntityObject('shop_topic');
-            $topic = $this->CI->shop_topic->entity_load($uri[3]);
-            $shop = $this->entity_load_by_user($topic->created_by);
+            $topic = $this->CI->shop_topic->loadEntity($uri[3]);
+            $shop = $this->loadEntity_by_user($topic->created_by);
 
             $block->shop_id = $shop->shop_id;
             return true;

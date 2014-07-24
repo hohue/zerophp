@@ -242,8 +242,15 @@ class Response {
                 break;
             
             default:
+                if ($this->isAdminPanel()) {
+                    $page = 'page-admin';
+                }
+                else {
+                    $page = 'page';
+                }
+
                 $this->_buildData();
-                $output = \View::make('layouts/page', $this->getData());
+                $output = \View::make("layouts/$page", $this->getData());
                 break;
         }
 

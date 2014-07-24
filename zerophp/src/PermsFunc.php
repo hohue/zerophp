@@ -6,13 +6,10 @@ use ZeroPHP\ZeroPHP\Entity;
 class PermsFunc extends Entity {
 
     function __construct() {
-        parent::__construct();
-
-        
-
         $this->setStructure(array(
             'id' => 'perms_func_id',
             'name' => 'perms_func',
+            'class' => 'ZeroPHP\ZeroPHP\PermsFunc',
             'title' => zerophp_lang('Permissions function'),
             'fields' => array(
                 'perm_id' => array(
@@ -52,15 +49,15 @@ class PermsFunc extends Entity {
         ));
     }
 
-    function entity_load_from_access_key($access_key, $attributes = array()) {
-        $cache_name = "Perms_func-entity_load_from_access_key-$access_key";
+    function loadEntity_from_access_key($access_key, $attributes = array()) {
+        $cache_name = "Perms_func-loadEntity_from_access_key-$access_key";
         if ($cache = \Cache::get($cache_name)) {
             return $cache;
         }
 
         $attributes['load_all'] = false;
         $attributes['where']['access_key'] = $access_key;
-        $result = reset($this->entity_load_executive(null, $attributes));
+        $result = reset($this->loadEntityExecutive(null, $attributes));
 
         \Cache::forever($cache_name, $result);
         return $result;

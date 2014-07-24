@@ -8,6 +8,7 @@ class Article extends Entity {
         $this->setStructure(array(
             'id' => 'article_id',
             'name' => 'article',
+            'class' => 'ZeroPHP\Article\Article',
             'title' => zerophp_lang('Article'),
             'fields' => array(
                 'article_id' => array(

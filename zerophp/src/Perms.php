@@ -7,13 +7,10 @@ use ZeroPHP\ZeroPHP\Entity;
 class Perms extends Entity {
 
     function __construct() {
-        parent::__construct();
-
-        
-
         $this->setStructure(array(
             'id' => 'perm_id',
             'name' => 'perms',
+            'class' => 'ZeroPHP\ZeroPHP\Perms',
             'title' => zerophp_lang('Permissions'),
             'fields' => array(
                 'perm_id' => array(
@@ -56,21 +53,21 @@ class Perms extends Entity {
         ));
     }
 
-    function entity_load_from_path($path, $attributes = array()) {
-        $cache_name = "Perms-entity_load_from_path-" . md5($path);
+    function loadEntity_from_path($path, $attributes = array()) {
+        $cache_name = "Perms-loadEntity_from_path-" . md5($path);
         if ($cache = \Cache::get($cache_name)) {
             return $cache;
         }
 
         $attributes['load_all'] = false;
         $attributes['where']['path'] = $path;
-        $result = reset($this->entity_load_executive(null, $attributes));
+        $result = reset($this->loadEntityExecutive(null, $attributes));
 
         \Cache::forever($cache_name, $result);
         return $result;
     }
 
-    function entity_load_all($attributes = array(), &$pager_sum = 0) {
+    function loadEntity_all($attributes = array(), &$pager_sum = 0) {
         if (!isset($attributes['order'])) {
             $attributes['order'] = array();
         }
@@ -83,6 +80,6 @@ class Perms extends Entity {
             $attributes['order']['perm_id'] = 'DESC';
         }
 
-        return parent::entity_load_all($attributes, $pager_sum);
+        return parent::loadEntity_all($attributes, $pager_sum);
     }
 }

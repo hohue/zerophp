@@ -9,13 +9,10 @@ class User extends Entity {
     private $expired = 7200; // 2 hours
 
     function __construct() {
-        parent::__construct();
-
-        
-
         $this->setStructure(array(
             'id' => 'user_id',
-            'name' => 'users',
+            'name' => 'user',
+            'class' => 'ZeroPHP\ZeroPHP\User',
             'title' => zerophp_lang('Users'),
             'fields' => array(
                 'user_id' => array(
@@ -128,7 +125,7 @@ class User extends Entity {
             $this->user = new stdClass();
             $this->user->user_id = 0;
             $this->user->roles = array(
-                1 => $this->CI->roles->entity_load(1),
+                1 => $this->CI->roles->loadEntity(1),
             );
         }
 
@@ -140,10 +137,10 @@ class User extends Entity {
         $_SESSION['user_id'] = $this->user->user_id;
     }
 
-    function entity_load_from_email($email, $attributes = array()) {
+    function loadEntity_from_email($email, $attributes = array()) {
         $attributes['load_all'] = false;
         $attributes['where']['email'] = $email;
-        return reset($this->entity_load_executive(null, $attributes));
+        return reset($this->loadEntityExecutive(null, $attributes));
     }
 
     function login_form() {
@@ -217,7 +214,7 @@ class User extends Entity {
             'cache' => false,
             'load_hidden' => true,
         );
-        $user = $this->entity_load_from_email($email, $attributes);
+        $user = $this->loadEntity_from_email($email, $attributes);
 
         if (isset($user->password) && $this->password_verify($password, $user->password)) {
             return true;
@@ -307,18 +304,18 @@ class User extends Entity {
             if ($entity_id) {
                 // Super admin
                 if ($entity_id == 1) {
-                    $result[3] = $this->CI->roles->entity_load(3, $attributes);
+                    $result[3] = $this->CI->roles->loadEntity(3, $attributes);
                 }
 
                 // Registered user
                 if (empty($result[2])) {
-                    $result[2] = $this->CI->roles->entity_load(2, $attributes);
+                    $result[2] = $this->CI->roles->loadEntity(2, $attributes);
                 }
             }
 
             // Anonymous user
             else {
-                $result[1] = $this->CI->roles->entity_load(1, $attributes);
+                $result[1] = $this->CI->roles->loadEntity(1, $attributes);
             }
         }
 
@@ -330,16 +327,16 @@ class User extends Entity {
         return $result;
     }
 
-    function entity_load_executive($entity_id = null, $attributes = array(), $pager_sum = 1) {
+    function loadEntityExecutive($entity_id = null, $attributes = array(), $pager_sum = 1) {
         // Get from cache
         if (!isset($attributes['cache']) || $attributes['cache']) {
-            $cache_name = "Users-entity_load_executive-$entity_id-" . serialize($attributes);
+            $cache_name = "Users-loadEntityExecutive-$entity_id-" . serialize($attributes);
             if ($cache_content = \Cache::get($cache_name)) {
                 return $cache_content;
             }
         }
 
-        $entities = parent::entity_load_executive($entity_id, $attributes, $pager_sum);
+        $entities = parent::loadEntityExecutive($entity_id, $attributes, $pager_sum);
 
         foreach ($entities as $key => $entity) {
             $entities[$key]->created_by = $entity->user_id;
@@ -505,7 +502,7 @@ class User extends Entity {
     }
 
     function forgot_pass_form_submit($form_id, $form, &$form_values) {
-        $user = $this->entity_load_from_email($form_values['email']);
+        $user = $this->loadEntity_from_email($form_values['email']);
 
         $entity = Entity::loadEntityObject('activation');
         $hash = $this->CI->activation->hash_set($user->user_id, 'users_reset_pass');

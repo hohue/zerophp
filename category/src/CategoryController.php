@@ -13,7 +13,7 @@ class CategoryController extends Controller {
         }
 
         if (!empty($data['category_id'])) {
-            $category = $this->category->entity_load(intval($data['category_id']));
+            $category = $this->category->loadEntity(intval($data['category_id']));
 
             if (!empty($category->parent)) {
                 $structure['fields']['parent']['value'] = reset(array_keys($category->parent));
@@ -40,7 +40,7 @@ class CategoryController extends Controller {
         }
 
         if (!empty($data['user_id'])) {
-            $users_profile = $this->users_profile->entity_load(intval($data['user_id']));
+            $users_profile = $this->users_profile->loadEntity(intval($data['user_id']));
 
             if (!empty($users_profile->district_id)) {
                 $structure['fields']['district_id']['value'] = reset(array_keys($users_profile->district_id));

@@ -6,13 +6,10 @@ use ZeroPHP\ZeroPHP\Entity;
 class ShopCart extends Entity {
 
     function __construct() {
-        parent::__construct();
-
-        
-
         $this->setStructure(array(
             'id' => 'shop_cart_id',
             'name' => 'shop_cart',
+            'class' => 'ZeroPHP\Shop\ShopCart',
             'title' => 'Shop cart',
             'fields' => array(
                 'shop_cart_id' => array(

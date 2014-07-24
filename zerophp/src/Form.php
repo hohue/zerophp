@@ -457,7 +457,7 @@ class Form {
             $ref_structure = $field['reference']['class']::getStructure();
 
             if (empty($field['reference_option'])) {
-                $reference = $this->CI->{$field['reference']}->entity_load_all();
+                $reference = $this->CI->{$field['reference']}->loadEntity_all();
             }
             else {
                 $entity = Entity::loadEntityObject($field['reference_option']['library']);

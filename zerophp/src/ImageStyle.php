@@ -3,16 +3,13 @@ namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
 
-class Image_style extends Entity {
+class ImageStyle extends Entity {
 
     function __construct() {
-        parent::__construct();
-
-        
-
         $this->setStructure(array(
             'id' => 'style',
             'name' => 'image_style',
+            'class' => 'ZeroPHP\ZeroPHP\ImageStyle',
             'title' => zerophp_lang('Image style'),
             'fields' => array(
                 'style' => array(
@@ -59,9 +56,9 @@ class Image_style extends Entity {
         $entity = Entity::loadEntityObject('image_lib', $config);
 
         if (!file_exists($path_style)) {
-            $style = $this->entity_load($style);
+            $style = $this->loadEntity($style);
             if (empty($style->style)) {
-                $style = $this->entity_load('normal');
+                $style = $this->loadEntity('normal');
             }
 
             $this->_create_directory($path_style);
