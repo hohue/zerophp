@@ -13,6 +13,7 @@ class Request {
     );
 
     public $data = array(
+        'alias' => '',
         'prefix' => 'normal',
         'url' => '',
         'segment' => array(),
@@ -26,14 +27,10 @@ class Request {
 
     //@todo 3 Get controller from DB
     public function getController() {
-        $url = $this->url();
+        // Get menu with url
+        $menu = $this->_getMenu();
 
-        //@todo 1 Get menu from URLAlias
-        // Get menu with wildcard
-
-        $menu_obj = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Menu');
-        $menu = $menu_obj->loadEntityByPath($this->url());
-
+        $result = array();
         if (isset($menu->class) && isset($menu->method)) {
             if (isset($menu->title)) {
                 zerophp_get_instance()->response->addTitle(zerophp_lang($menu->title));
@@ -45,7 +42,28 @@ class Request {
             );
         }
 
-        //@todo 1 Return page-404
+        \App::abort(404);
+    }
+
+    private function _getMenu($segment = null) {
+        // Start point
+        if ($segment === null) {
+            $segment = $this->segment();
+        }
+
+        $url = implode('/', $segment);
+        $menu = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Menu')->loadEntityByPath($url);
+
+        if (isset($menu->menu_id)) {
+            return $menu;
+        }
+
+        array_pop($segment);
+        if (count($segment)) {
+            return $this->_getMenu($segment);
+        }
+
+        return false;
     }
 
     public function url() {
@@ -56,20 +74,29 @@ class Request {
         return $this->data['prefix'];
     }
 
-    public function segment($index = null) {
+    public function segment($index = 'all') {
         return $this->_getDataIndex('segment', $index);
     }
 
-    public function filter($index = null) {
+    public function filter($index = 'all') {
         return $this->_getDataIndex('filter', $index);
     }
 
-    public function query($index = null) {
+    public function query($index = 'all') {
         return $this->_getDataIndex('query', $index);
     }
 
     private function _parseURI() {
-        $uri  = explode('/', strtolower(\Request::path()));
+        $uri = \Request::path();
+
+        // Get URL real from url alias
+        $alias = Entity::loadEntityObject('ZeroPHP\ZeroPHP\UrlAlias')->loadEntityByAlias($uri);
+        if (isset($alias->url_real)) {
+            $this->data['alias'] = $uri;
+            $uri = $alias->url_real;
+        }
+
+        $uri  = explode('/', strtolower($uri));
 
         // Get Prefix
         if (in_array($uri[0], $this->path_prefix)) {

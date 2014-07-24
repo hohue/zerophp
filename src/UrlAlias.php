@@ -69,8 +69,10 @@ class UrlAlias extends Entity {
         $url_alias = $this->loadEntityExecutive(null, $attributes);
 
         if (count($url_alias)) {
-            $url_alias = reset($url_alias);
+            return reset($url_alias);
         }
+
+        return false;
     }
 
     function loadEntityByReal($path) {
@@ -82,8 +84,10 @@ class UrlAlias extends Entity {
         $url_real = $this->loadEntityExecutive(null, $attributes);
 
         if (count($url_real)) {
-            $url_real = reset($url_real);
+            return reset($url_real);
         }
+
+        return false;
     }
 
     function verify($url_real, $url_alias, $validate = true) {

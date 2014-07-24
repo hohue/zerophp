@@ -64,14 +64,16 @@ class EntityModel {
     }
 
     private static function _buildLoadEntityWhere(&$db, $entity_id = 0, $structure, $attributes = array()) {
-        $filter = zerophp_get_instance()->request->filter();
-        if ((!isset($attributes['filter']) || $attributes['filter'] == true)
-            && count($filter) > 1
-            && !empty($filter['e'])
-            && $filter['e'] == $structure['name']) {
-            foreach ($filter as $key => $value) {
-                if (isset($structure['fields'][$key])) {
-                    $attributes['where'][$key] = $value;
+        // Filter
+        $zerophp =& zerophp_get_instance();
+        if (isset($zerophp->request)) {
+            $filter = $zerophp->request->filter();
+            if ((!isset($attributes['filter']) || $attributes['filter'] == true)
+                && count($filter) > 1 && !empty($filter['name']) && $filter['name'] == $structure['name']) {
+                foreach ($filter as $key => $value) {
+                    if (isset($structure['fields'][$key])) {
+                        $attributes['where'][$key] = $value;
+                    }
                 }
             }
         }
