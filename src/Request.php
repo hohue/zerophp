@@ -26,12 +26,12 @@ class Request {
 
     //@todo 3 Get controller from DB
     public function getController() {
+        $url = $this->url();
 
         //@todo 1 Get menu from URLAlias
         // Get menu with wildcard
 
         $menu_obj = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Menu');
-
         $menu = $menu_obj->loadEntityByPath($this->url());
 
         if (isset($menu->class) && isset($menu->method)) {

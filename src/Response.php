@@ -83,7 +83,6 @@ class Response {
 
         if (count($regions)) {
             $block = Entity::loadEntityObject('\ZeroPHP\ZeroPHP\Block');
-            //@todo 5 get All of blocks
             $blocks = $block->loadEntityAll();
             foreach ($regions as $region_key => $region_name) {
                 if (isset($blocks[$region_key]) && count($blocks[$region_key])) {

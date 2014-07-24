@@ -41,15 +41,8 @@ class Entity {
         $entity_name = zerophp_uri_validate($entity);
         $entity_name = str_replace('-', '_', $entity_name);
 
-        if (isset($zerophp->entity['zerophp_zerophp_languagetranslate'])) {
-            zerophp_devel_print($zerophp->entity, $entity_name);
-        }
-
         if (!isset($zerophp->entity[$entity_name])) {
             $zerophp->entity[$entity_name] = new $entity;
-        }
-        else {
-            zerophp_devel_print($zerophp->entity);
         }
 
         return $zerophp->entity[$entity_name];

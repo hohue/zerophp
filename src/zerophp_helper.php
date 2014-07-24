@@ -49,15 +49,14 @@ function zerophp_lang($line, $trans = array()) {
         $zerophp = zerophp_get_instance();
 
         if ($zerophp->language != 'en') {
-            $translate = zerophp_get_instance()->translate;
-            if (isset($translate[$line])) {
-                $line = $translate[$line];
+            if (isset($zerophp->translate[$line])) {
+                $line = $zerophp->translate[$line];
             }
+            // Insert English line to DB
             else {
-                //$translate = Entity::loadEntityObject('ZeroPHP\ZeroPHP\LanguageTranslate');
-                /*$translate_new = new stdClass();
-                $translate_new->en = $line;
-                $translate->saveEntity($translate_new);*/
+                if (!\DB::table('language_translate')->where('en', $line)->first()) {
+                    \DB::table('language_translate')->insert(array('en' => $line));
+                }
             }
         }
 
