@@ -25,21 +25,19 @@ class ZeroPHP {
         //@todo 9 Support Multi-language
         $this->language = \Config::get('app.locale', 'en');
         $this->translate = array();
-        /*if ($this->language != 'en') {
-            $translate = Entity::loadEntityObject('ZeroPHP\ZeroPHP\LanguageTranslate');
+        if ($this->language != 'en') {
+            $translate = Entity::loadEntityObject('\ZeroPHP\ZeroPHP\LanguageTranslate');
             $this->translate = $translate->loadEntityAllByLanguage($this->language);
-        }*/
+        }
 
         $controller = $this->request->getController();
         $class = new $controller['class'];
-        $class->$controller['method']($this->getInstance());
+        $class->$controller['method']($this);
 
         // Flush cache for Development Environment
         if (\Config::get('app.environment', 'production') == 'development') {
             \Cache::flush();
         }
-
-        //zerophp_devel_print($this->getInstance());
 
         return $this->response->output();
     }
