@@ -1,5 +1,7 @@
 <?php
 
+use ZeroPHP\ZeroPHP\Entity;
+
 function zerophp_devel_print($args) {
     $args = func_get_args();
     print '<pre>';
@@ -43,19 +45,27 @@ function zerophp_uri_validate($text) {
     return $text;
 }
 
-function zerophp_lang($line = '', $translate = array()) {
-        //@todo 5 get from DB
-        $value = '';
+function zerophp_lang($line, $trans = array()) {
+        $zerophp = zerophp_get_instance();
 
-        if (!$value) {
-            $value = $line;
+        if ($zerophp->language != 'en') {
+            $translate = zerophp_get_instance()->translate;
+            if (isset($translate[$line])) {
+                $line = $translate[$line];
+            }
+            else {
+                //$translate = Entity::loadEntityObject('ZeroPHP\ZeroPHP\LanguageTranslate');
+                /*$translate_new = new stdClass();
+                $translate_new->en = $line;
+                $translate->saveEntity($translate_new);*/
+            }
         }
 
-        if ($value && count($translate)) {
-            $value = strtr($value, $translate);
+        if (count($trans)) {
+            $line = strtr($line, $trans);
         }
 
-        return $value;
+        return $line;
 }
 
 

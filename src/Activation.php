@@ -17,6 +17,7 @@ class Activation extends Entity {
         $this->setStructure(array(
             'id' => 'activation_id',
             'name' => 'activation',
+            'class' => 'ZeroPHP\ZeroPHP\Activation',
             'title' => zerophp_lang('Activation'),
             'fields' => array(
                 'activation_id' => array(
@@ -70,7 +71,7 @@ class Activation extends Entity {
 
     function hash_set($destination_id, $type = 'users') {
         // Load activation
-        $activation = $this->entity_load_from_destination($destination_id, array(
+        $activation = $this->loadEntity_from_destination($destination_id, array(
             'where' => array(
                 'expired >=' => time(),
             ),
@@ -91,28 +92,28 @@ class Activation extends Entity {
         return $activation->hash;
     }
 
-    function entity_load_from_hash($hash, $attributes = array()) {
+    function loadEntity_from_hash($hash, $attributes = array()) {
         $attributes['load_all'] = false;
         $attributes['where']['hash'] = $hash;
         $attributes['where']['expired >='] = time();
-        return reset($this->entity_load_executive(null, $attributes));
+        return reset($this->loadEntityExecutive(null, $attributes));
     }
 
-    function entity_load_from_destination($destination_id, $attributes = array()) {
+    function loadEntity_from_destination($destination_id, $attributes = array()) {
         $attributes['load_all'] = false;
         $attributes['where']['destination_id'] = $destination_id;
-        return reset($this->entity_load_executive(null, $attributes));
+        return reset($this->loadEntityExecutive(null, $attributes));
     }
 
     function active_users($hash) {
-        $activation = $this->entity_load_from_hash($hash, array(
+        $activation = $this->loadEntity_from_hash($hash, array(
             'where' => array(
                 'type' => 'users',
             ),
         ));
 
         if (!empty($activation->destination_id) && ($activation->expired >= time())) {
-            $user = $this->CI->users->entity_load($activation->destination_id, array('check_active' => false));
+            $user = $this->CI->users->loadEntity($activation->destination_id, array('check_active' => false));
 
             $user_update = new stdClass();
             $user_update->user_id = $user->user_id;
@@ -175,7 +176,7 @@ class Activation extends Entity {
         }
 
         // Account activated
-        $user = $this->CI->users->entity_load_from_email($form_values['email'], array(
+        $user = $this->CI->users->loadEntity_from_email($form_values['email'], array(
             'where' => array(
                 'active' => 0,
             ),
@@ -204,7 +205,7 @@ class Activation extends Entity {
     }
 
     function users_reset_pass_form($hash) {
-        $activation = $this->entity_load_from_hash($hash);
+        $activation = $this->loadEntity_from_hash($hash);
 
         if (!$activation->destination_id) {
             $this->CI->theme->messages_add(lang('Your reset password link is not match or has expired.'), 'error');

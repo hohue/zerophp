@@ -7,11 +7,11 @@ class RolesController extends Controller {
     }
 
     function permissions() {
-        $roles = $this->roles->entity_load_all(array('cache' => false));
+        $roles = $this->roles->loadEntity_all(array('cache' => false));
         $access = $this->roles->access_get_list('', false);
 
         $this->load->library('perms');
-        $permissions = $this->perms->entity_load_all(array('cache' => false));
+        $permissions = $this->perms->loadEntity_all(array('cache' => false));
 
         $vars = array(
             'form_id' => $this->roles->permissions_form($roles, $permissions, $access),

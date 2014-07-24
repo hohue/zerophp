@@ -13,6 +13,7 @@ class Block extends Entity {
         $this->setStructure(array(
             'id' => 'block_id',
             'name' => 'block',
+            'class' => 'ZeroPHP\ZeroPHP\Block',
             'title' => zerophp_lang('Block'),
             'fields' => array(
                 'block_id' => array(
@@ -127,10 +128,9 @@ class Block extends Entity {
                 }
             }
 
-            $class = new $block->library;
-            $method = $block->function;
+            $class = new $block->class;
+            $method = $block->method;
             $block_content = $class->$method($block);
-            //$block_content = 'Hello AK';
 
             if ($block->cache_type) {
                 \Cache::put($cache_name, $block_content, ZEROPHP_CACHE_EXPIRE_TIME);
@@ -147,7 +147,7 @@ class Block extends Entity {
             return true;
         }
 
-        $class = new $block->library;
+        $class = new $block->class;
         $method = $block->access;
 
         return $class->$method($block);
