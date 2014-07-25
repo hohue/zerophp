@@ -132,6 +132,10 @@ function zerophp_is_adminpanel() {
     return zerophp_get_instance()->response->isAdminPanel();
 }
 
+function zerophp_message() {
+    return zerophp_get_instance()->response->getMessage();
+}
+
 function &zerophp_get_instance() {
     return \ZeroPHP\ZeroPHP\ZeroPHP::getInstance();
 }
