@@ -29,16 +29,16 @@ class ShopCart extends Entity {
                     'type' => 'textarea',
                     'form_hidden' => 1,
                 ),
-                'created_date' => array(
-                    'name' => 'created_date',
-                    'title' => 'created_date',
+                'created_at' => array(
+                    'name' => 'created_at',
+                    'title' => 'created_at',
                     'type' => 'input',
                     'widget' => 'date_timestamp',
                     'form_hidden' => 1,
                 ),
-                'updated_date' => array(
-                    'name' => 'updated_date	',
-                    'title' => 'updated_date',
+                'updated_at' => array(
+                    'name' => 'updated_at	',
+                    'title' => 'updated_at',
                     'type' => 'input',
                     'widget' => 'date_timestamp',
                     'form_hidden' => 1,

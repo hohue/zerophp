@@ -152,3 +152,11 @@ function zerophp_flush_cache_view() {
             }
         }  
 }
+
+function zerophp_is_login() {
+    if (\Auth::check() || \Auth::viaRemember()) {
+        return true;
+    }
+
+    return false;
+}

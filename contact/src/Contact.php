@@ -47,8 +47,8 @@ class Contact extends Entity {
                     'validate' => 'required',
                     'required' => true,
                 ),
-                'created_date' => array(
-                    'name' => 'created_date',
+                'created_at' => array(
+                    'name' => 'created_at',
                     'title' => zerophp_lang('Created date'),
                     'type' => 'input',
                     'widget' => 'date_timestamp',

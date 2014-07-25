@@ -1,7 +1,7 @@
 <?php
 namespace ZeroPHP\ZeroPHP;
 
-class UserModel {
+class UsersModel {
 
     function user_id_get($email) {
         $this->db->select('user_id');

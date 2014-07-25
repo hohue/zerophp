@@ -38,8 +38,8 @@ class Metadata extends Entity {
                     'type' => 'textarea',
                     'display_hidden' => 1,
                 ),
-                'updated_date' => array(
-                    'name' => 'updated_date',
+                'updated_at' => array(
+                    'name' => 'updated_at',
                     'title' => zerophp_lang('Updated date'),
                     'type' => 'input',
                     'widget' => 'date_timestamp',

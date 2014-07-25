@@ -35,15 +35,15 @@ class Article extends Entity {
                     'rte_enable' => 1,
                     'display_hidden' => 1,
                 ),
-                'created_date' => array(
-                    'name' => 'created_date',
+                'created_at' => array(
+                    'name' => 'created_at',
                     'title' => zerophp_lang('Created date'),
                     'type' => 'input',
                     'widget' => 'date_timestamp',
                     'form_hidden' => 1,
                 ),
-                'updated_date' => array(
-                    'name' => 'updated_date',
+                'updated_at' => array(
+                    'name' => 'updated_at',
                     'title' => zerophp_lang('Updated date'),
                     'type' => 'input',
                     'widget' => 'date_timestamp',

@@ -3,16 +3,12 @@ namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
 
-class User extends Entity {
-
-    private $user;
-    private $expired = 7200; // 2 hours
-
+class Users extends Entity {
     function __construct() {
         $this->setStructure(array(
             'id' => 'user_id',
             'name' => 'user',
-            'class' => 'ZeroPHP\ZeroPHP\User',
+            'class' => 'ZeroPHP\ZeroPHP\Users',
             'title' => zerophp_lang('Users'),
             'fields' => array(
                 'user_id' => array(
@@ -68,23 +64,29 @@ class User extends Entity {
                     'validate' => 'numeric|greater_than[-1]|less_than[3]',
                     'default' => 0,
                 ),
-                'created_date' => array(
-                    'name' => 'created_date',
-                    'title' => zerophp_lang('Registered date'),
+                'remember_token' => array(
+                    'name' => 'remember_token',
+                    'title' => zerophp_lang('Remember token'),
                     'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1,
-                ),
-                'updated_date' => array(
-                    'name' => 'updated_date',
-                    'title' => zerophp_lang('Updated date'),
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
                     'form_hidden' => 1,
                 ),
                 'last_activity' => array(
                     'name' => 'last_activity',
                     'title' => zerophp_lang('Last active'),
+                    'type' => 'input',
+                    'widget' => 'date_timestamp',
+                    'form_hidden' => 1,
+                ),
+                'created_at' => array(
+                    'name' => 'created_at',
+                    'title' => zerophp_lang('Registered date'),
+                    'type' => 'input',
+                    'widget' => 'date_timestamp',
+                    'form_hidden' => 1,
+                ),
+                'updated_at' => array(
+                    'name' => 'updated_at',
+                    'title' => zerophp_lang('Updated date'),
                     'type' => 'input',
                     'widget' => 'date_timestamp',
                     'form_hidden' => 1,
@@ -99,16 +101,19 @@ class User extends Entity {
             ),
             'can_not_delete' => array(1),
         ));
-
-        // Get default data
-        $this->user_set();
     }
 
-    function user_get() {
+
+
+
+
+
+
+    function getUser() {
         return $this->user;
     }
 
-    function user_set() {
+    function setUser() {
         $user = $this->CI->session->userdata('users-user');
         $last_activity = $this->CI->session->userdata('last_activity');
 
@@ -255,7 +260,7 @@ class User extends Entity {
                     'users-user' => $user_update,
                 );
                 $this->CI->session->set_userdata($data);
-                $this->user_set();
+                $this->setUser();
 
                 $this->CI->theme->messages_add(lang('You have been successfully logged in...'));
             }
@@ -275,7 +280,7 @@ class User extends Entity {
 
     function logout() {
         $this->CI->session->unset_userdata('users-user');
-        $this->user_set();
+        $this->setUser();
         $this->CI->theme->messages_add(lang('You are successfully logout.'));
     }
 
