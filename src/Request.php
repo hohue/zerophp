@@ -41,6 +41,7 @@ class Request {
                 return array(
                     'class' => $menu->class,
                     'method' => $menu->method,
+                    'arguments' => $menu->arguments,
                 );
             }
         }

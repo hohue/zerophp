@@ -33,7 +33,8 @@ class ZeroPHP {
 
         $controller = $this->request->getController();
         $class = new $controller['class'];
-        $class->$controller['method']($this);
+        $controller['arguments'] = $controller['arguments'] ? explode('|', $controller['arguments']) : array();
+        $class->$controller['method']($this, $controller['arguments']);
 
         // Flush cache for Development Environment
         if (\Config::get('app.environment', 'production') == 'development') {
