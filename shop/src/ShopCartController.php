@@ -2,10 +2,10 @@
 use ZeroPHP\ZeroPHP\Theme;
 
 class ShopcartController extends Controller {
-    function items() {
+    function showItems() {
         $vars = array(
             'items' => 0,
         );
-        $zerophp->response->addContent('shop_cart_items|shop_cart', '', $vars);
+        $zerophp->response->addContent(zerophp_view('shop_cart_items', $vars));
     }
 }

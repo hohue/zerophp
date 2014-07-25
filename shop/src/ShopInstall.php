@@ -53,6 +53,20 @@ class ShopInstall {
                 'active' => 1,
             ),
         ));
+
+        // Add some menus
+        \DB::table('menu')->insert(array(
+            array(
+                'title' => 'Sop cart items', 
+                'cache' => '',
+                'path' => 'shopcart/items',
+                'class' => 'ZeroPHP\\Shop\\ShopcartController',
+                'method' => 'showItems',
+                'access' => '',
+                'weight' => 0, 
+                'active' => 1,
+            ),
+        ));
     }
 
     private static function down_0_01() {
