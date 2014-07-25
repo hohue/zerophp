@@ -2,10 +2,10 @@
 use ZeroPHP\ZeroPHP;
 
 class ResponseController {
-    function message($zerophp) {
+    function showMessage($zerophp) {
         $vars = array(
             'messages' => $zerophp->response->getMessage(),
         );
-        $zerophp->response->addContent('response_message', '', $vars);
+        $zerophp->response->addContent(zerophp_view(('response_message', $vars));
     }
 }
