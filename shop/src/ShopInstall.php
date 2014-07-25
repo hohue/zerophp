@@ -22,49 +22,36 @@ class ShopInstall {
             array(
                 'title' => 'shop_information for topic', 
                 'cache_type' => 'page',
-                'region' => 'right sidebar', 
-                'content' => '', 
+                'region' => 'right sidebar',
                 'class' => 'ZeroPHP\\Shop\\Shop',
                 'method' => 'shop_information', 
                 'access' => 'shop_information_access_for_topic',
-                'weight' => 0, 
-                'active' => 1,
             ),
             array(
                 'title' => 'shop_information for shop', 
                 'cache_type' => 'page',
-                'region' => 'right sidebar', 
-                'content' => '', 
+                'region' => 'right sidebar',
                 'class' => 'ZeroPHP\\Shop\\Shop',
                 'method' => 'shop_information', 
                 'access' => 'shop_information_access_for_shop',
-                'weight' => 0, 
-                'active' => 1,
             ),
             array(
                 'title' => 'shop_topic_warning', 
                 'cache_type' => 'full',
-                'region' => 'right sidebar', 
-                'content' => '', 
+                'region' => 'right sidebar',
                 'class' => 'ZeroPHP\\Shop\\ShopTopic',
                 'method' => 'shop_topic_warning', 
                 'access' => 'shop_topic_warning_access',
-                'weight' => 0, 
-                'active' => 1,
             ),
         ));
 
         // Add some menus
         \DB::table('menu')->insert(array(
             array(
-                'title' => 'Sop cart items', 
-                'cache' => '',
+                'title' => 'Sop cart items',
                 'path' => 'shopcart/items',
                 'class' => 'ZeroPHP\\Shop\\ShopcartController',
                 'method' => 'showItems',
-                'access' => '',
-                'weight' => 0, 
-                'active' => 1,
             ),
         ));
     }
