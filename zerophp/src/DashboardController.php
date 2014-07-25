@@ -9,6 +9,5 @@ class DashboardController {
         else {
             $zerophp->response->addContent(zerophp_view('dashboard'), zerophp_lang('Homepage'));
         }
-        
     }
 }

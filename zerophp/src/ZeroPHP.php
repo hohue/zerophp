@@ -38,6 +38,7 @@ class ZeroPHP {
         // Flush cache for Development Environment
         if (\Config::get('app.environment', 'production') == 'development') {
             \Cache::flush();
+            zerophp_flush_cache_view();
         }
 
         return $this->response->output();

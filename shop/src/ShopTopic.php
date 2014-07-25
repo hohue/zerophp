@@ -140,7 +140,7 @@ class ShopTopic extends Entity {
         return zerophp_view('shop_topic_block_topic_warning|shop_topic', $data);
     }
 
-    function shop_topic_warning_access_for_topic($block) {
+    function shop_topic_warning_access($block) {
         $uri = explode('/', \URL::current());
 
         if (isset($uri[0]) && $uri[0] == 'e' && isset($uri[1]) && $uri[1] == 'read' && isset($uri[2]) && $uri[2] == 'shop_topic' && isset($uri[3]) && is_numeric($uri[3])) {
