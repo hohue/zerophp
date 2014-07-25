@@ -58,6 +58,17 @@ class SystemInstall {
             });
         }
 
+        \Schema::create('users', function($table) {
+            $table->increments('user_id');
+            $table->string('title', 128);
+            $table->string('email', 128);
+            $table->string('password', 128);
+            $table->boolean('active');
+            $table->rememberToken();
+            $table->timestamp('last_activity');
+            $table->timestamps();
+        });
+
         // Insert Default Data
         \DB::table('block')->insert(array(
             array(
@@ -102,5 +113,6 @@ class SystemInstall {
         \Schema::drop('block');
         \Schema::drop('menu');
         \Schema::drop('urlalias');
+        \Schema::drop('users');
     }
 }

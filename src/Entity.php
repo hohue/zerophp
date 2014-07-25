@@ -691,14 +691,14 @@ class Entity {
                     $entity->{$key} = zerophp_user_current();
                     break;
 
-                case 'created_date':
+                case 'created_at':
                     if (!isset($form_values[$this->structure['id']])) {
                         $widget = 'entity_widget_' . $value['widget'] . '_make';
                         $entity->{$key} = $widget(time());
                     }
                     break;
 
-                case 'updated_date':
+                case 'updated_at':
                     $widget = 'entity_widget_' . $value['widget'] . '_make';
                     $entity->{$key} = $widget(time());
                     break;

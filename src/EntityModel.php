@@ -18,11 +18,11 @@ class EntityModel {
             $db->orderBy('weight', 'ASC');
         }
 
-        if (!isset($order['updated_date']) && isset($structure['fields']['updated_date'])) {
-            $db->orderBy('updated_date', 'DESC');
+        if (!isset($order['updated_at']) && isset($structure['fields']['updated_at'])) {
+            $db->orderBy('updated_at', 'DESC');
         }
-        elseif (!isset($order['created_date']) && isset($structure['fields']['created_date'])) {
-            $db->orderBy('created_date', 'DESC');
+        elseif (!isset($order['created_at']) && isset($structure['fields']['created_at'])) {
+            $db->orderBy('created_at', 'DESC');
         }
 
         if (!isset($order['title']) && isset($structure['fields']['title'])) {
