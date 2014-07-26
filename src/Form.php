@@ -106,8 +106,8 @@ class Form {
                 unset($this->form_values[$form_id]);
             }
 
-            if (!empty($_GET['destination'])) {
-                $redirect = $_GET['destination'];
+            if (!empty($zerophp->request->query('destination'))) {
+                $redirect = $zerophp->request->query('destination');
             }
             elseif(!empty($this->form_items[$form_id]['#redirect'])) {
                 $redirect = $this->form_items[$form_id]['#redirect'];
@@ -247,7 +247,7 @@ class Form {
         }
     }
 
-    function form_build($form_id, $form = array(), $form_values = array(), $cache = true) {
+    function build($form_id, $form = array(), $form_values = array(), $cache = true) {
         if ($cache && $cache_value = \Cache::get("Form-form_build-$form_id")) {
             $this->form_items[$form_id] = $cache_value;
         }

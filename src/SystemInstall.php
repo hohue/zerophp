@@ -172,22 +172,78 @@ class SystemInstall {
             array(
                 'title' => 'Homepage',
                 'path' => '/',
+                'arguments' => '',
                 'class' => 'ZeroPHP\\ZeroPHP\\DashboardController',
                 'method' => 'showHomepage',
             ),
             array(
                 'title' => 'Message',
                 'path' => 'response/message',
+                'arguments' => '',
                 'class' => 'ZeroPHP\\ZeroPHP\\ResponseController',
                 'method' => 'showMessage',
             ),
             array(
-                'title' => 'Message',
+                'title' => 'User Login',
                 'path' => 'user/login',
+                'arguments' => '',
                 'class' => 'ZeroPHP\\ZeroPHP\\UserController',
                 'method' => 'showLoginForm',
             ),
+            array(
+                'title' => 'User Logout',
+                'path' => 'user/logout',
+                'arguments' => '',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'userLogout',
+            ),
+            array(
+                'title' => 'User Register',
+                'path' => 'user/register',
+                'arguments' => '',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'showRegisterForm',
+            ),
+            array(
+                'title' => 'User Activation',
+                'path' => 'user/activation/%',
+                'arguments' => '2',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'userActivation',
+            ),
+            array(
+                'title' => 'User Resend Activation Code',
+                'path' => 'user/activation/resend',
+                'arguments' => '',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'userActivationResendForm',
+            ),
+            array(
+                'title' => 'User Change Password',
+                'path' => 'user/changepass',
+                'arguments' => '',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'userChangePasswordForm',
+            ),
+            array(
+                'title' => 'User Activation',
+                'path' => 'user/forgotpass',
+                'arguments' => '',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'userForgotPasswordForm',
+            ),
+            array(
+                'title' => 'User Activation',
+                'path' => 'user/resetpass/%',
+                'arguments' => '2',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'userResetPasswordForm',
+            ),
         ));
+
+
+        //Set Variables
+        zerophp_variable_set('ZEROPHP_CACHE_EXPIRE_TIME', 10);
     }
 
     private static function down_0_01() {

@@ -62,7 +62,7 @@ class Activation extends Entity {
 
             $content = array(
                 'email' => $form_values['email'],
-                'active_link' => site_url('activation/users/' . $hash),
+                'active_link' => \URL::to('activation/users/' . $hash),
             );
             $entity = Entity::loadEntityObject('mail');
             $this->CI->mail->send($form_values['email'], fw_variable_get('Activation email template users subject', 'Active your acount'), $content, 'mail_template_activation_users|activation');
@@ -161,7 +161,7 @@ class Activation extends Entity {
             'function' => 'resend_users_form_submit',
         );
 
-        $form['#redirect'] = site_url();
+        $form['#redirect'] = \URL::to();
 
         $form_id = 'activation-resend_form';
         $this->CI->form->form_build($form_id, $form);
@@ -196,7 +196,7 @@ class Activation extends Entity {
         // Send Email
         $content = array(
             'email' => $form_values['email'],
-            'active_link' => site_url("activation/users/$hash")
+            'active_link' => \URL::to("activation/users/$hash")
         );
         $entity = Entity::loadEntityObject('mail');
         $this->CI->mail->send($form_values['email'], fw_variable_get('Activation email template users resend subject', 'Resend activation code'), $content, 'mail_template_activation_users_resend|activation');
@@ -209,7 +209,7 @@ class Activation extends Entity {
 
         if (!$activation->destination_id) {
             $this->CI->theme->messages_add(lang('Your reset password link is not match or has expired.'), 'error');
-            redirect(site_url());
+            redirect(\URL::to());
         }
 
         $form['password'] = array(
@@ -265,7 +265,7 @@ class Activation extends Entity {
             'function' => 'users_reset_pass_form_submit',
         );
 
-        $form['#redirect'] = site_url();
+        $form['#redirect'] = \URL::to();
 
         $form_id = 'activation-users_reset_pass_form';
         $this->CI->form->form_build($form_id, $form);

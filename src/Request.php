@@ -96,7 +96,7 @@ class Request {
             foreach ($filter as $value) {
                 $value = explode('.', $value);
                 if (isset($value[0]) && isset($value[1])) {
-                    $result[$value[0]] = $value[1];
+                    $result[zerophp_uri_validate($value[0])] = zerophp_uri_validate($value[1]);
                 }
             }
         }
@@ -106,7 +106,7 @@ class Request {
 
     private function _parseQuery($query) {
         foreach ($query as $key => $value) {
-            $query[$key] = trim($value, '/');
+            $query[$key] = zerophp_uri_validate(trim($value, '/'));
         }
         return $query;
     }
