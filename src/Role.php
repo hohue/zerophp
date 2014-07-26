@@ -85,7 +85,7 @@ class Role extends Entity {
 
             $form['#submit'][] = array(
                 'class' => 'roles',
-                'function' => 'permissions_form_submit',
+                'method' => 'permissions_form_submit',
             );
 
             $form['#redirect'] = 'admin/roles/permissions';

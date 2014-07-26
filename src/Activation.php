@@ -52,7 +52,7 @@ class Activation extends Entity {
     function users_create_form_alter($form_id, &$form) {
         $form['#submit'][] = array(
             'class' => 'activation',
-            'function' => 'users_create_form_submit'
+            'method' => 'users_create_form_submit'
         );
     }
 
@@ -153,12 +153,12 @@ class Activation extends Entity {
 
         $form['#validate'][] = array(
             'class' => 'activation',
-            'function' => 'resend_users_form_validate',
+            'method' => 'resend_users_form_validate',
         );
 
         $form['#submit'][] = array(
             'class' => 'activation',
-            'function' => 'resend_users_form_submit',
+            'method' => 'resend_users_form_submit',
         );
 
         $form['#redirect'] = \URL::to();
@@ -257,12 +257,12 @@ class Activation extends Entity {
 
         $form['#validate'][] = array(
             'class' => 'activation',
-            'function' => 'users_reset_pass_form_validate',
+            'method' => 'users_reset_pass_form_validate',
         );
 
         $form['#submit'][] = array(
             'class' => 'activation',
-            'function' => 'users_reset_pass_form_submit',
+            'method' => 'users_reset_pass_form_submit',
         );
 
         $form['#redirect'] = \URL::to();

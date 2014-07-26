@@ -28,7 +28,7 @@ class PermsFunc extends Entity {
                     'title' => zerophp_lang('Class'),
                     'type' => 'input',
                 ),
-                'function' => array(
+                'method' => array(
                     'name' => 'function',
                     'title' => zerophp_lang('Method'),
                     'type' => 'input',

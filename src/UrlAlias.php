@@ -203,7 +203,7 @@ class UrlAlias extends Entity {
 
         $form['#submit'][] = array(
             'class' => 'url_alias',
-            'function' => 'url_alias_form_alter_submit',
+            'method' => 'url_alias_form_alter_submit',
         );
     }
 

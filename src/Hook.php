@@ -4,9 +4,7 @@ namespace ZeroPHP\ZeroPHP;
 use ZeroPHP\ZeroPHP\Entity;
 
 class Hook extends Entity {
-
     function __construct() {
-
         $this->setStructure(array(
             'id' => 'hook_id',
             'name' => 'hook',
@@ -36,13 +34,13 @@ class Hook extends Entity {
                     'title' => zerophp_lang('Hook Condition'),
                     'type' => 'input',
                 ),
-                'library' => array(
-                    'name' => 'library',
+                'class' => array(
+                    'name' => 'class',
                     'title' => zerophp_lang('Class'),
                     'type' => 'input',
                 ),
-                'function' => array(
-                    'name' => 'function',
+                'method' => array(
+                    'name' => 'method',
                     'title' => zerophp_lang('Method'),
                     'type' => 'input',
                     'display_hidden' => 1,
@@ -69,6 +67,63 @@ class Hook extends Entity {
         ));
     }
 
+    function loadEntityAll($attributes = array()) {
+        $cache_name = __METHOD__ . serialize($attributes);
+
+        if ($cache = \Cache::get($cache_name)) {
+            return $cache;
+        }
+
+        if (!isset($attributes['order'])) {
+            $attributes['order'] = array();
+        }
+
+        if (!isset($attributes['order']['hook_type'])) {
+            $attributes['order']['hook_type'] = 'ASC';
+        }
+
+        if (!isset($attributes['order']['hook_condition'])) {
+            $attributes['order']['hook_condition'] = 'ASC';
+        }
+
+        if (!isset($attributes['order']['class'])) {
+            $attributes['order']['class'] = 'ASC';
+        }
+
+        if (!isset($attributes['order']['method'])) {
+            $attributes['order']['method'] = 'ASC';
+        }
+
+        $hooks = parent::loadEntityAll($attributes);
+
+        $result = array();
+        foreach ($hooks as $value) {
+            if (empty($value->hook_condition)) {
+                $value->hook_condition = '#all';
+            }
+            $result[$value->hook_type][$value->hook_condition][] = $value;
+        }
+
+        \Cache::forever($cache_name, $result);
+        return $result;
+    }
+
+    function loadEntityAllByHookType($hook_type, $hook_condition = '#all') {
+        $hooks = $this->loadEntityAll();
+
+        if (isset($hooks[$hook_type]) && isset($hooks[$hook_type][$hook_condition])) {
+            return $hooks[$hook_type][$hook_condition];
+        }
+
+        return array();
+    }
+
+
+
+
+
+
+
     // Define hook type
     private function hook_types() {
         return array(
@@ -78,49 +133,6 @@ class Hook extends Entity {
             'form_alter' => 'form_alter', //Call at Form->form_build
             'form_value_alter' => 'form_value_alter', //Cal at Form->form_build
         );
-    }
-
-    function loadEntity_all($attributes = array(), &$pager_sum = 0) {
-        if (!isset($attributes['order'])) {
-            $attributes['order'] = array();
-        }
-
-        if (!isset($attributes['order']['hook_type'])) {
-            $attributes['order']['hook_type'] = 'ASC';
-        }
-
-        if (!isset($attributes['order']['library'])) {
-            $attributes['order']['library'] = 'ASC';
-        }
-
-        if (!isset($attributes['order']['hook_condition'])) {
-            $attributes['order']['hook_condition'] = 'ASC';
-        }
-
-        return parent::loadEntity_all($attributes, $pager_sum);
-    }
-
-    function hook_get_all($hook_type, $hook_condition = '#all') {
-        $cache = \Cache::get("Hook-hook_get_all");
-
-        if (empty($cache)) {
-            $entity = Entity::loadEntityObject('hook');
-            $hooks = $this->CI->hook->loadEntity_all();
-            $cache = array();
-            foreach ($hooks as $hook) {
-                if (empty($hook->hook_condition)) {
-                    $hook->hook_condition = '#all';
-                }
-                $cache[$hook->hook_condition][$hook->hook_type][] = array(
-                    'library' => $hook->library,
-                    'function' => $hook->function
-                );
-            }
-
-            \Cache::forever("Hook-hook_get_all", $cache);
-        }
-
-        return !empty($cache[$hook_condition][$hook_type]) ? $cache[$hook_condition][$hook_type] : array();
     }
 
     function run($hooks, $arguments) {

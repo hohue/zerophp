@@ -267,7 +267,7 @@ class Entity {
         }
 
         $pager_sum = 1;
-        $entities = $this->loadEntity_all($attributes, $pager_sum);
+        $entities = $this->loadEntityAll($attributes, $pager_sum);
 
         $data = array(
             'form_id' => $this->crud_list_form($entities, $url_prefix, $page),
@@ -498,12 +498,12 @@ class Entity {
 
             $form['#validate'][] = array(
                 'class' => $this->structure['name'],
-                'function' => 'crud_create_form_validate',
+                'method' => 'crud_create_form_validate',
             );
 
             $form['#submit'][] = array(
                 'class' => $this->structure['name'],
-                'function' => 'crud_create_form_submit',
+                'method' => 'crud_create_form_submit',
             );
 
             if ($action) {
@@ -723,8 +723,8 @@ class Entity {
 
     function crud_create_form_submit_hook(&$form_values) {
         // Hook entity_create_submit
-        $entity = Entity::loadEntityObject('hook');
-        $hooks = $this->CI->hook->hook_get_all('entity_create_submit');
+        $entity = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Hook');
+        $hooks = $this->CI->hook->loadEntityAllByHookType('entity_create_submit');
         $this->CI->hook->run($hooks, $form_values);
     }
 
@@ -758,12 +758,12 @@ class Entity {
 
         $form['#validate'][] = array(
             'class' => $this->structure['name'],
-            'function' => 'crud_delete_form_validate',
+            'method' => 'crud_delete_form_validate',
         );
 
         $form['#submit'][] = array(
             'class' => $this->structure['name'],
-            'function' => 'crud_delete_form_submit',
+            'method' => 'crud_delete_form_submit',
         );
 
         $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['name'];
@@ -834,12 +834,12 @@ class Entity {
 
             $form['#validate'][] = array(
                 'class' => $this->structure['name'],
-                'function' => 'crud_list_form_validate',
+                'method' => 'crud_list_form_validate',
             );
 
             $form['#submit'][] = array(
                 'class' => $this->structure['name'],
-                'function' => 'crud_list_form_submit',
+                'method' => 'crud_list_form_submit',
             );
 
             $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['name'];
@@ -940,7 +940,7 @@ class Entity {
         }
 
         $entity = Entity::loadEntityObject('modules');
-        $entity_list = $this->CI->modules->loadEntity_all();
+        $entity_list = $this->CI->modules->loadEntityAll();
 
         $entity = array();
         foreach ($entity_list as $value) {

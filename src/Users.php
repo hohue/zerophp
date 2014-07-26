@@ -301,7 +301,7 @@ class Users extends Entity {
 
         array_unshift($form['#validate'], array(
             'class' => 'users',
-            'function' => 'users_create_form_validate'
+            'method' => 'users_create_form_validate'
         ));
 
         $form['password_confirm'] = $form['password'];
@@ -425,12 +425,12 @@ class Users extends Entity {
 
         $form['#validate'][] = array(
             'class' => 'users',
-            'function' => 'forgot_pass_form_validate',
+            'method' => 'forgot_pass_form_validate',
         );
 
         $form['#submit'][] = array(
             'class' => 'users',
-            'function' => 'forgot_pass_form_submit',
+            'method' => 'forgot_pass_form_submit',
         );
 
         $form_id = 'users-forgot_pass_form';
@@ -535,12 +535,12 @@ class Users extends Entity {
 
         $form['#validate'][] = array(
             'class' => 'users',
-            'function' => 'change_pass_form_validate',
+            'method' => 'change_pass_form_validate',
         );
 
         $form['#submit'][] = array(
             'class' => 'users',
-            'function' => 'change_pass_form_submit',
+            'method' => 'change_pass_form_submit',
         );
 
         $form['#redirect'] = \URL::to('user/logout');

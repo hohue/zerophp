@@ -15,8 +15,8 @@ class UserController {
     }
     function showRegisterForm($zerophp) {
         $form = $this->fields;
-
         unset($form['user_id'], $form['roles']);
+
         $form['password_confirm'] = $form['password'];
         $form['password_confirm']['#label'] = zerophp_lang('Password confirmation');
         $form['password_confirm']['#name'] = 'password_confirm';
@@ -38,7 +38,7 @@ class UserController {
 
         $form['#validate'][] = array(
             'class' => 'users',
-            'function' => 'login_form_validate',
+            'method' => 'login_form_validate',
         );
 
         $redirect = '/';
@@ -47,9 +47,11 @@ class UserController {
         }
         $form['#redirect'] = \URL::to($redirect);
 
-        zerophp_devel_print($form);
+        //zerophp_devel_print($form);
 
-        $zerophp->response->addContent(Form::build('users_login', $vars), zerophp_lang('Login'));
+        //$zerophp->response->addContent(zerophp_view('form', $form), zerophp_lang('Login'));
+
+        $zerophp->response->addContent(Form::build($form), zerophp_lang('Login'));
     }
 
 
