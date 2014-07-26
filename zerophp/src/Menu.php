@@ -79,9 +79,13 @@ class Menu extends Entity {
         }
 
         $menus = parent::loadEntityAll();
+        $result = array();
+        foreach ($menus as $value) {
+            $result[$value->path] = $value;
+        }
 
-        \Cache::forever(__METHOD__, $menus);
-        return $menus;
+        \Cache::forever(__METHOD__, $result);
+        return $result;
     }
 
     function loadEntityByPath($path) {

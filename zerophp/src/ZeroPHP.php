@@ -31,10 +31,17 @@ class ZeroPHP {
         $this->response = new Response();
         $this->response->setOutputType($this->request->prefix());
 
+        // Run Controller
         $controller = $this->request->getController();
-        $class = new $controller['class'];
-        $controller['arguments'] = $controller['arguments'] ? explode('|', $controller['arguments']) : array();
-        $class->$controller['method']($this, $controller['arguments']);
+        if (isset($controller->title)) {
+            $this->response->addTitle(zerophp_lang($controller->title));
+        }
+        $controller->arguments = $controller->arguments ? explode('|', $controller->arguments) : array();
+        $arguments = array($this);
+        foreach($controller->arguments as $value) {
+            $arguments[] = is_numeric($value) ? $this->request->segment($value) : $value;
+        }
+        call_user_func_array(array(new $controller->class, $controller->method), $arguments);
 
         // Flush cache for Development Environment
         if (\Config::get('app.environment', 'production') == 'development') {

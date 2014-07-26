@@ -27,22 +27,12 @@ class Request {
 
     //@todo 3 Get controller from DB
     public function getController() {
-        $menu_obj = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Menu');
-
-        $menus = $this->_getMenuAncestors($this->segment());
-        foreach ($menus as $value) {
-            $menu = $menu_obj->loadEntityByPath($value);
-
-            if (isset($menu->class) && isset($menu->method)) {
-                if (isset($menu->title)) {
-                    zerophp_get_instance()->response->addTitle(zerophp_lang($menu->title));
-                }
-
-                return array(
-                    'class' => $menu->class,
-                    'method' => $menu->method,
-                    'arguments' => $menu->arguments,
-                );
+        $menus = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Menu')->loadEntityAll();
+        $ancestors = $this->_getMenuAncestors($this->segment());
+        
+        foreach ($ancestors as $value) {
+            if (isset($menus[$value]) && isset($menus[$value]->class) && isset($menus[$value]->method)) {
+                return $menus[$value];
             }
         }
 
