@@ -42,7 +42,7 @@ class Category extends Entity {
                     'reference_type' => 'internal',
                     'reference_option' => array(
                         'library' => 'category',
-                        'function' => 'parent_get_from_group',
+                        'method' => 'parent_get_from_group',
                         'arguments' => array(
                             'group' => 0,
                             'load_children' => false,
@@ -101,7 +101,7 @@ class Category extends Entity {
             if (!isset($arguments['attributes'])) {
                 $arguments['attributes'] = array();
             }
-            $categories = $this->loadEntity_all_from_group($group, $arguments['attributes']);
+            $categories = $this->loadEntityAll_from_group($group, $arguments['attributes']);
 
             //fw_devel_print($categories);
             if (count($categories) > 1) {
@@ -114,7 +114,7 @@ class Category extends Entity {
         return $result;
     }
 
-    function loadEntity_all_from_group($group, $attributes = array()) {
+    function loadEntityAll_from_group($group, $attributes = array()) {
         $cache_name = __METHOD__ . $group . serialize($attributes);
         if ($cache = \Cache::get($cache_name)) {
             return $cache;
@@ -122,17 +122,17 @@ class Category extends Entity {
 
         $attributes['where']['category_group_id'] = $group;
 
-        $entities = $this->loadEntity_all($attributes);
+        $entities = $this->loadEntityAll($attributes);
 
         foreach ($entities as $key => $value) {
-            $entities[$key]->children_count = count($this->loadEntity_all_from_parent($key));
+            $entities[$key]->children_count = count($this->loadEntityAll_from_parent($key));
         }
 
         \Cache::forever($cache_name, $entities);
         return $entities;
     }
 
-    function loadEntity_all_from_parent($parent, $attributes = array()) {
+    function loadEntityAll_from_parent($parent, $attributes = array()) {
         $cache_name = __METHOD__ . $parent . serialize($attributes);
         if ($cache = \Cache::get($cache_name)) {
             return $cache;
@@ -140,10 +140,10 @@ class Category extends Entity {
 
         $attributes['where']['parent'] = $parent;
 
-        $entities = $this->loadEntity_all($attributes);
+        $entities = $this->loadEntityAll($attributes);
 
         foreach ($entities as $key => $value) {
-            $entities[$key]->children_count = count($this->loadEntity_all_from_parent($key));
+            $entities[$key]->children_count = count($this->loadEntityAll_from_parent($key));
         }
 
         \Cache::forever($cache_name, $entities);
@@ -162,7 +162,7 @@ class Category extends Entity {
         return $result;
     }
 
-    function loadEntity_all($attributes = array(), &$pager_sum = 0) {
+    function loadEntityAll($attributes = array()) {
         if (!isset($attributes['order'])) {
             $attributes['order'] = array();
         }
@@ -175,6 +175,6 @@ class Category extends Entity {
             $attributes['order']['category_id'] = 'ASC';
         }
 
-        return parent::loadEntity_all($attributes, $pager_sum);
+        return parent::loadEntityAll($attributes, $pager_sum);
     }
 }

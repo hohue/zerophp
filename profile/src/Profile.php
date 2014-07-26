@@ -37,7 +37,7 @@ class Profile extends Entity {
                     'reference_type' => 'internal',
                     'reference_option' => array(
                         'library' => 'category',
-                        'function' => 'parent_get_from_group',
+                        'method' => 'parent_get_from_group',
                         'arguments' => array(
                             'group' => 5,
                             'load_children' => false,
@@ -64,7 +64,7 @@ class Profile extends Entity {
                     'reference_type' => 'internal',
                     'reference_option' => array(
                         'library' => 'users_profile',
-                        'function' => 'district_get_from_local',
+                        'method' => 'district_get_from_local',
                         'arguments' => array(
                             'group' => 0,
                             'load_children' => false,
@@ -178,7 +178,7 @@ class Profile extends Entity {
                     'title' => 'ASC',
                 )
             );
-            $categories = $this->CI->category->loadEntity_all_from_parent($group, $attributes);
+            $categories = $this->CI->category->loadEntityAll_from_parent($group, $attributes);
 
             //fw_devel_print($categories);
             if (count($categories) > 1) {

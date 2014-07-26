@@ -67,7 +67,7 @@ class Perms extends Entity {
         return $result;
     }
 
-    function loadEntity_all($attributes = array(), &$pager_sum = 0) {
+    function loadEntityAll($attributes = array()) {
         if (!isset($attributes['order'])) {
             $attributes['order'] = array();
         }
@@ -80,6 +80,6 @@ class Perms extends Entity {
             $attributes['order']['perm_id'] = 'DESC';
         }
 
-        return parent::loadEntity_all($attributes, $pager_sum);
+        return parent::loadEntityAll($attributes, $pager_sum);
     }
 }

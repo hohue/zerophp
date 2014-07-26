@@ -165,7 +165,7 @@ class ShopTopic extends Entity {
         );
 
         $option = array();
-        $category = $this->CI->category->loadEntity_all_from_group($level, $attributes);
+        $category = $this->CI->category->loadEntityAll_from_group($level, $attributes);
         //fw_devel_print($category);
         if (count($category)) {
             foreach ($category as $key => $val) {
@@ -270,12 +270,12 @@ class ShopTopic extends Entity {
 
         $form['#validate'][] = array(
             'class' => 'shop_topic',
-            'function' => 'create_start_form_validate',
+            'method' => 'create_start_form_validate',
         );
 
         $form['#submit'][] = array(
             'class' => 'shop_topic',
-            'function' => 'create_start_form_submit',
+            'method' => 'create_start_form_submit',
         );
 
         $form['#redirect'] = \URL::to('e/create/shop_topic');

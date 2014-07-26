@@ -180,3 +180,52 @@ function zerophp_variable_set($key, $value) {
 function zerophp_form($template, $data = array()) {
     return \View::make($template, $data)->render();
 }
+
+function zerophp_object_to_array($object) {
+    return json_decode(json_encode($object), true);
+}
+
+/**
+* Returns the calling function through a backtrace
+*/
+function zerophp_get_calling_function() {
+  // a funciton x has called a function y which called this
+  // see stackoverflow.com/questions/190421
+  $caller = debug_backtrace();
+  $caller = $caller[2];
+  $r = $caller['function'];
+  if (isset($caller['class'])) {
+    $r = $caller['class'] . '::' . $r;
+  }
+  return $r;
+}
+
+function zerophp_form_render($key, &$form) {
+    if (isset($form[$key]) && substr($key, 0, 1) != '#') {
+        $item = $form[$key];
+        unset($form[$key]);
+
+        if (isset($item['theme'])) {
+            $template = $item['theme'];
+            unset($item['theme']);
+        }
+        else {
+            $template = 'form_item';
+        }
+
+        //zerophp_devel_print($item);
+
+        return zerophp_view($template, $item);
+    }
+    
+    return '';
+}
+
+function zerophp_form_render_all(&$form) {
+    $result = '';
+    foreach ($form as $key => $value){
+        $result .= zerophp_form_render($key, $form);
+    }
+
+    return $result;
+}

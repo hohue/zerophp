@@ -42,7 +42,7 @@ class Shop extends Entity {
                     'reference_type' => 'internal',
                     'reference_option' => array(
                         'library' => 'category',
-                        'function' => 'parent_get_from_group',
+                        'method' => 'parent_get_from_group',
                         'arguments' => array(
                             'group' => 5,
                             'load_children' => false,
@@ -62,7 +62,7 @@ class Shop extends Entity {
                     'reference_type' => 'internal',
                     'reference_option' => array(
                         'library' => 'users_profile',
-                        'function' => 'district_get_from_local',
+                        'method' => 'district_get_from_local',
                         'arguments' => array(
                             'group' => 0,
                             'load_children' => false,
@@ -196,12 +196,12 @@ class Shop extends Entity {
 
         $form['#validate'][] = array(
             'class' => 'shop',
-            'function' => 'shop_create_form_validate',
+            'method' => 'shop_create_form_validate',
         );
 
         $form['#submit'][] = array(
             'class' => 'shop',
-            'function' => 'shop_create_form_submit',
+            'method' => 'shop_create_form_submit',
         );
     }
 
