@@ -162,7 +162,15 @@ function zerophp_is_login() {
 }
 
 function zerophp_variable_get($key, $default = null) {
-    return \ZeroPHP\ZeroPHP\VariableModel::get($key, $default);
+    $cache_name = __METHOD__ . $key;
+    if ($cache = \Cache::get($cache_name)) {
+        return $cache;
+    }
+
+    $result =  \ZeroPHP\ZeroPHP\VariableModel::get($key, $default);
+
+    \Cache::forever($cache_name);
+    return $result;
 }
 
 function zerophp_variable_set($key, $value) {

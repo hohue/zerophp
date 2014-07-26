@@ -181,6 +181,12 @@ class SystemInstall {
                 'class' => 'ZeroPHP\\ZeroPHP\\ResponseController',
                 'method' => 'showMessage',
             ),
+            array(
+                'title' => 'Message',
+                'path' => 'user/login',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'showLoginForm',
+            ),
         ));
     }
 
