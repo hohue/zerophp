@@ -15,8 +15,7 @@ class ZeroPHP {
     }
 
     public function bootstrap($request_type = 'get') {
-        //@todo 6 Nhan gia tri tu file cau hinh
-        define('ZEROPHP_CACHE_EXPIRE_TIME', 10); // 10 minutes
+        define('ZEROPHP_CACHE_EXPIRE_TIME', zerophp_variable_get('ZEROPHP_CACHE_EXPIRE_TIME', 10)); // 10 minutes
 
         $this->language = \Config::get('app.locale', 'en');
         $this->translate = array();
