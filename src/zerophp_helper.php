@@ -160,3 +160,11 @@ function zerophp_is_login() {
 
     return false;
 }
+
+function zerophp_variable_get($key, $default = null) {
+    return \ZeroPHP\ZeroPHP\VariableModel::get($key, $default);
+}
+
+function zerophp_variable_set($key, $value) {
+    return \ZeroPHP\ZeroPHP\VariableModel::set($key, $value);
+}
