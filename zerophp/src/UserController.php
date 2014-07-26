@@ -6,7 +6,7 @@ class UserController extends Controller {
         redirect('e/read/users/' . zerophp_user_current());
     }
 
-    function login() {
+    function showLoginForm() {
         $vars = array(
             'form_id' => $this->users->login_form(),
         );
