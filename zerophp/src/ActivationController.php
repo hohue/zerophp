@@ -11,7 +11,7 @@ class ActivationController extends Controller {
                     'item' => zerophp_lang('authentication information')
                 )
             );
-            $this->response->breadcrumbs_add($items);
+            $zerophp->response->addBreadcrumb($items);
             $zerophp->response->addContent('activation_success|activation', zerophp_lang('success') );
         }
         else {

@@ -91,6 +91,13 @@ class Users extends Entity {
                     'widget' => 'date_timestamp',
                     'form_hidden' => 1,
                 ),
+                'deleted_at' => array(
+                    'name' => 'updated_at',
+                    'title' => zerophp_lang('Updated date'),
+                    'type' => 'input',
+                    'widget' => 'date_timestamp',
+                    'form_hidden' => 1,
+                ),
                 'roles' => array(
                     'name' => 'roles',
                     'title' => zerophp_lang('Roles'),
@@ -146,71 +153,6 @@ class Users extends Entity {
         $attributes['load_all'] = false;
         $attributes['where']['email'] = $email;
         return reset($this->loadEntityExecutive(null, $attributes));
-    }
-
-    function login_form() {
-        $form['email'] = array(
-            '#name' => 'email',
-            '#type' => 'input',
-            '#label' => zerophp_lang('Email'),
-            '#item' => array(
-                'name' => 'email',
-                'type' => 'input',
-                'data-validate' => 'email',
-                'placeholder' => zerophp_lang('paolo.maldini@gmail.com'),
-            ),
-            '#error_messages' => zerophp_lang('Invalid email'),
-            '#required' => true,
-        );
-
-        $form['password'] = array(
-            '#name' => 'password',
-            '#type' => 'password',
-            '#label' => zerophp_lang('Password'),
-            '#item' => array(
-                'name' => 'password',
-                'type' => 'password',
-                'data-validate' => 'password',
-            ),
-            '#description' => zerophp_lang('Must contain at least <font>8 characters</font>'),
-            '#error_messages' => zerophp_lang('Invalid password'),
-            '#required' => true,
-        );
-
-        $form['remember_me'] = array(
-            '#name' => 'remember_me',
-            '#type' => 'checkbox',
-            '#label' => zerophp_lang('Remember me'),
-            '#item' => array(
-                'name' => 'remember_me',
-                'type' => 'checkbox',
-                'value' => 1,
-            ),
-        );
-
-        $form['submit'] = array(
-            '#name' => 'submit',
-            '#type' => 'submit',
-            '#item' => array(
-                'name' => 'submit',
-                'value' => zerophp_lang('Login'),
-            ),
-        );
-
-        $form['#validate'][] = array(
-            'class' => 'users',
-            'function' => 'login_form_validate',
-        );
-
-        $redirect = '';
-        if (isset($_GET['destination'])) {
-            $redirect = site_url(trim($_GET['destination']));
-        }
-        $form['#redirect'] = site_url($redirect);
-
-        $form_id = 'users-login_form';
-        $this->CI->form->form_build($form_id, $form);
-        return $form_id;
     }
 
     function login_check($email, $password, &$user = null) {
@@ -383,12 +325,12 @@ class Users extends Entity {
             ),
             '#error_messages' => zerophp_lang('You must accept to register your account.'),
             '#description' => zerophp_lang('Accept websites\'s  policy', array(
-                '%link1' => site_url('e/read/article/3'),
-                '%link2' => site_url('e/read/article/4'),
+                '%link1' => \URL::to('e/read/article/3'),
+                '%link2' => \URL::to('e/read/article/4'),
             )),
         );
         $form['submit']['#item']['value'] = zerophp_lang('Register');
-        $form['#redirect'] = site_url('user/register_success');
+        $form['#redirect'] = \URL::to('user/register_success');
 
         unset($form['active']);
         unset($form['roles']);
@@ -515,7 +457,7 @@ class Users extends Entity {
         // Send Email
         $content = array(
             'title' => $user->title,
-            'link' => site_url("activation/users_reset_pass/$hash"),
+            'link' => \URL::to("activation/users_reset_pass/$hash"),
         );
         $entity = Entity::loadEntityObject('mail');
         $this->CI->mail->send($form_values['email'], fw_variable_get('Activation email template users reset password subject', 'Reset your password'), $content, 'mail_template_activation_users_reset_pass|activation');
@@ -601,7 +543,7 @@ class Users extends Entity {
             'function' => 'change_pass_form_submit',
         );
 
-        $form['#redirect'] = site_url('user/logout');
+        $form['#redirect'] = \URL::to('user/logout');
 
         $form_id = 'users-change_pass_form';
         $this->CI->form->form_build($form_id, $form);

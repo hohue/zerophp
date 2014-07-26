@@ -169,10 +169,14 @@ function zerophp_variable_get($key, $default = null) {
 
     $result =  \ZeroPHP\ZeroPHP\VariableModel::get($key, $default);
 
-    \Cache::forever($cache_name);
+    \Cache::forever($cache_name, $result);
     return $result;
 }
 
 function zerophp_variable_set($key, $value) {
     return \ZeroPHP\ZeroPHP\VariableModel::set($key, $value);
+}
+
+function zerophp_form($template, $data = array()) {
+    return \View::make($template, $data)->render();
 }

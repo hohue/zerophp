@@ -278,7 +278,7 @@ class ShopTopic extends Entity {
             'function' => 'create_start_form_submit',
         );
 
-        $form['#redirect'] = site_url('e/create/shop_topic');
+        $form['#redirect'] = \URL::to('e/create/shop_topic');
 
         $form_id = 'shop_topic_create_start_form';
         $this->CI->form->form_build($form_id, $form);

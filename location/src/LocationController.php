@@ -5,6 +5,6 @@ class LocationController extends Controller {
             $this->CI->session->set_userdata('location_current', $location_id);
         }
         
-        redirect(site_url($_GET['destination']));
+        redirect(\URL::to($zerophp->request->query('destination')));
     }
 }
