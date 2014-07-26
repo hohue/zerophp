@@ -186,5 +186,10 @@ class SystemInstall {
 
     private static function down_0_01() {
         // Drop Tables
+        \Schema::drop('menu');
+        \Schema::drop('block');
+        \Schema::drop('hook');
+        \Schema::drop('image_style');
+        \Schema::drop('variable');
     }
 }
