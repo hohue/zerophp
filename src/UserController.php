@@ -9,31 +9,28 @@ class UserController {
 
     function __construct() {
         $fields = Entity::loadEntityObject('\ZeroPHP\ZeroPHP\Users')->getStructure();
-        unset($fields['fields']['active'], $fields['fields']['remember_token'], $fields['fields']['last_activity'],
-            $fields['fields']['created_at'], $fields['fields']['updated_at'], $fields['fields']['deleted_at']);
-        $this->fields = $fields['fields'];
+        unset($fields['#fields']['active'], $fields['#fields']['remember_token'], $fields['#fields']['last_activity'],
+            $fields['#fields']['created_at'], $fields['#fields']['updated_at'], $fields['#fields']['deleted_at']);
+        $this->fields = $fields['#fields'];
     }
     function showRegisterForm($zerophp) {
         $form = $this->fields;
         unset($form['user_id'], $form['roles']);
 
+        $form['#title'] = zerophp_lang('Register a new user');
+
         $form['password_confirm'] = $form['password'];
-        $form['password_confirm']['#label'] = zerophp_lang('Password confirmation');
+        $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
         $form['password_confirm']['#name'] = 'password_confirm';
         $form['password_confirm']['#id'] = 'fii_password_confirm';
-        $form['password_confirm']['#item']['name'] = 'password_confirm';
-        $form['password_confirm']['#item']['id'] = 'fii_password_confirm_field';
-        $form['password_confirm']['#item']['data-validate'] = 'password_confirm';
+        $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
         $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
 
 
         $form['submit'] = array(
             '#name' => 'submit',
             '#type' => 'submit',
-            '#item' => array(
-                'name' => 'submit',
-                'value' => zerophp_lang('Login'),
-            ),
+            '#value' => zerophp_lang('Register'),
         );
 
         $form['#validate'][] = array(

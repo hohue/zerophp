@@ -2,48 +2,39 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
-use ZeroPHP\ZeroPHP\Theme;
 
 class Activation extends Entity {
-    private $expired = 172800; // 2 days
-
     function __construct() {
-        parent::__construct();
-
-        
-
-        $this->CI->lang->load('activation', config_item('language'));
-
         $this->setStructure(array(
-            'id' => 'activation_id',
-            'name' => 'activation',
-            'class' => 'ZeroPHP\ZeroPHP\Activation',
-            'title' => zerophp_lang('Activation'),
-            'fields' => array(
+            '#id' => 'activation_id',
+            '#name' => 'activation',
+            '#class' => 'ZeroPHP\ZeroPHP\Activation',
+            '#title' => zerophp_lang('Activation'),
+            '#fields' => array(
                 'activation_id' => array(
-                    'name' => 'activation_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden',
+                    '#name' => 'activation_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden',
                 ),
                 'destination_id' => array(
-                    'name' => 'destination_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden',
+                    '#name' => 'destination_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden',
                 ),
                 'hash' => array(
-                    'name' => 'hash',
-                    'title' => zerophp_lang('Activation hash'),
-                    'type' => 'input',
+                    '#name' => 'hash',
+                    '#title' => zerophp_lang('Activation hash'),
+                    '#type' => 'text',
                 ),
                 'expired' => array(
-                    'name' => 'expired',
-                    'title' => zerophp_lang('Expired'),
-                    'type' => 'input',
+                    '#name' => 'expired',
+                    '#title' => zerophp_lang('Expired'),
+                    '#type' => 'text',
                 ),
                 'type' => array(
-                    'name' => 'type',
-                    'title' => zerophp_lang('Activation type'),
-                    'type' => 'input',
+                    '#name' => '#type',
+                    '#title' => zerophp_lang('Activation type'),
+                    '#type' => 'text',
                 ),
             ),
         ));
@@ -108,7 +99,7 @@ class Activation extends Entity {
     function active_users($hash) {
         $activation = $this->loadEntity_from_hash($hash, array(
             'where' => array(
-                'type' => 'users',
+                '#type' => 'users',
             ),
         ));
 
@@ -131,11 +122,11 @@ class Activation extends Entity {
     function resend_users_form() {
         $form['email'] = array(
             '#name' => 'email',
-            '#type' => 'input',
+            '#type' => 'text',
             '#label' => zerophp_lang('Email'),
             '#item' => array(
-                'name' => 'email',
-                'type' => 'input',
+                '#name' => 'email',
+                '#type' => 'text',
                 'label' => zerophp_lang('Email'),
                 'data-validate' => 'email',
                 'placeholder' => zerophp_lang('paolo.maldini@gmail.com'),
@@ -146,7 +137,7 @@ class Activation extends Entity {
             '#name' => 'submit',
             '#type' => 'submit',
             '#item' => array(
-                'name' => 'submit',
+                '#name' => 'submit',
                 'value' => zerophp_lang('Resend'),
             ),
         );
@@ -217,8 +208,8 @@ class Activation extends Entity {
             '#type' => 'password',
             '#label' => zerophp_lang('Password'),
             '#item' => array(
-                'name' => 'password',
-                'type' => 'password',
+                '#name' => 'password',
+                '#type' => 'password',
                 'label' => zerophp_lang('Password'),
                 'data-validate' => 'password',
             ),
@@ -229,8 +220,8 @@ class Activation extends Entity {
             '#type' => 'password',
             '#label' => zerophp_lang('Password confirm'),
             '#item' => array(
-                'name' => 'password_confirm',
-                'type' => 'password',
+                '#name' => 'password_confirm',
+                '#type' => 'password',
                 'label' => zerophp_lang('Password confirm'),
                 'data-validate' => 'password_confirm',
             ),
@@ -240,7 +231,7 @@ class Activation extends Entity {
             '#name' => 'submit',
             '#type' => 'submit',
             '#item' => array(
-                'name' => 'submit',
+                '#name' => 'submit',
                 'value' => zerophp_lang('Submit'),
             ),
         );

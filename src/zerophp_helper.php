@@ -201,21 +201,27 @@ function zerophp_get_calling_function() {
 }
 
 function zerophp_form_render($key, &$form) {
-    if (isset($form[$key]) && substr($key, 0, 1) != '#') {
-        $item = $form[$key];
-        unset($form[$key]);
-
-        if (isset($item['theme'])) {
-            $template = $item['theme'];
-            unset($item['theme']);
+    if (substr($key, 0, 1) != '#') {
+        if (isset($form[$key])) {
+            $item = $form[$key];
+            unset($form[$key]);
         }
-        else {
-            $template = 'form_item';
+        elseif (isset($form['#actions'][$key])) {
+            $item = $form['#actions'][$key];
+            unset($form['#actions'][$key]);
         }
 
-        //zerophp_devel_print($item);
+        if (isset($item)) {
+            if (isset($item['theme'])) {
+                $template = $item['theme'];
+                unset($item['theme']);
+            }
+            else {
+                $template = 'form_item';
+            }
 
-        return zerophp_view($template, $item);
+            return zerophp_view($template, array('element' => $item));
+        }
     }
     
     return '';
