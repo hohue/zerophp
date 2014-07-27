@@ -6,50 +6,54 @@ use ZeroPHP\ZeroPHP\Entity;
 class Profile extends Entity {
     function __construct() {
         $this->setStructure(array(
-            'id' => 'user_id',
-            'name' => 'profile', //ten bang
-            'class' => 'ZeroPHP\Profile\Profile',
-            'title' => zerophp_lang('Users profile'),
-            'fields' => array(
+            '#id' => 'user_id',
+            '#name' => 'profile', //ten bang
+            '#class' => 'ZeroPHP\Profile\Profile',
+            '#title' => zerophp_lang('Users profile'),
+            '#fields' => array(
                 'user_id' => array(
-                    'name' => 'user_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden'
+                    '#name' => 'user_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden'
                 ),
                 'address' => array(
-                    'name' => 'address',
-                    'title' => zerophp_lang('address'),
-                    'type' => 'input',
-                    'placeholder' => '123 Phường Chánh Nghĩa',
+                    '#name' => 'address',
+                    '#title' => zerophp_lang('address'),
+                    '#type' => 'input',
+                    '#attributes' => array(
+                        'placeholder' => '123 Phường Chánh Nghĩa',
+                    ),
                 ),
                 'birthday' => array(
-                    'name' => 'birthday',
-                    'title' => zerophp_lang('Birthday'),
-                    'validate' => 'required',
-                    'required' => true,
-                    'type' => 'date_group',
+                    '#name' => 'birthday',
+                    '#title' => zerophp_lang('Birthday'),
+                    '#validate' => 'required',
+                    '#required' => true,
+                    '#type' => 'date_group',
                 ),
                 'local_id' => array(
-                    'name' => 'local_id',
-                    'title' => 'Khu vực',
-                    'type' => 'select_build',
-                    'reference' => 'category',
-                    'reference_type' => 'internal',
-                    'reference_option' => array(
-                        'library' => 'category',
-                        'method' => 'parent_get_from_group',
-                        'arguments' => array(
-                            'group' => 5,
-                            'load_children' => false,
-                            'attributes' => array(
-                                'order' => array(
-                                    'weight' => 'ASC',
-                                    'title' => 'ASC',
+                    '#name' => 'local_id',
+                    '#title' => 'Khu vực',
+                    '#type' => 'select_build',
+                    '#reference' => array(
+                        'name' => 'category',
+                        'type' => 'internal',
+                        'options' => array(
+                            'class' => 'category',
+                            'method' => 'parent_get_from_group',
+                            'arguments' => array(
+                                'group' => 5,
+                                'load_children' => false,
+                                'attributes' => array(
+                                    'order' => array(
+                                        'weight' => 'ASC',
+                                        'title' => 'ASC',
+                                    ),
                                 ),
                             ),
                         ),
                     ),
-                    'ajax' => array(
+                    '#ajax' => array(
                         'path' => 'users_profile/district_get_from_local',
                         'wrapper' => 'fii_district_id',
                         'method' => 'html',
@@ -57,29 +61,35 @@ class Profile extends Entity {
                     ),
                 ),
                 'district_id' => array(
-                    'name' => 'district_id',
-                    //'title' => 'Quận huyện',
-                    'type' => 'select_build',
-                    'reference' => 'category',
-                    'reference_type' => 'internal',
-                    'reference_option' => array(
-                        'library' => 'users_profile',
-                        'method' => 'district_get_from_local',
-                        'arguments' => array(
-                            'group' => 0,
-                            'load_children' => false,
+                    '#name' => 'district_id',
+                    //'#title' => 'Quận huyện',
+                    '#type' => 'select_build',
+                    '#reference' => array(
+                        'name' => 'category',
+                        'type' => 'internal',
+                        'options' => array(
+                            'class' => 'users_profile',
+                            'method' => 'district_get_from_local',
+                            'arguments' => array(
+                                'group' => 0,
+                                'load_children' => false,
+                            ),
                         ),
                     ),
-                    'display_hidden' => 1,
+                    '#display_hidden' => 1,
                 ),
                 'mobile' => array(
-                    'name' => 'mobile',
-                    'title' => zerophp_lang('mobile'),
-                    'type' => 'input',
+                    '#name' => 'mobile',
+                    '#title' => zerophp_lang('mobile'),
+                    '#type' => 'input',
                 ),
             ),
         ));
     }
+
+
+
+    
 
     function users_profile_update_form_alter($form_id, &$form) {
         $form['fullname'] = array(
@@ -88,10 +98,10 @@ class Profile extends Entity {
             '#label' => zerophp_lang('Fullname'),
             '#required' => true,
             '#item' => array(
-                'name' => 'fullname',
-                'validate' => 'required',
-                'required' => 1,
-                'type' => 'input',
+                '#name' => 'fullname',
+                '#validate' => '#required',
+                '#required' => 1,
+                '#type' => 'input',
                 'placeholder' => 'Nguyễn Văn Anh',
             ),
             '#error_messages' => zerophp_lang('Required field'),
@@ -101,8 +111,8 @@ class Profile extends Entity {
             '#name' => 'reset',
             '#type' => 'reset',
             '#item' => array(
-                'name' => 'reset',
-                'type' => "reset",
+                '#name' => 'reset',
+                '#type' => "reset",
                 'value' => zerophp_lang('Reset'),
             ),
         );
@@ -175,7 +185,7 @@ class Profile extends Entity {
             $attributes = array(
                 'order' => array(
                     'weight' => 'ASC',
-                    'title' => 'ASC',
+                    '#title' => 'ASC',
                 )
             );
             $categories = $this->CI->category->loadEntityAll_from_parent($group, $attributes);

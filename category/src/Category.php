@@ -6,73 +6,84 @@ use ZeroPHP\ZeroPHP\Entity;
 class Category extends Entity {
     function __construct() {
         $this->setStructure(array(
-            'id' => 'category_id',
-            'name' => 'category',
-            'class' => 'ZeroPHP\Category\Category',
-            'title' => zerophp_lang('Category'),
-            'fields' => array(
+            '#id' => 'category_id',
+            '#name' => 'category',
+            '#class' => 'ZeroPHP\Category\Category',
+            '#title' => zerophp_lang('Category'),
+            '#fields' => array(
                 'category_id' => array(
-                    'name' => 'category_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden',
+                    '#name' => 'category_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden',
                 ),
                 'title' => array(
-                    'name' => 'title',
-                    'title' => zerophp_lang('Title'),
-                    'type' => 'input',
-                    'validate' => 'required',
-                    'required' => true,
+                    '#name' => 'title',
+                    '#title' => zerophp_lang('Title'),
+                    '#type' => 'input',
+                    '#validate' => '#required',
+                    '#required' => true,
                 ),
                 'category_group_id' => array(
-                    'name' => 'category_group_id',
-                    'title' => zerophp_lang('Category group'),
-                    'type' => 'select_build',
-                    'reference' => 'category_group',
-                    'reference_type' => 'internal',
-                    'ajax' => array(
+                    '#name' => 'category_group_id',
+                    '#title' => zerophp_lang('Category group'),
+                    '#type' => 'select_build',
+                    '#reference' => array(
+                        'name' => 'category_group',
+                        'type' => 'internal',
+                    ),
+                    '#ajax' => array(
                         'path' => 'category/parent_get_from_group',
                         'wrapper' => 'fii_parent_content select',
                     ),
                 ),
                 'parent' => array(
-                    'name' => 'parent',
-                    'title' => zerophp_lang('Parent category'),
-                    'type' => 'select_build',
-                    'reference' => 'category',
-                    'reference_type' => 'internal',
-                    'reference_option' => array(
-                        'library' => 'category',
-                        'method' => 'parent_get_from_group',
-                        'arguments' => array(
-                            'group' => 0,
-                            'load_children' => false,
+                    '#name' => 'parent',
+                    '#title' => zerophp_lang('Parent category'),
+                    '#type' => 'select_build',
+                    '#reference' => array(
+                        'name' => 'category',
+                        'type' => 'internal',
+                        'options' => array(
+                            'class' => 'category',
+                            'method' => 'parent_get_from_group',
+                            'arguments' => array(
+                                'group' => 0,
+                                'load_children' => false,
+                            ),
                         ),
                     ),
-                    'size' => 10,
+                    '#attributes' => array(
+                        'size' => 10,
+                    ),
                 ),
                 'weight' => array(
-                    'name' => 'weight',
-                    'title' => zerophp_lang('Weight'),
-                    'type' => 'select_build',
-                    'options' => form_options_make_weight(),
-                    'default' => 0,
-                    'validate' => 'required|numeric|greater_than[-100]|less_than[100]',
-                    'fast_edit' => 1,
+                    '#name' => 'weight',
+                    '#title' => zerophp_lang('Weight'),
+                    '#type' => 'select_build',
+                    '#options' => form_options_make_weight(),
+                    '#default' => 0,
+                    '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    '#fast_edit' => 1,
                 ),
                 'active' => array(
-                    'name' => 'active',
-                    'title' => zerophp_lang('Active'),
-                    'type' => 'radios',
-                    'options' => array(
+                    '#name' => 'active',
+                    '#title' => zerophp_lang('Active'),
+                    '#type' => 'radios',
+                    '#options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),
                     ),
-                    'default' => 1,
-                    'validate' => 'required|numeric|greater_than[-1]|less_than[2]',
+                    '#default' => 1,
+                    '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
                 ),
             ),
         ));
     }
+
+
+
+
+
 
     function parent_get_from_group($arguments = null) {
         $cache_name = __METHOD__ . serialize($arguments);

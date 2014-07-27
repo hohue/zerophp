@@ -4,55 +4,54 @@ namespace ZeroPHP\Shop;
 use ZeroPHP\ZeroPHP\Entity;
 
 class ShopCart extends Entity {
-
     function __construct() {
         $this->setStructure(array(
-            'id' => 'shop_cart_id',
-            'name' => 'shop_cart',
-            'class' => 'ZeroPHP\Shop\ShopCart',
-            'title' => 'Shop cart',
-            'fields' => array(
+            '#id' => 'shop_cart_id',
+            '#name' => 'shop_cart',
+            '#class' => 'ZeroPHP\Shop\ShopCart',
+            '#title' => 'Shop cart',
+            '#fields' => array(
                 'shop_cart_id' => array(
-                    'name' => 'shop_cart_id',
-                    'title' => 'ID',
-                    'type' => 'hidden'
+                    '#name' => 'shop_cart_id',
+                    '#title' => 'ID',
+                    '#type' => 'hidden'
                 ),
                 'products' => array(
-                    'name' => 'products	',
-                    'title' => 'products',
-                    'type' => 'textarea',
-                    'form_hidden' => 1,
+                    '#name' => 'products	',
+                    '#title' => 'Products',
+                    '#type' => 'textarea',
+                    '#form_hidden' => 1,
                 ),
                 'created_by' => array(
-                    'name' => 'created_by	',
-                    'title' => 'tạo b',
-                    'type' => 'textarea',
-                    'form_hidden' => 1,
+                    '#name' => 'created_by	',
+                    '#title' => 'tạo b',
+                    '#type' => 'textarea',
+                    '#form_hidden' => 1,
                 ),
                 'created_at' => array(
-                    'name' => 'created_at',
-                    'title' => 'created_at',
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1,
+                    '#name' => 'created_at',
+                    '#title' => 'created_at',
+                    '#type' => 'input',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1,
                 ),
                 'updated_at' => array(
-                    'name' => 'updated_at	',
-                    'title' => 'updated_at',
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1,
+                    '#name' => 'updated_at	',
+                    '#title' => 'updated_at',
+                    '#type' => 'input',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1,
                 ),
                 'active' => array(
-                    'name' => 'active',
-                    'title' => 'Kích hoạt',
-                    'type' => 'radios',
-                    'options' => array(
+                    '#name' => 'active',
+                    '#title' => 'Kích hoạt',
+                    '#type' => 'radios',
+                    '#options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),
                     ),
-                    'form_hidden' => 1,
-                    'default' => 1,
+                    '#form_hidden' => 1,
+                    '#default' => 1,
                 ),
             )
         )

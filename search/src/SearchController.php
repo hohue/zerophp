@@ -1,7 +1,11 @@
 <?php
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\ZeroPHP;
 
-class SearchController extends Controller {
+class SearchController {
+
+
+
+    
     function  search_no_result() {
         $vars = array(
         );

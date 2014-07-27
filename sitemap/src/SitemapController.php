@@ -1,7 +1,11 @@
 <?php 
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\Sitemap;
 
-class SitemapController extends Controller {
+class SitemapController {
+
+
+
+    
     function category_product() {
     
             $this->load->library('category');

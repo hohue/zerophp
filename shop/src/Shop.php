@@ -6,156 +6,171 @@ use ZeroPHP\ZeroPHP\Entity;
 class Shop extends Entity {
     function __construct() {
         $this->setStructure(array(
-            'id' => 'shop_id',
-            'name' => 'shop',
-            'class' => 'ZeroPHP\Shop\Shop',
-            'title' => zerophp_lang('Shop'),
-            'fields' => array(
+            '#id' => 'shop_id',
+            '#name' => 'shop',
+            '#class' => 'ZeroPHP\Shop\Shop',
+            '#title' => zerophp_lang('Shop'),
+            '#fields' => array(
                 'shop_id' => array(
-                    'name' => 'shop_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden',
+                    '#name' => 'shop_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden',
                 ),
                 'title' => array(
-                    'name' => 'title',
-                    'title' => 'Tên Shop',
-                    'type' => 'input',
-                    'required' => true,
-                    'validate' => 'required|min_length[3]|max_length[100]',
-                    'placeholder' => 'Hoa mai shop'
+                    '#name' => 'title',
+                    '#title' => 'Tên Shop',
+                    '#type' => 'input',
+                    '#required' => true,
+                    '#validate' => 'required|min_length[3]|max_length[100]',
+                    '#attributes' => array(
+                        'placeholder' => 'Hoa mai shop'
+                    ),
                 ),
                 'url_alias' => array(
-                    'name' => 'url_alias',
-                    'title' => 'URL shop',
-                    'type' => 'input',
-                    'required' => true,
-                    'validate' => 'required|min_length[3]|max_length[100]',
-                    'placeholder' => 'hoa-mai-shop',
-                    'data-prefix' => 'http://chovip.vn/',
-                    'class' => 'form-prefix',
+                    '#name' => 'url_alias',
+                    '#title' => 'URL shop',
+                    '#type' => 'input',
+                    '#required' => true,
+                    '#validate' => 'required|min_length[3]|max_length[100]',
+                    '#attributes' => array(
+                        'placeholder' => 'hoa-mai-shop',
+                        'data-prefix' => 'http://chovip.vn/',
+                    ),
+                    '#class' => 'form-prefix',
                 ),
                 'local_id' => array(
-                    'name' => 'local_id',
-                    'title' => 'Khu vực',
-                    'type' => 'select_build',
-                    'reference' => 'category',
-                    'reference_type' => 'internal',
-                    'reference_option' => array(
-                        'library' => 'category',
-                        'method' => 'parent_get_from_group',
-                        'arguments' => array(
-                            'group' => 5,
-                            'load_children' => false,
+                    '#name' => 'local_id',
+                    '#title' => 'Khu vực',
+                    '#type' => 'select_build',
+                    '#reference' => array(
+                        'name' => 'category',
+                        'type' => 'internal',
+                        '#options' => array(
+                            'class' => 'category',
+                            'method' => 'parent_get_from_group',
+                            'arguments' => array(
+                                'group' => 5,
+                                'load_children' => false,
+                            ),
                         ),
                     ),
-                    'ajax' => array(
+                    '#ajax' => array(
                         'path' => 'shop/district_get_from_local',
                         'wrapper' => 'fii_district_id',
                         'method' => 'html',
                     ),
                 ),
                 'district_id' => array(
-                    'name' => 'district_id',
-                    'title' => 'Quận huyện',
-                    'type' => 'select_build',
-                    'reference' => 'category',
-                    'reference_type' => 'internal',
-                    'reference_option' => array(
-                        'library' => 'users_profile',
-                        'method' => 'district_get_from_local',
-                        'arguments' => array(
-                            'group' => 0,
-                            'load_children' => false,
+                    '#name' => 'district_id',
+                    '#title' => 'Quận huyện',
+                    '#type' => 'select_build',
+                    '#reference' => array(
+                        'name' => 'category',
+                        'type' => 'internal',
+                        '#options' => array(
+                            'class' => 'users_profile',
+                            'method' => 'district_get_from_local',
+                            'arguments' => array(
+                                'group' => 0,
+                                'load_children' => false,
+                            ),
                         ),
                     ),
-                    'display_hidden' => 1,
+                    '#display_hidden' => 1,
                 ),
                 'address' => array(
-                    'name' => 'address',
-                    'title' => zerophp_lang('Address'),
-                    'type' => 'input',
-                    'required' =>true,
-                    'validate' => 'required',
-                    'placeholder' => "123 Chánh Nghĩa",
-                    'display_hidden' => 1,
+                    '#name' => 'address',
+                    '#title' => zerophp_lang('Address'),
+                    '#type' => 'input',
+                    '#required' =>true,
+                    '#validate' => '#required',
+                    '#attributes' => array(
+                        'placeholder' => "123 Chánh Nghĩa",
+                    ),
+                    '#display_hidden' => 1,
                 ),
                 'website' => array(
-                    'name' => 'website',
-                    'title' => zerophp_lang('Website'),
-                    'type' => 'input',
-                    'display_hidden' => 1,
+                    '#name' => 'website',
+                    '#title' => zerophp_lang('Website'),
+                    '#type' => 'input',
+                    '#display_hidden' => 1,
                 ),
                 'homephone' => array(
-                    'name' => 'homephone',
-                    'title' => zerophp_lang('Homephone'),
-                    'type' => 'input',
-                    'display_hidden' => 1,
+                    '#name' => 'homephone',
+                    '#title' => zerophp_lang('Homephone'),
+                    '#type' => 'input',
+                    '#display_hidden' => 1,
                 ),
                 'mobile' => array(
-                    'name' => 'mobile',
-                    'title' => zerophp_lang('Mobile'),
-                    'type' => 'input',
-                    'required' =>true,
-                    'validate' => 'required|integer',
-                    'display_hidden' => 1,
-                    'placeholder' => '0912345678',
+                    '#name' => 'mobile',
+                    '#title' => zerophp_lang('Mobile'),
+                    '#type' => 'input',
+                    '#required' =>true,
+                    '#validate' => 'required|integer',
+                    '#display_hidden' => 1,
+                    '#attributes' => array(
+                        'placeholder' => '0912345678',
+                    ),
                 ),
                 'image' => array(
-                    'name' => 'image',
-                    'title' => zerophp_lang('Avatar Shop'),
-                    'type' => 'upload',
-                    'widget' => 'image',
-                    'display_hidden' => 1,
+                    '#name' => 'image',
+                    '#title' => zerophp_lang('Avatar Shop'),
+                    '#type' => 'upload',
+                    '#widget' => 'image',
+                    '#display_hidden' => 1,
                 ),
                 'created_by' => array(
-                    'name' => 'created_by',
-                    'title' => zerophp_lang('Created by'),
-                    'type' => 'input',
-                    'form_hidden' => 1,
-                    'display_hidden' => 1,
+                    '#name' => 'created_by',
+                    '#title' => zerophp_lang('Created by'),
+                    '#type' => 'input',
+                    '#form_hidden' => 1,
+                    '#display_hidden' => 1,
                 ),
                 'created_at' => array(
-                    'name' => 'created_at',
-                    'title' => zerophp_lang('Created date'),
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1,
+                    '#name' => 'created_at',
+                    '#title' => zerophp_lang('Created date'),
+                    '#type' => 'input',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1,
                 ),
                 'updated_at' => array(
-                    'name' => 'updated_at',
-                    'title' => zerophp_lang('Updated date'),
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1,
+                    '#name' => 'updated_at',
+                    '#title' => zerophp_lang('Updated date'),
+                    '#type' => 'input',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1,
                 ),
                 'active' => array(
-                    'name' => 'active',
-                    'title' => zerophp_lang('Active'),
-                    'type' => 'radios',
-                    'options' => array(
+                    '#name' => 'active',
+                    '#title' => zerophp_lang('Active'),
+                    '#type' => 'radios',
+                    '#options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),
                     ),
-                    'default' => 0,
-                    'form_hidden' => 1,
+                    '#default' => 0,
+                    '#form_hidden' => 1,
                 ),
                 'paymenth_method' => array(
-                    'name' => 'paymenth_method',
-                    'title' => 'Phương thức thanh toán',
-                    'type' => 'textarea',
-                    'rte_enable' => 1,
-                    'display_hidden' => 1,
+                    '#name' => 'paymenth_method',
+                    '#title' => 'Phương thức thanh toán',
+                    '#type' => 'textarea',
+                    '#rte_enable' => 1,
+                    '#display_hidden' => 1,
                 ),
                 'shipmenth_method' => array(
-                    'name' => 'shipmenth_method',
-                    'title' => 'Phương thức giao hàng',
-                    'type' => 'textarea',
-                    'rte_enable' => 1,
-                    'display_hidden' => 1,
+                    '#name' => 'shipmenth_method',
+                    '#title' => 'Phương thức giao hàng',
+                    '#type' => 'textarea',
+                    '#rte_enable' => 1,
+                    '#display_hidden' => 1,
                 ),
             ),
         ));
     }
+
+
+    
 
     function loadEntity_by_user($user_id, $attributes = array()) {
         $attributes['where']['created_by'] = $user_id;
@@ -195,12 +210,12 @@ class Shop extends Entity {
         $form['submit']['#item']['value'] = 'Xác Nhận Thông Tin';
 
         $form['#validate'][] = array(
-            'class' => 'shop',
+            '#class' => 'shop',
             'method' => 'shop_create_form_validate',
         );
 
         $form['#submit'][] = array(
-            'class' => 'shop',
+            '#class' => 'shop',
             'method' => 'shop_create_form_submit',
         );
     }
@@ -303,7 +318,7 @@ class Shop extends Entity {
 
         $data = array(
             'shop_url' => "e/read/shop/$shop_id",
-            'name'=> $shop->title,
+            '#name'=> $shop->title,
             'address' => $shop->address,
             'mobile' => $shop->mobile,
             'email' => $saleman->email,

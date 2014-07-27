@@ -1,8 +1,8 @@
 <?php
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\Shop;
 
-class ShopcartController extends Controller {
-    function showItems() {
+class ShopcartController {
+    function showItems($zerophp) {
         $vars = array(
             'items' => 0,
         );

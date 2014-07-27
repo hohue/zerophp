@@ -1,5 +1,10 @@
-<?php 
-class ProfileController extends Controller {
+<?php
+namespace ZeroPHP\Profile;
+
+class ProfileController {
+
+
+    
     function district_get_from_local() {
         $data = $this->input->get();
 

@@ -1,7 +1,11 @@
 <?php 
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\Shop;
 
-class ShoporderController extends Controller {
+class ShoporderController {
+
+
+
+    
     function  order_finalize() {
         $vars = array(
             'cart_id' => isset($_GET['cart_id']) ? intval($_GET['cart_id']) : 0,

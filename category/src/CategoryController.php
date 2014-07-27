@@ -1,5 +1,11 @@
 <?php 
-class CategoryController extends Controller {
+namespace ZeroPHP\Category;
+
+class CategoryController {
+
+
+
+    
     function parent_get_from_group() {
         $data = $this->input->get();
 

@@ -1,7 +1,13 @@
 <?php 
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\Shop;
 
-class ShoptopicController extends Controller {
+class ShoptopicController {
+
+
+
+
+
+    
     function start() {
         $this->load->library('shop_topic');
 

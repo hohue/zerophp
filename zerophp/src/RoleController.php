@@ -1,7 +1,10 @@
 <?php
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\ZeroPHP;
 
-class RolesController extends Controller {
+class RoleController{
+
+
+    
     function index() {
         redirect('admin/e/index/roles');
     }

@@ -4,131 +4,128 @@ namespace ZeroPHP\Shop;
 use ZeroPHP\ZeroPHP\Entity;
 
 class ShopTopic extends Entity {
-
     function __construct() {
-
         $this->setStructure(array(
-            'id' => 'shop_topic_id',
-            'name' => 'shop_topic',
-            'class' => 'ZeroPHP\Shop\ShopTopic',
-            'title' => 'Shop topic',
-            'fields' => array(
+            '#id' => 'shop_topic_id',
+            '#name' => 'shop_topic',
+            '#class' => 'ZeroPHP\Shop\ShopTopic',
+            '#title' => 'Shop topic',
+            '#fields' => array(
                 'shop_topic_id' => array(
-                    'name' => 'shop_topic_id',
-                    'title' => 'ID',
-                    'type' => 'hidden'
+                    '#name' => 'shop_topic_id',
+                    '#title' => 'ID',
+                    '#type' => 'hidden'
                 ),
                 'title' => array(
-                    'name' => 'title',
-                    'title' => 'Tiêu đề',
-                    'type' => 'input',
-                    'validate' => 'required'
+                    '#name' => 'title',
+                    '#title' => 'Tiêu đề',
+                    '#type' => 'input',
+                    '#validate' => 'required'
                 ),
                 'short_description' => array(
-                    'name' => 'short_description',
-                    'title' => 'Mô tả ngắn',
-                    'type' => 'input',
-                    'validate' => 'required'
+                    '#name' => 'short_description',
+                    '#title' => 'Mô tả ngắn',
+                    '#type' => 'input',
+                    '#validate' => 'required'
                 ),
                 'content' => array(
-                    'name' => 'content',
-                    'title' => 'MÔ TẢ CHI TIẾT',
-                    'type' => 'textarea',
-                    'rte_enable' => 1
+                    '#name' => 'content',
+                    '#title' => 'MÔ TẢ CHI TIẾT',
+                    '#type' => 'textarea',
+                    '#rte_enable' => 1
                 ),
                 'price' => array(
-                    'name' => 'price',
-                    'title' => 'Giá sản phẩm',
-                    'type' => 'input',
-                    'validate' => 'required|numeric'
+                    '#name' => 'price',
+                    '#title' => 'Giá sản phẩm',
+                    '#type' => 'input',
+                    '#validate' => 'required|numeric'
                 ),
                 'shipping' => array(
-                    'name' => 'shipping',
-                    'title' => 'Phí Vận Chuyển',
-                    'type' => 'select_build',
-                    'options' => array(
+                    '#name' => 'shipping',
+                    '#title' => 'Phí Vận Chuyển',
+                    '#type' => 'select_build',
+                    '#options' => array(
                         0 => 'Phí Vận Chuyển',
                         1 => 'Mễn Phí',
                         2 => 'Liên Hệ'
                     )
                 ),
                 'is_promotion' => array(
-                    'name' => 'is_promotion',
-                    'title' => 'Sản phẩm này có khuyến mãi',
-                    'type' => 'checkbox',
-                    'value' => 1
+                    '#name' => 'is_promotion',
+                    '#title' => 'Sản phẩm này có khuyến mãi',
+                    '#type' => 'checkbox',
                 ),
                 'promotion' => array(
-                    'name' => 'promotion',
-                    'title' => 'Khuyến Mãi',
-                    'type' => 'input'
+                    '#name' => 'promotion',
+                    '#title' => 'Khuyến Mãi',
+                    '#type' => 'input'
                 ),
                 'promotion_type' => array(
-                    'name' => 'promotion_type',
-                    'title' => 'Kiểu Khuyến Mãi',
-                    'type' => 'select_build',
-                    'options' => array(
+                    '#name' => 'promotion_type',
+                    '#title' => 'Kiểu Khuyến Mãi',
+                    '#type' => 'select_build',
+                    '#options' => array(
                         1 => 'Phần trăm',
                         2 => 'Giá trị'
                     ),
-                    'form_hidden' => 1
+                    '#form_hidden' => 1
                 ),
                 'promotion_start' => array(
-                    'name' => 'promotion_start',
-                    'title' => 'Thời Gian Khuyến Mãi',
-                    'type' => 'input'
+                    '#name' => 'promotion_start',
+                    '#title' => 'Thời Gian Khuyến Mãi',
+                    '#type' => 'input'
                 ),
                 'promotion_end' => array(
-                    'name' => 'promotion_end',
-                    'title' => 'đến',
-                    'type' => 'input'
+                    '#name' => 'promotion_end',
+                    '#title' => 'đến',
+                    '#type' => 'input'
                 ),
                 'category_id' => array(
-                    'name' => 'category_id',
-                    'title' => 'Danh mục',
-                    'type' => 'hidden',
-                    'validate' => 'required',
+                    '#name' => 'category_id',
+                    '#title' => 'Danh mục',
+                    '#type' => 'hidden',
+                    '#validate' => 'required',
                 ),
                 'created_by' => array(
-                    'name' => 'created_by',
-                    'title' => 'Tạo bởi',
-                    'type' => 'input',
-                    'validate' => 'required',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1
+                    '#name' => 'created_by',
+                    '#title' => 'Tạo bởi',
+                    '#type' => 'input',
+                    '#validate' => 'required',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1
                 ),
                 'image' => array(
-                    'name' => 'image',
-                    'title' => 'Ảnh đại diện',
-                    'type' => 'upload',
-                    'widget' => 'image',
-                    'display_hidden' => 1,
-                    'description' => 'Không chèn quảng cáo, Số điện thoại, Địa chỉ, Tên web... lên ảnh đại diện'
+                    '#name' => 'image',
+                    '#title' => 'Ảnh đại diện',
+                    '#type' => 'upload',
+                    '#widget' => 'image',
+                    '#display_hidden' => 1,
+                    '#description' => 'Không chèn quảng cáo, Số điện thoại, Địa chỉ, Tên web... lên ảnh đại diện'
                 ),
                 'created_at' => array(
-                    'name' => 'created_at',
-                    'title' => 'created_at',
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1
+                    '#name' => 'created_at',
+                    '#title' => 'created_at',
+                    '#type' => 'input',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1
                 ),
                 'updated_at' => array(
-                    'name' => 'updated_at	',
-                    'title' => 'updated_at',
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1
+                    '#name' => 'updated_at	',
+                    '#title' => 'updated_at',
+                    '#type' => 'input',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1
                 ),
                 'active' => array(
-                    'name' => 'active',
-                    'title' => 'Kích hoạt',
-                    'type' => 'radios',
-                    'options' => array(
+                    '#name' => 'active',
+                    '#title' => 'Kích hoạt',
+                    '#type' => 'radios',
+                    '#options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable')
                     ),
-                    'form_hidden' => 1,
-                    'default' => 0
+                    '#form_hidden' => 1,
+                    '#default' => 0
                 )
             )
         ));
@@ -188,10 +185,10 @@ class ShopTopic extends Entity {
             '#name' => 'category_level1',
             '#type' => 'select_build',
             '#item' => array(
-                'name' => 'category_level1',
-                'type' => 'select_build',
+                '#name' => 'category_level1',
+                '#type' => 'select_build',
                 'size' => 15,
-                'options' => $this->category_option_get_all(1),
+                '#options' => $this->category_option_get_all(1),
                 'ajax' => array(
                     'path' => 'shop_topic/start_get_level2',
                     'wrapper' => 'fii_category_level2',
@@ -204,8 +201,8 @@ class ShopTopic extends Entity {
             '#name' => 'category_level2',
             '#type' => 'select_build',
             '#item' => array(
-                'name' => 'category_level2',
-                'type' => 'select_build',
+                '#name' => 'category_level2',
+                '#type' => 'select_build',
                 'size' => 15,
                 'ajax' => array(
                     'path' => 'shop_topic/start_get_level3',
@@ -220,8 +217,8 @@ class ShopTopic extends Entity {
             '#name' => 'category_level3',
             '#type' => 'select_build',
             '#item' => array(
-                'name' => 'category_level2',
-                'type' => 'select_build',
+                '#name' => 'category_level2',
+                '#type' => 'select_build',
                 'size' => 15,
             ),
             '#prefix' => '<span>&gt;</span>',
@@ -243,10 +240,10 @@ class ShopTopic extends Entity {
             '#name' => 'category_choose',
             '#type' => 'select_build',
             '#item' => array(
-                'name' => 'category_choose',
-                'type' => 'select_build',
+                '#name' => 'category_choose',
+                '#type' => 'select_build',
                 'size' => 15,
-                'options' => $this->category_get_posted(zerophp_user_current()),
+                '#options' => $this->category_get_posted(zerophp_user_current()),
             ),
         );
 
@@ -263,8 +260,8 @@ class ShopTopic extends Entity {
             '#name' => 'submit',
             '#type' => 'submit',
             '#item' => array(
-                'name' => 'submit',
-                'value' => 'Bắt đầu đăng tin >',
+                '#name' => 'submit',
+                '#value' => 'Bắt đầu đăng tin >',
             ),
         );
 
