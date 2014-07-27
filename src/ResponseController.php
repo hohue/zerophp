@@ -1,5 +1,5 @@
 <?php 
-use ZeroPHP\ZeroPHP;
+namespace ZeroPHP\ZeroPHP;
 
 class ResponseController {
     function showMessage($zerophp) {

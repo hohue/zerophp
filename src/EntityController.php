@@ -1,5 +1,11 @@
-<?php 
-class EntityController extends Controller {
+<?php
+namespace ZeroPHP\ZeroPHP;
+
+class EntityController {
+
+
+
+    
     // List all of Controller
     function index($entity_name = '', $page = 1) {
         $this->_view('crud_list', $entity_name, $page);

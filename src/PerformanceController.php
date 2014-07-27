@@ -1,7 +1,12 @@
 <?php
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\ZeroPHP;
 
-class PerformanceController extends Controller {
+class PerformanceController {
+
+
+
+
+    
     function cache_clear_system() {
         $this->cachef->clean_system();
 

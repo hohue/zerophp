@@ -1,7 +1,13 @@
 <?php 
-use ZeroPHP\ZeroPHP\Theme;
+namespace ZeroPHP\ZeroPHP;
 
-class ActivationController extends Controller {
+class ActivationController {
+
+
+
+
+
+    
     function users($hash) {
         $this->load->library('activation');
         if ($this->activation->active_users($hash)) {
