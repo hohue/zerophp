@@ -24,7 +24,7 @@ class LanguageTranslate extends Entity {
                 ),
                 'vi' => array(
                     '#name' => 'vi',
-                    '#title' => zerophp_lang('Viet#namese'),
+                    '#title' => zerophp_lang('Vietnamese'),
                     '#type' => 'textarea',
                 ),
             ),

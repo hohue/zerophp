@@ -9,3 +9,5 @@ class ShopcartController {
         $zerophp->response->addContent(zerophp_view('shop_cart_items', $vars));
     }
 }
+
+// CHECKED
