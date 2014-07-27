@@ -52,7 +52,7 @@ class Article extends Entity {
                 'active' => array(
                     'name' => 'active',
                     'title' => zerophp_lang('Active'),
-                    'type' => 'radio_build',
+                    'type' => 'radios',
                     'options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),

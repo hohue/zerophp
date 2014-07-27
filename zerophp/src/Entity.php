@@ -56,7 +56,7 @@ class Entity {
     function loadEntityExecutive($entity_id = 0, $attributes = array()) {
         // Get from cache
         if (!isset($attributes['cache']) || $attributes['cache']) {
-            $cache_name = __METHOD__ . $entity_id . $this->structure['name'];
+            $cache_name = __METHOD__ . $entity_id . $this->structure['#name'];
             $cache_name .= serialize($attributes);
 
             $cache_content = \Cache::get($cache_name);
@@ -70,7 +70,7 @@ class Entity {
 
         if ($entity_id === 0 && empty($attributes['load_all'])) {
             $entities[0] = new stdClass();
-            $entities[0]->{$this->structure['id']} = 0;
+            $entities[0]->{$this->structure['#id']} = 0;
         }
         else {
             $entities = EntityModel::loadEntity($entity_id, $this->structure, $attributes);
@@ -89,24 +89,24 @@ class Entity {
     }
 
     public function buildEntity($entity, $attributes = false) {
-        foreach ($this->structure['fields'] as $value) {
+        foreach ($this->structure['#fields'] as $value) {
             if ((!isset($attributes['load_hidden']) || !$attributes['load_hidden'])
-                 && (isset($value['load_hidden']) && $value['load_hidden']) ) {
-                $entity->{$value['name']} = '';
+                 && (isset($value['#load_hidden']) && $value['#load_hidden']) ) {
+                $entity->{$value['#name']} = '';
                 continue;
             }
 
-            if (isset($value['reference']) && $value['reference']) {
-                $entity->{$value['name']} = $this->buildEntityReference($entity, $value['name'], $attributes);
+            if (isset($value['#reference']) && $value['#reference']) {
+                $entity->{$value['#name']} = $this->buildEntityReference($entity, $value['#name'], $attributes);
                 continue;
             }
 
-            if (empty($entity->{$this->structure['id']})) {
-                if ($value['name'] == $this->structure['id']) {
-                    $entity->{$value['name']} = 0;
+            if (empty($entity->{$this->structure['#id']})) {
+                if ($value['#name'] == $this->structure['#id']) {
+                    $entity->{$value['#name']} = 0;
                 }
                 else {
-                    $entity->{$value['name']} = '';
+                    $entity->{$value['#name']} = '';
                 }
             }
         }
@@ -115,28 +115,28 @@ class Entity {
     }
 
     function buildEntityReference($entity, $field, $attributes = array()) {
-        $entity_id = $entity->{$this->structure['id']};
+        $entity_id = $entity->{$this->structure['#id']};
 
         // Get from cache
         if (!isset($attributes['cache']) || $attributes['cache'] == true) {
-            $cache_name = __METHOD__ . "$field-$entity_id-" . $this->structure['name'] . serialize($attributes);
+            $cache_name = __METHOD__ . "$field-$entity_id-" . $this->structure['#name'] . serialize($attributes);
             if ($cache_content = \Cache::get($cache_name)) {
                 return $cache_content;
             }
         }
 
-        $field = $this->structure['fields'][$field];
+        $field = $this->structure['#fields'][$field];
 
-        $ref = $this->loadEntityObject($field['reference']['class']);
+        $ref = $this->loadEntityObject($field['#reference']['class']);
         $ref_structure = $ref->getStructure();
 
         $reference = array();
-        if (!isset($field['reference']['type']) || $field['reference']['type'] != 'internal') {
-            $reference = EntityModel::loadReference($field['name'], $entity_id, $this->structure, $ref_structure);
+        if (!isset($field['#reference']['type']) || $field['#reference']['type'] != 'internal') {
+            $reference = EntityModel::loadReference($field['#name'], $entity_id, $this->structure, $ref_structure);
         }
         else {
             $reference = array(
-                $entity->{$field['name']},
+                $entity->{$field['#name']},
             );
         }
 
@@ -145,15 +145,15 @@ class Entity {
             foreach ($reference as $ref_id) {
                 if ($ref_id) {
                     $attributes['filter'] = false;
-                    $reference_entity_obj = $this->loadEntityObject($field['reference']['class']);
+                    $reference_entity_obj = $this->loadEntityObject($field['#reference']['class']);
                     $reference_entity = $reference_entity_obj->loadEntity($ref_id, $attributes);
 
-                    //if ($field['name'] == 'district_id') {
+                    //if ($field['#name'] == 'district_id') {
                         //fw_devel_print($field, $ref, $ref_structure);
                     //}
 
-                    if (!empty($reference_entity->{$ref_structure['id']})) {
-                        $result[$reference_entity->{$ref_structure['id']}] = $reference_entity;
+                    if (!empty($reference_entity->{$ref_structure['#id']})) {
+                        $result[$reference_entity->{$ref_structure['#id']}] = $reference_entity;
                     }
                 }
             }
@@ -172,7 +172,7 @@ class Entity {
         $cached = false;
         if (is_numeric($entity_id) && !count($attributes)) {
             $cached = true;
-            $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['name'];
+            $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['#name'];
             if ($cache = \Cache::get($cache_name)) {
                 return $cache;
             }
@@ -191,41 +191,41 @@ class Entity {
 
     function saveEntity($entity) {
         $reference = array();
-        foreach ($this->structure['fields'] as $field) {
+        foreach ($this->structure['#fields'] as $field) {
             // Save Reference fields to temp
-            if (!empty($field['reference']) && isset($entity->{$field['name']})) {
-                if (!is_array($entity->{$field['name']})) {
+            if (!empty($field['#reference']) && isset($entity->{$field['#name']})) {
+                if (!is_array($entity->{$field['#name']})) {
                     $reference_field = array(
-                        $entity->{$field['name']},
+                        $entity->{$field['#name']},
                     );
                 }
                 else {
-                    $reference_field = $entity->{$field['name']};
+                    $reference_field = $entity->{$field['#name']};
                 }
-                $reference[$field['name']] = $reference_field;
+                $reference[$field['#name']] = $reference_field;
 
-                if (empty($field['reference']['type']) || $field['reference']['type'] != 'internal') {
-                    unset($entity->{$field['name']});
+                if (empty($field['#reference']['type']) || $field['#reference']['type'] != 'internal') {
+                    unset($entity->{$field['#name']});
                 }
             }
         }
 
         $update = false;
-        if (isset($entity->{$this->structure['id']}) && $entity->{$this->structure['id']}) {
-            $entity_old = $this->loadEntity($entity->{$this->structure['id']}, array(
+        if (isset($entity->{$this->structure['#id']}) && $entity->{$this->structure['#id']}) {
+            $entity_old = $this->loadEntity($entity->{$this->structure['#id']}, array(
                 'check_active' => false,
                 'cache' => false,
             ));
 
-            if (!empty($entity_old->{$this->structure['id']})) {
+            if (!empty($entity_old->{$this->structure['#id']})) {
                 $entity_id = EntityModel::update($entity, $this->structure);
 
-                $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['name'];
+                $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['#name'];
                 \Cache::forget($cache_name);
 
                 $update = true;
 
-                unset($entity->{$this->structure['id']});
+                unset($entity->{$this->structure['#id']});
             }
         }
 
@@ -254,8 +254,8 @@ class Entity {
 
 
     function crud_list($url_prefix = '', $page = 1) {
-        $template = "entity_list_" . $this->structure['name'] . '|' . $this->structure['name'];
-        $template = $this->CI->theme->template_check($template, $this->structure['name']) ? $template : 'entity_list';
+        $template = "entity_list_" . $this->structure['#name'] . '|' . $this->structure['#name'];
+        $template = $this->CI->theme->template_check($template, $this->structure['#name']) ? $template : 'entity_list';
 
         $attributes = array(
             'page' => $page,
@@ -273,11 +273,11 @@ class Entity {
             'form_id' => $this->crud_list_form($entities, $url_prefix, $page),
             'entities' => $entities,
             'structure' => $this->structure,
-            'add_new_link' => fw_anchor($url_prefix . "up/e/create/" . $this->structure['name'], zerophp_lang('Add new')),
+            'add_new_link' => fw_anchor($url_prefix . "up/e/create/" . $this->structure['#name'], zerophp_lang('Add new')),
             'url_prefix' => $url_prefix,
             'pager_current' => $page,
             'pager_sum' => $pager_sum,
-            'pager_uri' => $url_prefix . "up/e/index/" . $this->structure['name'],
+            'pager_uri' => $url_prefix . "up/e/index/" . $this->structure['#name'],
         );
 
         return array(
@@ -288,8 +288,8 @@ class Entity {
     }
 
     function crud_create($type = 'create', $entity = null, $url_prefix = '', $action = '') {
-        $template = "entity_create_" . $this->structure['name'] . '|' . $this->structure['name'];
-        $template = $this->CI->theme->template_check($template, $this->structure['name']) ? $template : 'entity_create';
+        $template = "entity_create_" . $this->structure['#name'] . '|' . $this->structure['#name'];
+        $template = $this->CI->theme->template_check($template, $this->structure['#name']) ? $template : 'entity_create';
 
         // Update
         if ($type == 'update' && $entity) {
@@ -298,7 +298,7 @@ class Entity {
                 $page_title .= $entity->title;
             }
             else {
-                $page_title .= $this->structure->title . " " . $entity->{$this->structure['id']};
+                $page_title .= $this->structure->title . " " . $entity->{$this->structure['#id']};
             }
         }
 
@@ -309,10 +309,10 @@ class Entity {
                 $page_title .= $entity->title;
             }
             else {
-                $page_title .= $this->structure->title . " " . $entity->{$this->structure['id']};
+                $page_title .= $this->structure->title . " " . $entity->{$this->structure['#id']};
             }
 
-            unset($entity->{$this->structure['id']});
+            unset($entity->{$this->structure['#id']});
         }
 
         // Create
@@ -332,7 +332,7 @@ class Entity {
     }
 
     function crud_read($entity, $url_prefix = '') {
-        $template = "entity_read_" . $this->structure['name'] . '|' . $this->structure['name'];
+        $template = "entity_read_" . $this->structure['#name'] . '|' . $this->structure['#name'];
         $template = $this->CI->theme->template_check($template) ? $template : 'entity_read';
 
         $data = array(
@@ -345,8 +345,8 @@ class Entity {
 
         $this->CI->theme->breadcrumbs_add(array(array('item' => $page_title)));
 
-        if (!empty($entity->{$this->structure['id']})) {
-            $this->CI->theme->tabs_add($this->link_tab($this->link_action($entity->{$this->structure['id']}, $url_prefix, 'read')));
+        if (!empty($entity->{$this->structure['#id']})) {
+            $this->CI->theme->tabs_add($this->link_tab($this->link_action($entity->{$this->structure['#id']}, $url_prefix, 'read')));
         }
 
         return array(
@@ -369,15 +369,15 @@ class Entity {
             $entity_title = $entity->title;
         }
         else {
-            $entity_title = "#" . $entity->{$this->structure['id']};
+            $entity_title = "#" . $entity->{$this->structure['#id']};
         }
 
-        $template = "entity_delete_" . $this->structure['name'] . '|' . $this->structure['name'];
-        $template = $this->CI->theme->template_check($template, $this->structure['name']) ? $template : 'entity_delete';
+        $template = "entity_delete_" . $this->structure['#name'] . '|' . $this->structure['#name'];
+        $template = $this->CI->theme->template_check($template, $this->structure['#name']) ? $template : 'entity_delete';
 
         $data = array(
-            'form_id' => $this->crud_delete_form($entity->{$this->structure['id']}, $url_prefix),
-            'entity_name' => $this->structure['name'],
+            'form_id' => $this->crud_delete_form($entity->{$this->structure['#id']}, $url_prefix),
+            'entity_name' => $this->structure['#name'],
             'entity_title' => $entity_title,
         );
 
@@ -460,7 +460,7 @@ class Entity {
     }
 
     function crud_create_form($type = 'create', $entity = null, $update = false, $url_prefix = '', $action = '') {
-        $form_id = 'entity_crud_' . ($update ? 'update' : 'create') . '_' . $this->structure['name'];
+        $form_id = 'entity_crud_' . ($update ? 'update' : 'create') . '_' . $this->structure['#name'];
         $cache_name = "Entity-crud_create_form-$form_id";
         $cache = \Cache::get($cache_name);
         $form = array();
@@ -469,13 +469,13 @@ class Entity {
             $form = $cache;
         }
         else {
-            foreach ($this->structure['fields'] as $value) {
+            foreach ($this->structure['#fields'] as $value) {
                 if (isset($value['form_hidden']) && $value['form_hidden']) {
                     continue;
                 }
 
-                if ($value['name'] != $this->structure['id']) {
-                    $form[$value['name']] = $this->CI->form->form_item_generate($value);
+                if ($value['#name'] != $this->structure['#id']) {
+                    $form[$value['#name']] = $this->CI->form->form_item_generate($value);
                 }
             }
 
@@ -483,7 +483,7 @@ class Entity {
                 '#name' => 'entity_name',
                 '#type' => 'hidden',
                 '#item' => array(
-                    'entity_name' => $this->structure['name'],
+                    'entity_name' => $this->structure['#name'],
                 ),
             );
 
@@ -497,12 +497,12 @@ class Entity {
             );
 
             $form['#validate'][] = array(
-                'class' => $this->structure['name'],
+                'class' => $this->structure['#name'],
                 'method' => 'crud_create_form_validate',
             );
 
             $form['#submit'][] = array(
-                'class' => $this->structure['name'],
+                'class' => $this->structure['#name'],
                 'method' => 'crud_create_form_submit',
             );
 
@@ -511,7 +511,7 @@ class Entity {
             }
             else {
                 $url_prefix = $url_prefix ? $url_prefix : (count(array_intersect(array_keys($this->CI->users->user_get()->roles), fw_variable_get('users roles admin', array()))) ? 'admin' : 'up');
-                $action = "$url_prefix/e/index/" . $this->structure['name'];
+                $action = "$url_prefix/e/index/" . $this->structure['#name'];
                 if ($this->CI->roles->access_check($action)) {
                     $form['#redirect'] = $action;
                 }
@@ -524,22 +524,22 @@ class Entity {
             $entity = new stdClass();
         }
 
-        if (isset($entity->{$this->structure['id']})) {
-            $form[$this->structure['id']] = array(
-                '#name' => $this->structure['id'],
+        if (isset($entity->{$this->structure['#id']})) {
+            $form[$this->structure['#id']] = array(
+                '#name' => $this->structure['#id'],
                 '#type' => 'hidden',
                 '#disabled' => 'disabled',
-                '#value' => $entity->{$this->structure['id']},
+                '#value' => $entity->{$this->structure['#id']},
                 '#item' => array(
-                    $this->structure['id'] => $entity->{$this->structure['id']},
+                    $this->structure['#id'] => $entity->{$this->structure['#id']},
                 ),
             );
         }
 
-        foreach ($this->structure['fields'] as $value) {
-            if ($value['type'] == 'textarea' && !empty($value['rte_enable']) && !empty($entity->{$value['name']})) {
+        foreach ($this->structure['#fields'] as $value) {
+            if ($value['type'] == 'textarea' && !empty($value['rte_enable']) && !empty($entity->{$value['#name']})) {
                 $text = new DOMDocument();
-                @$text->loadHTML('<?xml encoding="UTF-8"?>' . $entity->{$value['name']});
+                @$text->loadHTML('<?xml encoding="UTF-8"?>' . $entity->{$value['#name']});
 
                 $images = $text->getElementsByTagName('img');
                 foreach ($images as $image) {
@@ -549,17 +549,17 @@ class Entity {
                 }
 
                 $body = $text->getElementsByTagName('body')->item(0);
-                $entity->{$value['name']} = str_replace("\n</body>", '', str_replace("<body>\n", '', $text->saveHTML($body)));
+                $entity->{$value['#name']} = str_replace("\n</body>", '', str_replace("<body>\n", '', $text->saveHTML($body)));
             }
 
             // Default value
-            if (!isset($entity->{$value['name']}) && isset($value['default'])) {
-                if (isset($value['reference'])) {
-                    $entity = Entity::loadEntityObject($value['reference']);
-                    $value['default'] = $this->CI->{$value['reference']}->loadEntity($value['default']);
+            if (!isset($entity->{$value['#name']}) && isset($value['default'])) {
+                if (isset($value['#reference'])) {
+                    $entity = Entity::loadEntityObject($value['#reference']);
+                    $value['default'] = $this->CI->{$value['#reference']}->loadEntity($value['default']);
                 }
 
-                $entity->{$value['name']} = $value['default'];
+                $entity->{$value['#name']} = $value['default'];
             }
         }
 
@@ -572,7 +572,7 @@ class Entity {
         $entity = Entity::loadEntityObject('form_validation');
 
         $validate = false;
-        foreach ($this->structure['fields'] as $key => $value) {
+        foreach ($this->structure['#fields'] as $key => $value) {
             if (isset($value['validate'])) {
                 $this->CI->form_validation->set_rules($key, $value['title'],$value['validate']);
                 $validate = true;
@@ -585,7 +585,7 @@ class Entity {
         }
 
         // Textarea clean
-        foreach ($this->structure['fields'] as $key => $value) {
+        foreach ($this->structure['#fields'] as $key => $value) {
             if ($value['type'] == 'textarea' && !empty($form_values[$key])) {
                 if (!empty($value['rte_enable'])) {
                     // Make safe and standard html document
@@ -635,7 +635,7 @@ class Entity {
         $entity = new stdClass();
 
         // Fetch via structure to skip unexpected fields (alter form another modules)
-        foreach ($this->structure['fields'] as $key => $value) {
+        foreach ($this->structure['#fields'] as $key => $value) {
             if ($value['type'] == 'upload'
                 && file_exists($_FILES[$key]['tmp_name'])
                 && is_uploaded_file($_FILES[$key]['tmp_name'])
@@ -692,7 +692,7 @@ class Entity {
                     break;
 
                 case 'created_at':
-                    if (!isset($form_values[$this->structure['id']])) {
+                    if (!isset($form_values[$this->structure['#id']])) {
                         $widget = 'entity_widget_' . $value['widget'] . '_make';
                         $entity->{$key} = $widget(time());
                     }
@@ -707,13 +707,13 @@ class Entity {
                     if (isset($form_values[$key])) {
                         $entity->{$key} = $form_values[$key];
                     }
-                    elseif (isset($value['default']) && !isset($form_values[$this->structure['id']])) {
+                    elseif (isset($value['default']) && !isset($form_values[$this->structure['#id']])) {
                         $entity->{$key} = $value['default'];
                     }
             }
         }
 
-        $form_values[$this->structure['id']] = $this->entity_save($entity);
+        $form_values[$this->structure['#id']] = $this->entity_save($entity);
 
         $message = $message ? $message : zerophp_lang('Your data was updated successfully.');
         $this->CI->theme->messages_add($message, 'success');
@@ -742,8 +742,8 @@ class Entity {
         );
         $i = 0;
         foreach ($entity_ids as $value) {
-            $form['delete']['#item']["delete[" . $this->structure['id'] . "_$i]"] = $value;
-            $form['delete']['#value'][$this->structure['id'] . "_$i"] = $value;
+            $form['delete']['#item']["delete[" . $this->structure['#id'] . "_$i]"] = $value;
+            $form['delete']['#value'][$this->structure['#id'] . "_$i"] = $value;
             $i++;
         }
 
@@ -757,18 +757,18 @@ class Entity {
         );
 
         $form['#validate'][] = array(
-            'class' => $this->structure['name'],
+            'class' => $this->structure['#name'],
             'method' => 'crud_delete_form_validate',
         );
 
         $form['#submit'][] = array(
-            'class' => $this->structure['name'],
+            'class' => $this->structure['#name'],
             'method' => 'crud_delete_form_submit',
         );
 
-        $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['name'];
+        $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['#name'];
 
-        $form_id = "Entity-crud_delete-" . $this->structure['name'];
+        $form_id = "Entity-crud_delete-" . $this->structure['#name'];
         $this->CI->form->form_build($form_id, $form, array(), false);
         return $form_id;
     }
@@ -789,17 +789,17 @@ class Entity {
         $form_values = array();
 
         foreach ($entities as $entity) {
-            foreach ($this->structure['fields'] as $value) {
+            foreach ($this->structure['#fields'] as $value) {
                 if (isset($value['fast_edit']) && $value['fast_edit']) {
-                    $field_name = $value['name'] . '_' . $entity->{$this->structure['id']};
+                    $field_name = $value['#name'] . '_' . $entity->{$this->structure['#id']};
 
                     $form_item = array(
                         'type' => $value['type'],
                         'name' => $field_name,
-                        'value' => $entity->{$value['name']},
+                        'value' => $entity->{$value['#name']},
                     );
 
-                    if ($value['name'] == 'weight') {
+                    if ($value['#name'] == 'weight') {
                         $form_item['options'] = form_options_make_weight();
                     }
 
@@ -808,7 +808,7 @@ class Entity {
                 }
             }
 
-            $row[] = $entity->{$this->structure['id']};
+            $row[] = $entity->{$this->structure['#id']};
         }
 
         if (count($form)) {
@@ -833,19 +833,19 @@ class Entity {
             );
 
             $form['#validate'][] = array(
-                'class' => $this->structure['name'],
+                'class' => $this->structure['#name'],
                 'method' => 'crud_list_form_validate',
             );
 
             $form['#submit'][] = array(
-                'class' => $this->structure['name'],
+                'class' => $this->structure['#name'],
                 'method' => 'crud_list_form_submit',
             );
 
-            $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['name'];
+            $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['#name'];
         }
 
-        $form_id = "Entity-crud_list-" . $this->structure['name'];
+        $form_id = "Entity-crud_list-" . $this->structure['#name'];
         $this->CI->form->form_build($form_id, $form, $form_values, false);
         return $form_id;
     }
@@ -859,11 +859,11 @@ class Entity {
 
             $validate = false;
             foreach ($rows as $row) {
-                foreach ($this->structure['fields'] as $value) {
-                    if (isset($value['fast_edit']) && $value['fast_edit'] && isset($form_values[$value['name'] . '_' . $row])) {
-                        $form_values['#update'][$row][$value['name']] = $form_values[$value['name'] . '_' . $row];
+                foreach ($this->structure['#fields'] as $value) {
+                    if (isset($value['fast_edit']) && $value['fast_edit'] && isset($form_values[$value['#name'] . '_' . $row])) {
+                        $form_values['#update'][$row][$value['#name']] = $form_values[$value['#name'] . '_' . $row];
                         if (isset($value['validate'])) {
-                            $this->CI->form_validation->set_rules($value['name'] . '_' . $row, $value['title'], $value['validate']);
+                            $this->CI->form_validation->set_rules($value['#name'] . '_' . $row, $value['title'], $value['validate']);
                             $validate = true;
                         }
                     }
@@ -883,7 +883,7 @@ class Entity {
         $entities = array();
         foreach ($form_values['#update'] as $entity_id => $update) {
             $entities[$entity_id] = new stdClass();
-            $entities[$entity_id]->{$this->structure['id']} = $entity_id;
+            $entities[$entity_id]->{$this->structure['#id']} = $entity_id;
 
             foreach ($update as $key => $value) {
                 $entities[$entity_id]->{$key} = $value;
@@ -926,7 +926,7 @@ class Entity {
 
         $entity = $this->loadEntity($entity_id, array('check_active' => $active, 'cache' => $cache));
 
-        if (isset($entity->{$this->structure['id']}) && $entity->{$this->structure['id']}) {
+        if (isset($entity->{$this->structure['#id']}) && $entity->{$this->structure['#id']}) {
             return $entity;
         }
 
@@ -959,22 +959,22 @@ class Entity {
 
         $url_prefix = $url_prefix ? $url_prefix : 'up';
 
-        if ($link = fw_anchor($url_prefix . "e/preview/" . $this->structure['name'] . "/$entity_id", '<i class="icon_view_large"></i>' . zerophp_lang('View'))) {
+        if ($link = fw_anchor($url_prefix . "e/preview/" . $this->structure['#name'] . "/$entity_id", '<i class="icon_view_large"></i>' . zerophp_lang('View'))) {
             $item['preview'] = $link;
         }
 
         if ($type != 'list') {
-            if ($link = fw_anchor($url_prefix . "e/duplicate/". $this->structure['name'] . "/$entity_id", '<i class="icon_postsimalar"></i>' . zerophp_lang('Clone'))) {
+            if ($link = fw_anchor($url_prefix . "e/duplicate/". $this->structure['#name'] . "/$entity_id", '<i class="icon_postsimalar"></i>' . zerophp_lang('Clone'))) {
                 $item['duplicate'] = $link;
             }
         }
 
-        if ($link = fw_anchor($url_prefix . "e/update/". $this->structure['name'] . "/$entity_id", '<i class="icon_editlarge"></i>' . zerophp_lang('Edit'))) {
+        if ($link = fw_anchor($url_prefix . "e/update/". $this->structure['#name'] . "/$entity_id", '<i class="icon_editlarge"></i>' . zerophp_lang('Edit'))) {
             $item['update'] = $link;
         }
 
         if (!in_array($entity_id, $this->structure->can_not_delete)
-            && $link = fw_anchor($url_prefix . "e/delete/" . $this->structure['name'] . "/$entity_id", zerophp_lang('Del'))
+            && $link = fw_anchor($url_prefix . "e/delete/" . $this->structure['#name'] . "/$entity_id", zerophp_lang('Del'))
         ) {
             $item['delete'] = $link;
         }

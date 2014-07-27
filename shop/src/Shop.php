@@ -37,7 +37,7 @@ class Shop extends Entity {
                 'local_id' => array(
                     'name' => 'local_id',
                     'title' => 'Khu vực',
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'reference' => 'category',
                     'reference_type' => 'internal',
                     'reference_option' => array(
@@ -57,7 +57,7 @@ class Shop extends Entity {
                 'district_id' => array(
                     'name' => 'district_id',
                     'title' => 'Quận huyện',
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'reference' => 'category',
                     'reference_type' => 'internal',
                     'reference_option' => array(
@@ -131,7 +131,7 @@ class Shop extends Entity {
                 'active' => array(
                     'name' => 'active',
                     'title' => zerophp_lang('Active'),
-                    'type' => 'radio_build',
+                    'type' => 'radios',
                     'options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),

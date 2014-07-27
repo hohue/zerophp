@@ -7,44 +7,44 @@ class Role extends Entity {
 
     function __construct() {
         $this->setStructure(array(
-            'name' => 'role',
-            'class' => 'ZeroPHP\ZeroPHP\Role',
-            'title' => zerophp_lang('Roles'),
-            'id' => 'role_id',
-            'fields' => array(
+            '#name' => 'role',
+            '#class' => 'ZeroPHP\ZeroPHP\Role',
+            '#title' => zerophp_lang('Roles'),
+            '#id' => 'role_id',
+            '#fields' => array(
                 'role_id' => array(
-                    'name' => 'role_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden',
+                    '#name' => 'role_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden',
                 ),
                 'title' => array(
-                    'name' => 'title',
-                    'title' => zerophp_lang('Role title'),
-                    'type' => 'input',
-                    'validate' => 'required|max_length[80]'
+                    '#name' => 'title',
+                    '#title' => zerophp_lang('Role title'),
+                    '#type' => 'text',
+                    '#validate' => 'required|max_length[80]'
                 ),
                 'active' => array(
-                    'name' => 'active',
-                    'title' => zerophp_lang('Active'),
-                    'type' => 'radio_build',
-                    'options' => array(
+                    '#name' => 'active',
+                    '#title' => zerophp_lang('Active'),
+                    '#type' => 'radios',
+                    '#options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),
                     ),
-                    'default' => 0,
-                    'validate' => 'required|numeric|greater_than[-1]|less_than[2]',
+                    '#default' => 0,
+                    '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
                 ),
                 'weight' => array(
-                    'name' => 'weight',
-                    'title' => zerophp_lang('Weight'),
-                    'type' => 'dropdown_build',
-                    'options' => form_options_make_weight(),
-                    'default' => 0,
-                    'validate' => 'required|numeric|greater_than[-100]|less_than[100]',
-                    'fast_edit' => 1,
+                    '#name' => 'weight',
+                    '#title' => zerophp_lang('Weight'),
+                    '#type' => 'select_build',
+                    '#options' => form_options_make_weight(),
+                    '#default' => 0,
+                    '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    '#fast_edit' => 1,
                 ),
             ),
-            'can_not_delete' => array(1, 2, 3, 4),
+            '#can_not_delete' => array(1, 2, 3, 4),
         ));
     }
 
@@ -52,7 +52,7 @@ class Role extends Entity {
         $form = array();
         $form_values = array();
         $field = array(
-            'type' => 'checkbox',
+            '#type' => 'checkbox',
         );
 
         foreach ($permissions as $permission) {
@@ -64,11 +64,11 @@ class Role extends Entity {
 
             foreach ($perms as $perm) {
                 foreach ($roles as $role_id => $role) {
-                    $field['name'] = "perm:$perm:$role_id";
+                    $field['#name'] = "perm:$perm:$role_id";
                     $field['value'] = 1;
                     $field['checked'] = !empty($access[$perm][$role_id]) && $access[$perm][$role_id] == 1 ? true : false;
-                    $form[$field['name']] = $this->CI->form->form_item_generate($field);
-                    $form_values[$field['name']] = 1;
+                    $form[$field['#name']] = $this->CI->form->form_item_generate($field);
+                    $form_values[$field['#name']] = 1;
                 }
             }
         }
@@ -78,7 +78,7 @@ class Role extends Entity {
                 '#name' => 'submit',
                 '#type' => 'submit',
                 '#item' => array(
-                    'name' => 'submit',
+                    '#name' => 'submit',
                     'value' => zerophp_lang('Save Configuration'),
                 ),
             );

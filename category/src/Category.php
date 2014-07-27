@@ -26,7 +26,7 @@ class Category extends Entity {
                 'category_group_id' => array(
                     'name' => 'category_group_id',
                     'title' => zerophp_lang('Category group'),
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'reference' => 'category_group',
                     'reference_type' => 'internal',
                     'ajax' => array(
@@ -37,7 +37,7 @@ class Category extends Entity {
                 'parent' => array(
                     'name' => 'parent',
                     'title' => zerophp_lang('Parent category'),
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'reference' => 'category',
                     'reference_type' => 'internal',
                     'reference_option' => array(
@@ -53,7 +53,7 @@ class Category extends Entity {
                 'weight' => array(
                     'name' => 'weight',
                     'title' => zerophp_lang('Weight'),
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'options' => form_options_make_weight(),
                     'default' => 0,
                     'validate' => 'required|numeric|greater_than[-100]|less_than[100]',
@@ -62,7 +62,7 @@ class Category extends Entity {
                 'active' => array(
                     'name' => 'active',
                     'title' => zerophp_lang('Active'),
-                    'type' => 'radio_build',
+                    'type' => 'radios',
                     'options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),

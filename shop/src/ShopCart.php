@@ -46,7 +46,7 @@ class ShopCart extends Entity {
                 'active' => array(
                     'name' => 'active',
                     'title' => 'Kích hoạt',
-                    'type' => 'radio_build',
+                    'type' => 'radios',
                     'options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),

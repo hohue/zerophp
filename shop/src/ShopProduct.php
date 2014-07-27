@@ -53,7 +53,7 @@ class ShopProduct extends Entity {
                 'promotion_type' => array(
                     'name' => 'promotion_type',
                     'title' => 'Kiểu Khuyến Mãi',
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'options' => array(
                         1 => 'Phần trăm',
                         2 => 'Giá trị',
@@ -103,7 +103,7 @@ class ShopProduct extends Entity {
                 'active' => array(
                     'name' => 'active',
                     'title' => 'Kích hoạt',
-                    'type' => 'radio_build',
+                    'type' => 'radios',
                     'options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),

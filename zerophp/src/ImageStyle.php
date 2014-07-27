@@ -7,43 +7,43 @@ class ImageStyle extends Entity {
 
     function __construct() {
         $this->setStructure(array(
-            'id' => 'style',
-            'name' => 'image_style',
-            'class' => 'ZeroPHP\ZeroPHP\ImageStyle',
-            'title' => zerophp_lang('Image style'),
-            'fields' => array(
+            '#id' => 'style',
+            '#name' => 'image_style',
+            '#class' => 'ZeroPHP\ZeroPHP\ImageStyle',
+            '#title' => zerophp_lang('Image style'),
+            '#fields' => array(
                 'style' => array(
-                    'name' => 'style',
-                    'title' => zerophp_lang('Style name'),
-                    'type' => 'input',
-                    'required' => true,
-                    'validate' => 'required|max_length[64]',
+                    '#name' => 'style',
+                    '#title' => zerophp_lang('Style name'),
+                    '#type' => 'text',
+                    '#required' => true,
+                    '#validate' => 'required|max_length[64]',
                 ),
                 'width' => array(
-                    'name' => 'width',
-                    'title' => zerophp_lang('Width'),
-                    'type' => 'input',
-                    'validate' => 'numeric|less_than[2000]',
+                    '#name' => 'width',
+                    '#title' => zerophp_lang('Width'),
+                    '#type' => 'text',
+                    '#validate' => 'numeric|less_than[2000]',
                 ),
                 'height' => array(
-                    'name' => 'height',
-                    'title' => zerophp_lang('Height'),
-                    'type' => 'input',
-                    'validate' => 'numeric|less_than[2000]',
+                    '#name' => 'height',
+                    '#title' => zerophp_lang('Height'),
+                    '#type' => 'text',
+                    '#validate' => 'numeric|less_than[2000]',
                 ),
                 'type' => array(
-                    'name' => 'type',
-                    'title' => zerophp_lang('Type'),
-                    'type' => 'dropdown_build',
-                    'options' => array(
+                    '#name' => 'type',
+                    '#title' => zerophp_lang('Type'),
+                    '#type' => 'select_build',
+                    '#options' => array(
                         'scale and crop' => zerophp_lang('Scale and crop'),
                         'scale' => zerophp_lang('Scale'),
                     ),
-                    'required' => true,
-                    'validate' => 'required|max_length[32]',
+                    '#required' => true,
+                    '#validate' => 'required|max_length[32]',
                 ),
             ),
-            'can_not_delete' => array(1, 2),
+            '#can_not_delete' => array(1, 2),
         ));
     }
 
@@ -76,7 +76,7 @@ class ImageStyle extends Entity {
             }
 
             $error = false;
-            switch ($style->type) {
+            switch ($style->#type) {
                 case 'scale and crop':
                     $config['width'] = !empty($config['width']) ? $config['width'] : (!empty($config['height']) ? $config['height'] : 100);
                     $config['height'] = !empty($config['height']) ? $config['height'] : $config['width'];

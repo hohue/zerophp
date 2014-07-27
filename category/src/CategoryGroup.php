@@ -26,7 +26,7 @@ class CategoryGroup extends Entity {
                 'weight' => array(
                     'name' => 'weight',
                     'title' => zerophp_lang('Weight'),
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'options' => form_options_make_weight(),
                     'default' => 0,
                     'validate' => 'required|numeric|greater_than[-100]|less_than[100]',
@@ -35,7 +35,7 @@ class CategoryGroup extends Entity {
                 'active' => array(
                     'name' => 'active',
                     'title' => zerophp_lang('Active'),
-                    'type' => 'radio_build',
+                    'type' => 'radios',
                     'options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),

@@ -4,15 +4,6 @@ namespace ZeroPHP\ZeroPHP;
 use ZeroPHP\ZeroPHP\Entity;
 
 class Form {
-
-    private $form_special_keys = array(
-        '#validate',
-        '#submit',
-        '#redirect',
-        '#actions',
-        '#form',
-    );
-
     public static function build($form = array(), $form_values = array()) {
         $form_id = zerophp_uri_validate(zerophp_get_calling_function());
 
@@ -23,13 +14,14 @@ class Form {
         else {
             $form['#id'] = $form_id;
             $form['_form_id'] = array(
-                'type' => 'hidden',
-                'value' => $form_id,
+                '#name' => '_form_id',
+                '#type' => 'hidden',
+                '#value' => $form_id,
             );
 
             // Call form_alter functions
             self::_alter($form_id, $form);
-            self::_build($form_id, $form);
+            $form = self::_build($form_id, $form);
 
             \Cache::forever($cache_name, $form);
         }
@@ -39,14 +31,11 @@ class Form {
         self::_alter($form_id, $form, $form_values, 'form_value_alter');
 
         // Set default value for form
-        self::_setValues($form_id, $form, $form_values);
+        $form = self::_setValues($form_id, $form, $form_values);
 
         // Create cache to use when form submitted
         \Cache::put(__CLASS__ . "-build-$form_id-" . \Session::getId(), $form, \Config::get('session.lifetime', 120));
 
-        if (!isset($form['#theme'])) {
-            $form['#theme'] = 'form';
-        }
         return zerophp_view($form['#theme'], array('form' => $form));
     }
 
@@ -65,55 +54,69 @@ class Form {
         }
     }
 
-    private static function _build($form_id, &$form) {
-        if (!isset($form['#form'])) {
-            $form['#form'] = array();
-        }
+    private static function _build($form_id, $form) {
+        // Set form attributes default
+        $form['#form'] = isset($form['#form']) ? $form['#form'] : array();
+        $form['#theme'] = isset($form['#theme']) ? $form['#theme'] : 'form';
+        $form['#actions'] = isset($form['#actions']) ? $form['#actions'] :  array();
 
-        if (!isset($form['#actions'])) {
-            $form['#actions'] = array();
-        }
-
+        // Move submit to $form['actions']
         if (isset($form['submit'])) {
             $form['#actions']['submit'] = $form['submit'];
             unset($form['submit']);
         }
 
-        /*$keys_not_support = array(
-            $key['form_key'],
-            $key['form_token'],
-            'form_id'
-        );*/
-        //zerophp_devel_print($form);
-        /*foreach ($form as $form_key => $form_value) {
-            // Don't care with #validate, #submit
-            if (!in_array($form_key, $this->form_special_keys)) {
-                if (in_array($form_key, $keys_not_support) && $change_setting) {
-                    show_error("Your form is not valid: $form_key / $form_id");
-                }
+        foreach ($form as $key => $value) {
+            if (substr($key, 0, 1) == '_') {
+                \App::error(function(InvalidUserException $exception) {
+                    $message = "Field name must not start with _";
+                    \Log::error($message);
 
-                $form_value['#id'] = "fii_$form_key"; // fii = form item id
-
-                if ($form_value['#type'] != 'hidden') {
-                    if (isset($form_value['#item'])) {
-                        $form_value['#item']['id'] = isset($form_value['#item']['id']) ? $form_value['#item']['id'] : $form_value['#id'] . '_field';
-                    }
-                    elseif (isset($form_value['#field'])) {
-                        foreach ($form_value['#field'] as $k => $v) {
-                            $form_value['#field'][$k]['id'] = isset($v['id']) ? $v['id'] : $form_value['#id'] . '_field_' . $k;
-                        }
-                    }
-                }
-
-                $class = "form_items form_item_" . $form_value['#type'] . " form_item_$form_key";
-                $form_value['#class'] = $class . (isset($form_value['#class']) ? ' ' . $form_value['#class'] : '');
+                    return $message;
+                });
             }
 
-            $form_items[$form_key] = $form_value;
-        }*/
+            // Don't care with #validate, #submit...
+            if (substr($key, 0, 1) != '#') {
+                $form[$key] = self::__buildItem($value);
+            }
+            elseif ($key == '#actions') {
+                foreach ($value as $k => $v) {
+                    $form[$key][$k] = self::__buildItem($v);
+                }
+            }
+        }
+
+        return $form;
     }
 
-    private static function _setValues($form_id, &$form, $form_values = array()) {
+    private static function __buildItem($item) {
+        /*if (!isset($item['#name'])) {
+            zerophp_devel_print($item);
+        }*/
+
+        $item['#id'] = isset($item['#id']) ? $item['#id'] : 'fii_' . $item['#name']; // fii = form item id
+        $item['#class'] = 'form_item form_item_' . $item['#type'] . ' form_item_' . $item['#name'] . (isset($item['#class']) ? ' ' . $item['#class'] : '');
+        $item['#value'] = isset($item['#value']) ? $item['#value'] : '';
+        $item['#attributes'] = isset($item['#attributes']) ? $item['#attributes'] : array();
+
+        switch ($item['#type']) {
+            case 'checkbox':
+            case 'radio':
+                $item['#checked'] = isset($item['#checked']) ? $item['#checked'] : false;
+                break;
+
+            case 'select':
+            case 'radios':
+            case 'checkboxes':
+                $item['#options'] = isset($item['#options']) ? $item['#options'] : array();
+                break;
+        }
+
+        return $item;
+    }
+
+    private static function _setValues($form_id, $form, $form_values = array()) {
         if (is_object($form_values)) {
             $form_values = fw_object_to_array($form_values);
         }
@@ -142,7 +145,7 @@ class Form {
                         }
                         break;
 
-                    case 'checkbox_build':
+                    case 'checkboxes':
                         // For Reference Entity Value
                         $test_value = reset($value);
                         if (is_array($test_value)) {
@@ -160,7 +163,7 @@ class Form {
                         }
                         break;
 
-                    case 'radio_build':
+                    case 'radios':
                         foreach ($form_items[$key]['#field'] as $k => $v) {
                             if ($v['value'] == $value) {
                                 $form_items[$key]['#field'][$k]['checked'] = true;
@@ -204,6 +207,8 @@ class Form {
                 }
             }
         }*/
+
+        return $form;
     }
 
 
@@ -373,8 +378,8 @@ class Form {
 
         $this->_form_item_generate_reference($field);
         switch ($field['type']) {
-            case 'checkbox_build':
-            case 'radio_build':
+            case 'checkboxes':
+            case 'radios':
                 foreach ($field['options'] as $option_key => $option_value) {
                     $form_item_data = array();
                     $form_item_data['value'] = $option_key;

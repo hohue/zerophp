@@ -7,25 +7,25 @@ class LanguageTranslate extends Entity {
 
     function __construct() {
         $this->setStructure(array(
-            'id' => 'language_translate_id',
-            'name' => 'language_translate',
-            'class' => 'ZeroPHP\ZeroPHP\LanguageTranslate',
-            'title' => zerophp_lang('Language Translate'),
-            'fields' => array(
+            '#id' => 'language_translate_id',
+            '#name' => 'language_translate',
+            '#class' => 'ZeroPHP\ZeroPHP\LanguageTranslate',
+            '#title' => zerophp_lang('Language Translate'),
+            '#fields' => array(
                 'language_translate_id' => array(
-                    'name' => 'language_translate_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden',
+                    '#name' => 'language_translate_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden',
                 ),
                 'en' => array(
-                    'name' => 'en',
-                    'title' => zerophp_lang('English'),
-                    'type' => 'textarea',
+                    '#name' => 'en',
+                    '#title' => zerophp_lang('English'),
+                    '#type' => 'textarea',
                 ),
                 'vi' => array(
-                    'name' => 'vi',
-                    'title' => zerophp_lang('Vietnamese'),
-                    'type' => 'textarea',
+                    '#name' => 'vi',
+                    '#title' => zerophp_lang('Viet#namese'),
+                    '#type' => 'textarea',
                 ),
             ),
         ));

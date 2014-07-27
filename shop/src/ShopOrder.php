@@ -20,7 +20,7 @@ class ShopOrder extends Entity {
                 'payinfo_gender' => array(
                     'name' => 'payinfo_gender	',
                     'title' => 'giới tính',
-                    'type' => 'checkbox_build',
+                    'type' => 'checkboxes',
                 ),
                 'pay_name' => array(
                     'name' => 'pay_name	',
@@ -51,7 +51,7 @@ class ShopOrder extends Entity {
                 'shipinfo_gender' => array(
                     'name' => 'payinfo_gender	',
                     'title' => 'giới tính',
-                    'type' => 'checkbox_build',
+                    'type' => 'checkboxes',
                 ),
                 'ship_name' => array(
                     'name' => 'pay_name	',

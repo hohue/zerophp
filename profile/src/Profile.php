@@ -32,7 +32,7 @@ class Profile extends Entity {
                 'local_id' => array(
                     'name' => 'local_id',
                     'title' => 'Khu vực',
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'reference' => 'category',
                     'reference_type' => 'internal',
                     'reference_option' => array(
@@ -59,7 +59,7 @@ class Profile extends Entity {
                 'district_id' => array(
                     'name' => 'district_id',
                     //'title' => 'Quận huyện',
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'reference' => 'category',
                     'reference_type' => 'internal',
                     'reference_option' => array(
@@ -83,7 +83,7 @@ class Profile extends Entity {
 
     function users_profile_update_form_alter($form_id, &$form) {
         $form['fullname'] = array(
-            '#type' => 'input',
+            '#type' => 'text',
             '#name' => 'fullname',
             '#label' => zerophp_lang('Fullname'),
             '#required' => true,

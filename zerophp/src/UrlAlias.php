@@ -11,38 +11,38 @@ use ZeroPHP\ZeroPHP\Entity;
 class UrlAlias extends Entity {
     function __construct() {
         $this->setStructure(array(
-            'id' => 'urlalias_id',
-            'name' => 'urlalias',
-            'title' => zerophp_lang('URL alias'),
-            'fields' => array(
+            '#id' => 'urlalias_id',
+            '#name' => 'urlalias',
+            '#title' => zerophp_lang('URL alias'),
+            '#fields' => array(
                 'urlalias_id' => array(
-                    'name' => 'urlalias_id',
-                    'title' => zerophp_lang('ID'),
-                    'type' => 'hidden',
+                    '#name' => 'urlalias_id',
+                    '#title' => zerophp_lang('ID'),
+                    '#type' => 'hidden',
                 ),
                 'url_real' => array(
-                    'name' => 'url_real',
-                    'title' => zerophp_lang('URL real'),
-                    'type' => 'input',
+                    '#name' => 'url_real',
+                    '#title' => zerophp_lang('URL real'),
+                    '#type' => 'text',
                 ),
                 'url_alias' => array(
-                    'name' => 'url_alias',
-                    'title' => zerophp_lang('URL alias'),
-                    'type' => 'input',
+                    '#name' => 'url_alias',
+                    '#title' => zerophp_lang('URL alias'),
+                    '#type' => 'text',
                 ),
                 'created_at' => array(
-                    'name' => 'created_at',
-                    'title' => zerophp_lang('Created At'),
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1,
+                    '#name' => 'created_at',
+                    '#title' => zerophp_lang('Created At'),
+                    '#type' => 'text',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1,
                 ),
                 'updated_at' => array(
-                    'name' => 'updated_at',
-                    'title' => zerophp_lang('Updated At'),
-                    'type' => 'input',
-                    'widget' => 'date_timestamp',
-                    'form_hidden' => 1,
+                    '#name' => 'updated_at',
+                    '#title' => zerophp_lang('Updated At'),
+                    '#type' => 'text',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1,
                 ),
             ),
         ));
@@ -187,11 +187,11 @@ class UrlAlias extends Entity {
         // Dieu nay phai phan quyen, boi vi nguoi ban hang co the khong duoc phep nhap url alias
         $form['url_alias'] = array(
             '#name' => 'url_alias',
-            '#type' => 'input',
+            '#type' => 'text',
             '#label' => zerophp_lang('URL alias'),
             '#item' => array(
-                'type' => 'input',
-                'name' => 'url_alias',
+                '#type' => 'text',
+                '#name' => 'url_alias',
             ),
             '#description' => zerophp_lang('Example:') . ' ' . zerophp_lang('female-fashion'),
         );
@@ -212,7 +212,7 @@ class UrlAlias extends Entity {
             $entity = Entity::loadEntityObject($form_values['entity_name']);
             $structure = $this->CI->{$form_values['entity_name']}->getStructure();
 
-            $url_real = 'e/read/' . $form_values['entity_name'] . '/' . $form_values[$structure['id']];
+            $url_real = 'e/read/' . $form_values['entity_name'] . '/' . $form_values[$structure['#id']];
             $prefix = fw_variable_get("url alias entity " . $form_values['entity_name'] . " prefix", '');
             $this->url_alias_create($url_real, $form_values['url_alias'], $prefix);
         }
@@ -231,8 +231,8 @@ class UrlAlias extends Entity {
         $entity = Entity::loadEntityObject($entity_name);
         $structure = $this->CI->{$entity_name}->getStructure();
 
-        if (!empty($form_values[$structure['id']])) {
-            $url_alias = $this->CI->cachef->get_url_real("e/read/$entity_name/" . $form_values[$structure['id']]);
+        if (!empty($form_values[$structure['#id']])) {
+            $url_alias = $this->CI->cachef->get_url_real("e/read/$entity_name/" . $form_values[$structure['#id']]);
             $form_values['url_alias'] = $url_alias ? $url_alias : ' ';
         }
     }

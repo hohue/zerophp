@@ -45,7 +45,7 @@ class ShopTopic extends Entity {
                 'shipping' => array(
                     'name' => 'shipping',
                     'title' => 'Phí Vận Chuyển',
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'options' => array(
                         0 => 'Phí Vận Chuyển',
                         1 => 'Mễn Phí',
@@ -66,7 +66,7 @@ class ShopTopic extends Entity {
                 'promotion_type' => array(
                     'name' => 'promotion_type',
                     'title' => 'Kiểu Khuyến Mãi',
-                    'type' => 'dropdown_build',
+                    'type' => 'select_build',
                     'options' => array(
                         1 => 'Phần trăm',
                         2 => 'Giá trị'
@@ -122,7 +122,7 @@ class ShopTopic extends Entity {
                 'active' => array(
                     'name' => 'active',
                     'title' => 'Kích hoạt',
-                    'type' => 'radio_build',
+                    'type' => 'radios',
                     'options' => array(
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable')
@@ -186,10 +186,10 @@ class ShopTopic extends Entity {
         //@todo 6 Fixed for Danh muc san pham cap 1
         $form['category_level1'] = array(
             '#name' => 'category_level1',
-            '#type' => 'dropdown_build',
+            '#type' => 'select_build',
             '#item' => array(
                 'name' => 'category_level1',
-                'type' => 'dropdown_build',
+                'type' => 'select_build',
                 'size' => 15,
                 'options' => $this->category_option_get_all(1),
                 'ajax' => array(
@@ -202,10 +202,10 @@ class ShopTopic extends Entity {
 
         $form['category_level2'] = array(
             '#name' => 'category_level2',
-            '#type' => 'dropdown_build',
+            '#type' => 'select_build',
             '#item' => array(
                 'name' => 'category_level2',
-                'type' => 'dropdown_build',
+                'type' => 'select_build',
                 'size' => 15,
                 'ajax' => array(
                     'path' => 'shop_topic/start_get_level3',
@@ -218,10 +218,10 @@ class ShopTopic extends Entity {
 
         $form['category_level3'] = array(
             '#name' => 'category_level3',
-            '#type' => 'dropdown_build',
+            '#type' => 'select_build',
             '#item' => array(
                 'name' => 'category_level2',
-                'type' => 'dropdown_build',
+                'type' => 'select_build',
                 'size' => 15,
             ),
             '#prefix' => '<span>&gt;</span>',
@@ -241,10 +241,10 @@ class ShopTopic extends Entity {
 
         $form['category_choose'] = array(
             '#name' => 'category_choose',
-            '#type' => 'dropdown_build',
+            '#type' => 'select_build',
             '#item' => array(
                 'name' => 'category_choose',
-                'type' => 'dropdown_build',
+                'type' => 'select_build',
                 'size' => 15,
                 'options' => $this->category_get_posted(zerophp_user_current()),
             ),
