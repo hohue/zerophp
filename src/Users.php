@@ -22,14 +22,16 @@ class Users extends Entity {
                     '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => zerophp_lang('Paolo Maldini'),
+                        'data-required' => '',
                     ),
                     '#validate' => 'required',
                     '#required' => true,
+                    '#error_messages' => zerophp_lang('Required field'),
                 ),
                 'email' => array(
                     '#name' => 'email',
                     '#title' => zerophp_lang('Email'),
-                    '#type' => 'email',
+                    '#type' => 'text',
                     '#validate' => 'required|valid_email',
                     '#attributes' => array(
                         'data-validate' => 'email',
