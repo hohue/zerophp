@@ -7,7 +7,7 @@ class Users extends Entity {
     function __construct() {
         $this->setStructure(array(
             '#id' => 'user_id',
-            '#name' => 'user',
+            '#name' => 'users',
             '#class' => 'ZeroPHP\ZeroPHP\Users',
             '#title' => zerophp_lang('Users'),
             '#fields' => array(
@@ -32,7 +32,7 @@ class Users extends Entity {
                     '#name' => 'email',
                     '#title' => zerophp_lang('Email'),
                     '#type' => 'text',
-                    '#validate' => 'required|valid_email',
+                    '#validate' => 'required|email',
                     '#attributes' => array(
                         'data-validate' => 'email',
                         'placeholder' => zerophp_lang('paolo.maldini@gmail.com'),
@@ -40,13 +40,12 @@ class Users extends Entity {
                     '#error_messages' => zerophp_lang('Invalid email'),
                     '#required' => true,
                     '#description' => zerophp_lang('Please enter your real email. We will sent you an email to activation your account.'),
-                    '#required' => true,
                 ),
                 'password' => array(
                     '#name' => 'password',
                     '#title' => zerophp_lang('Password'),
                     '#type' => 'password',
-                    '#validate' => 'min_length[8]|max_length[32]',
+                    '#validate' => 'min:8|max:12',
                     '#attributes' => array(
                         'data-validate' => 'password',
                     ),
@@ -61,11 +60,11 @@ class Users extends Entity {
                     '#title' => zerophp_lang('Status'),
                     '#type' => 'radios',
                     '#options' => array(
-                        1 => zerophp_lang('Active'),
                         0 => zerophp_lang('InActive'),
+                        1 => zerophp_lang('Active'),
                         2 => zerophp_lang('Blocked')
                     ),
-                    '#validate' => 'numeric|greater_than[-1]|less_than[3]',
+                    '#validate' => 'numeric|between:0,2',
                     '#default' => 0,
                 ),
                 'remember_token' => array(
@@ -107,7 +106,7 @@ class Users extends Entity {
                     '#title' => zerophp_lang('Roles'),
                     '#type' => 'checkboxes',
                     '#reference' => array(
-                        'name' => 'roles',
+                        'name' => 'role',
                         'class' => 'ZeroPHP\ZeroPHP\Role',
                     ),
                     '#display_hidden' => 1,
@@ -115,6 +114,17 @@ class Users extends Entity {
             ),
             '#can_not_delete' => array(1),
         ));
+    }
+
+    function saveEntity($entity) {
+        if (empty($entity->password)) {
+            unset($entity->password);
+        }
+        else {
+            $entity->password = \Hash::make($entity->password);
+        }
+
+        return parent::saveEntity($entity);
     }
 
 
@@ -181,11 +191,11 @@ class Users extends Entity {
         $structure = $this->getStructure();
         $entity = Entity::loadEntityObject('form_validation');
 
-        $this->CI->form_validation->set_rules('email', zerophp_lang('Email'), $structure['fields']['email']['#validate'] . '|is_exists[users.email]');
-        $this->CI->form_validation->set_rules('password', zerophp_lang('Password'), $structure['fields']['password']['#validate']);
+        $this->CI->form_validation->set_rules('email', zerophp_lang('Email'), $structure['#fields']['email']['#validate'] . '|is_exists[users.email]');
+        $this->CI->form_validation->set_rules('password', zerophp_lang('Password'), $structure['#fields']['password']['#validate']);
 
         if ($this->CI->form_validation->run() == FALSE) {
-            $this->CI->theme->messages_add(validation_errors(), 'error');
+            zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
             return false;
         }
 
@@ -196,7 +206,7 @@ class Users extends Entity {
             $user_update = new stdClass();
             $user_update->user_id = $user->user_id;
             $user_update->last_activity = date('Y-m-d H:i:s');
-            $this->entity_save($user_update);
+            $this->saveEntity($user_update);
 
             if ($user->active == 1) {
                 $user_update->user_id = $user->user_id;
@@ -211,26 +221,26 @@ class Users extends Entity {
                 $this->CI->session->set_userdata($data);
                 $this->setUser();
 
-                $this->CI->theme->messages_add(lang('You have been successfully logged in...'));
+                zerophp_get_instance()->response->addMessage(lang('You have been successfully logged in...'));
             }
             elseif ($user->active == 2) {
-                $this->CI->theme->messages_add(lang('Your account was blocked. Please contact the administrator.'), 'error');
+                zerophp_get_instance()->response->addMessage(lang('Your account was blocked. Please contact the administrator.'), 'error');
             }
             else {
-                $this->CI->theme->messages_add(lang('Your account is not active yet.'), 'error');
+                zerophp_get_instance()->response->addMessage(lang('Your account is not active yet.'), 'error');
             }
 
             return true;
         }
 
-        $this->CI->theme->messages_add(lang('Your password is incorrect. Please try again.'), 'error');
+        zerophp_get_instance()->response->addMessage(lang('Your password is incorrect. Please try again.'), 'error');
         return false;
     }
 
     function logout() {
         $this->CI->session->unset_userdata('users-user');
         $this->setUser();
-        $this->CI->theme->messages_add(lang('You are successfully logout.'));
+        zerophp_get_instance()->response->addMessage(lang('You are successfully logout.'));
     }
 
     function password_hash($password) {
@@ -376,11 +386,11 @@ class Users extends Entity {
         elseif ($form_id =='entity_crud_update_users') {
             $email_rule = 'is_exists[users.email]';
         }
-        $this->CI->form_validation->set_rules('email', $form['email']['#label'], $structure['fields']['email']['#validate'] . '|' . $email_rule);
+        $this->CI->form_validation->set_rules('email', $form['email']['#label'], $structure['#fields']['email']['#validate'] . '|' . $email_rule);
 
         if (isset($form_values['password']) || isset($form_values['password_confirm']) || $form_id =='entity_crud_create_users') {
             $this->CI->form_validation->set_rules('password_confirm', $form['password_confirm']['#label'], 'require');
-            $this->CI->form_validation->set_rules('password', $form['password']['#label'], $structure['fields']['password']['#validate'] . '|matches[password_confirm]');
+            $this->CI->form_validation->set_rules('password', $form['password']['#label'], $structure['#fields']['password']['#validate'] . '|matches[password_confirm]');
 
             $form_values['password'] = $this->password_hash($form_values['password']);
         }
@@ -395,14 +405,6 @@ class Users extends Entity {
         }
 
         return true;
-    }
-
-    function entity_save($entity) {
-        if (empty($entity->password)) {
-            unset($entity->password);
-        }
-
-        return parent::entity_save($entity);
     }
 
     function forgot_pass_form() {
@@ -447,7 +449,7 @@ class Users extends Entity {
 
     function forgot_pass_form_validate($form_id, $form, &$form_values) {
         $entity = Entity::loadEntityObject('form_validation');
-        $this->CI->form_validation->set_rules('email', $form['email']['#label'], 'trim|required|valid_email|is_exists[users.email]');
+        $this->CI->form_validation->set_rules('email', $form['email']['#label'], 'trim|required|email|is_exists[users.email]');
         if ($this->CI->form_validation->run() == FALSE) {
             return false;
         }
@@ -469,7 +471,7 @@ class Users extends Entity {
         $entity = Entity::loadEntityObject('mail');
         $this->CI->mail->send($form_values['email'], fw_variable_get('Activation email template users reset password subject', 'Reset your password'), $content, 'mail_template_activation_users_reset_pass|activation');
 
-        $this->CI->theme->messages_add(lang('We sent reset password email to your email. Please check your email now.'), 'success');
+        zerophp_get_instance()->response->addMessage(lang('We sent reset password email to your email. Please check your email now.'), 'success');
     }
 
     function change_pass_form() {
@@ -559,15 +561,15 @@ class Users extends Entity {
 
     function change_pass_form_validate($form_id, $form, &$form_values) {
         $entity = Entity::loadEntityObject('form_validation');
-        $this->CI->form_validation->set_rules('password_old', zerophp_lang('Old password'), 'require|min_length[8]|max_length[32]');
+        $this->CI->form_validation->set_rules('password_old', zerophp_lang('Old password'), 'require|min:8|max:12');
         $this->CI->form_validation->set_rules('password_confirm', zerophp_lang('New password confirmation'), 'require');
-        $this->CI->form_validation->set_rules('password', zerophp_lang('New password'), 'required|min_length[8]|max_length[32]|matches[password_confirm]');
+        $this->CI->form_validation->set_rules('password', zerophp_lang('New password'), 'required|min:8|max:12|matches[password_confirm]');
         if ($this->CI->form_validation->run() == FALSE) {
             return false;
         }
 
         if (!$this->login_check($this->user->email, $form_values['password_old'])) {
-            $this->CI->theme->messages_add(lang('Your old password is not match.'), 'error');
+            zerophp_get_instance()->response->addMessage(lang('Your old password is not match.'), 'error');
             return false;
         }
 
@@ -580,8 +582,8 @@ class Users extends Entity {
         $user = new stdClass();
         $user->user_id = $this->user->user_id;
         $user->password = $form_values['password'];
-        $this->entity_save($user);
+        $this->saveEntity($user);
 
-        $this->CI->theme->messages_add(lang('Your new password was updated successfully.'), 'success');
+        zerophp_get_instance()->response->addMessage(lang('Your new password was updated successfully.'), 'success');
     }
 }

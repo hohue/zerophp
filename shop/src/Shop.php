@@ -197,8 +197,8 @@ class Shop extends Entity {
             // Check shop registered
             $shop = $this->loadEntity_by_user(zerophp_user_current());
             if (!empty($shop->shop_id)) {
-                $this->CI->theme->messages_add('Bạn chỉ có thể mở một shop.', 'error');
-                redirect();
+                zerophp_get_instance()->response->addMessage('Bạn chỉ có thể mở một shop.', 'error');
+                \Redirect::to();
             }
 
             unset($form['paymenth_method']);
@@ -241,7 +241,7 @@ class Shop extends Entity {
             $this->CI->form_validation->set_rules('url_alias', $form['url_alias']['#label'], 'is_unique[shop.url_alias]');
 
             if ($this->CI->form_validation->run() == FALSE) {
-                $this->CI->theme->messages_add(validation_errors(), 'error');
+                zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
                 return false;
             }
         }
@@ -255,7 +255,7 @@ class Shop extends Entity {
         if ($role_id) {
             $user = $this->CI->users->loadEntity(zerophp_user_current());
             $user->roles[] = $role_id;
-            $this->CI->users->entity_save($user);
+            $this->CI->users->saveEntity($user);
         }
 
         $entity = Entity::loadEntityObject('url_alias');
@@ -268,8 +268,8 @@ class Shop extends Entity {
         // Check shop updated
         $shop = $this->loadEntity_by_user(zerophp_user_current());
         if (empty($shop->shop_id) || $shop->shop_id != $form['shop_id']['#item']['shop_id']) {
-            $this->CI->theme->messages_add('Bạn không có quyền truy cập vào trang này', 'error');
-            redirect();
+            zerophp_get_instance()->response->addMessage('Bạn không có quyền truy cập vào trang này', 'error');
+            \Redirect::to();
         }
 
         $form['url_alias']['#disabled'] = 'disabled';

@@ -28,7 +28,7 @@ class Contact extends Entity {
                     '#name' => 'email',
                     '#title' => zerophp_lang('Email'),
                     '#type' => 'input',
-                    '#validate' => 'valid_email',
+                    '#validate' => 'email',
                     '#attributes' => array(
                         'data-validate' => 'email',
                         'placeholder' => zerophp_lang('paolo.maldini@gmail.com'),

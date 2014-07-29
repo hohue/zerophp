@@ -7,34 +7,42 @@ class Form {
     public static function build($form = array(), $form_values = array()) {
         $form_id = zerophp_uri_validate(zerophp_get_calling_function());
 
-        $cache_name = __METHOD__ . $form_id;
-        if ($cache_value = \Cache::get($cache_name)) {
+        // Rebuild from error form
+        $cache_name_error_form = __CLASS__ . "-build-$form_id-" . csrf_token();
+        if ($cache_value = \Cache::get($cache_name_error_form)) {
             $form = $cache_value;
         }
         else {
-            $form['#id'] = $form_id;
-            $form['_form_id'] = array(
-                '#name' => '_form_id',
-                '#type' => 'hidden',
-                '#value' => $form_id,
-            );
+            $cache_name = __METHOD__ . $form_id;
+            if ($cache_value = \Cache::get($cache_name)) {
+                $form = $cache_value;
+            }
+            else {
+                $form['#id'] = $form_id;
+                $form['_form_id'] = array(
+                    '#name' => '_form_id',
+                    '#type' => 'hidden',
+                    '#value' => $form_id,
+                );
 
-            // Call form_alter functions
-            self::_alter($form_id, $form);
-            $form = self::_build($form_id, $form);
+                // Call form_alter functions
+                self::_alter($form_id, $form);
+                $form = self::_build($form_id, $form);
 
-            \Cache::forever($cache_name, $form);
+                \Cache::forever($cache_name, $form);
+            }
+
+            // Call form_value_alter functions
+            $form_values = zerophp_object_to_array($form_values);
+            self::_alter($form_id, $form, $form_values, 'form_value_alter');
+
+            // Set default value for form
+            $form = self::_setValues($form_id, $form, $form_values);
+
         }
 
-        // Call form_value_alter functions
-        $form_values = zerophp_object_to_array($form_values);
-        self::_alter($form_id, $form, $form_values, 'form_value_alter');
-
-        // Set default value for form
-        $form = self::_setValues($form_id, $form, $form_values);
-
         // Create cache to use when form submitted
-        \Cache::put(__CLASS__ . "-build-$form_id-" . \Session::getId(), $form, \Config::get('session.lifetime', 120));
+        \Cache::put($cache_name_error_form, $form, \Config::get('session.lifetime', 120));
 
         return zerophp_view($form['#theme'], array('form' => $form));
     }
@@ -59,6 +67,7 @@ class Form {
         $form['#form'] = isset($form['#form']) ? $form['#form'] : array();
         $form['#theme'] = isset($form['#theme']) ? $form['#theme'] : 'form';
         $form['#actions'] = isset($form['#actions']) ? $form['#actions'] :  array();
+        $form['#variable'] = isset($form['#variable']) ? $form['#variable'] :  array();
 
         // Move submit to $form['actions']
         if (isset($form['submit'])) {
@@ -211,37 +220,24 @@ class Form {
         return $form;
     }
 
-
-
-
-
-
-    function form_values_get_all($form_id) {
-        return $form_values;
-    }
-
-    function csrf_expire_get() {
-        return $this->_csrf_expire;
-    }
-
-    function submit() {
-        $form_id = $this->CI->input->post('form_id');
+    public static function submit() {
+        $form_id = \Input::get('_form_id', false);
+        $form_token = \Input::get('_token', false);
 
         // Restore $form_items from cache
-        $cache_name = "Form-form_items-$form_id-" . $this->csrf_get_hash();
-        $form_items = $this->CI->cachef->get_form($cache_name);
-        $this->CI->cachef->del_form($cache_name);
+        $cache_name = __CLASS__ . "-build-$form_id-$form_token";
+        $form = \Cache::get($cache_name);
+        \Cache::forget($cache_name);
 
-        if (!count($form_items)) {
-            return;
+        if (!count($form)) {
+            return true;
         }
 
-        $form_values = $this->CI->input->post();
-        $this->_form_validate($form_id, $form_items, $form_values);
-        $_POST = $form_values;
+        $form_values = \Input::all();
+        self::_submitValidate($form_id, $form, $form_values);
 
         // Generate form_values
-        foreach ($form_items as $key => $value) {
+        foreach ($form as $key => $value) {
             if (isset($value['#type']) && $value['#type'] == 'date_group') {
                 if (!empty($form_values[$key]['year']) && is_numeric($form_values[$key]['year'])
                     && 1000 <= $form_values[$key]['year'] && $form_values[$key]['year'] <= 9999
@@ -258,59 +254,67 @@ class Form {
 
         // Validate this form
         $validate = true;
-        if (!empty($form_items['#validate'])) {
-            foreach ($form_items['#validate'] as $value) {
-                $entity = Entity::loadEntityObject($value['class']);
-                if (!$this->CI->{$value['class']}->{$value['function']}($form_id, $form_items, $form_values)) {
+        if (!empty($form['#validate'])) {
+            foreach ($form['#validate'] as $value) {
+                $class = '\\' . ltrim($value['class'], '\\');
+                $entity = new $class;
+                if (!$entity->{$value['method']}($form_id, $form, $form_values)) {
                     $validate = false;
                 }
             }
         }
 
         // Submit action
+        $zerophp =& zerophp_get_instance();
         $redirect = '';
         if ($validate) {
-            if (!empty($form_items['#submit'])) {
-                foreach ($form_items['#submit'] as $value) {
-                    $entity = Entity::loadEntityObject($value['class']);
-
-                    $this->CI->{$value['class']}->{$value['function']}($form_id, $form_items, $form_values);
+            if (!empty($form['#submit'])) {
+                foreach ($form['#submit'] as $value) {
+                    $class = '\\' . ltrim($value['class'], '\\');
+                    $entity = new $class;
+                    $entity->{$value['method']}($form_id, $form, $form_values);
                 }
-
-                unset($form_values);
             }
 
             if (!empty($zerophp->request->query('destination'))) {
                 $redirect = $zerophp->request->query('destination');
             }
-            elseif(!empty($form_items['#redirect'])) {
-                $redirect = $form_items['#redirect'];
+            elseif(!empty($form['#redirect'])) {
+                $redirect = $form['#redirect'];
             }
         }
-
-        unset($form_items);
+        // Set default value
+        else {
+            foreach ($form_values as $key => $value) {
+                if (isset($form[$key])) {
+                    $form[$key]['#value'] = $value;
+                }
+            }
+            \Cache::put($cache_name, $form);
+        }
 
         // Redirect after submit finalize
         if ($redirect) {
-            switch ($this->CI->theme->output_type_get()) {
+            switch ($zerophp->response->output_type_get()) {
                 case 'json':
                 case 'html':
                     $data = array(
                         'form_redirect' => $redirect,
                     );
-                    $zerophp->response->addContent_json($data);
-                    $this->CI->theme->output_type_set('json');
-                    fw_output();
-                    die();
+                    $zerophp->response->addContentJSON($data);
+                    $zerophp->response->setOutputType('json');
+                    return false;
 
                 default:
-                    redirect($redirect);
+                    \Redirect::to($redirect);
             }
         }
+
+        return true;
     }
 
     // Validate & reset $form_values
-    private function _form_validate($form_id, $form, &$form_values) {
+    private static function _submitValidate($form_id, $form, &$form_values) {
         if (count($form)) {
             // Client edit disabled field
             foreach ($form as $value) {
@@ -328,18 +332,12 @@ class Form {
         }
     }
 
-    function form_key_make() {
-        return $this->form_keys;
-    }
 
-    private function _form_token_make($form_key, $form_id) {
-        return do_hash($form_id . $this->csrf_get_hash() . $form_key);
-    }
 
-    function form_token_get() {
-        $key = $this->form_key_make();
-        return $this->_form_token_make($this->CI->input->post($key['form_key']), $this->CI->input->post('form_id'));
-    }
+
+
+
+    
 
     function form_item_generate($field, $item_name = '') {
         $field['name'] = $item_name ? $item_name : $field['name'];
@@ -414,7 +412,7 @@ class Form {
     private function _form_item_generate_reference(&$field) {
         if (isset($field['reference']) && $field['reference']) {
             $entity = Entity::loadEntityObject($field['reference']);
-            $ref_structure = $field['reference']['class']::getStructure();
+            $ref_structure = $field['#reference']['class']::getStructure();
 
             if (empty($field['reference_option'])) {
                 $reference = $this->CI->{$field['reference']}->loadEntityAll();
@@ -426,90 +424,8 @@ class Form {
 
             foreach ($reference as $ref) {
                 $ref = fw_object_to_array($ref);
-                $field['options'][$ref[$ref_structure['id']]] = isset($ref['title']) ? $ref['title'] : $ref[$ref_structure['id']];
+                $field['options'][$ref[$ref_structure['#id']]] = isset($ref['title']) ? $ref['title'] : $ref[$ref_structure['#id']];
             }
         }
-    }
-
-    function form_item_get($form_item, $form_id) {
-        if (isset($form_items) && isset($form_items[$form_item])) {
-            $result = $form_items[$form_item];
-            return $result;
-        }
-
-        return array();
-    }
-
-    // Delete form_item rendered
-    function form_item_rendered($form_item, $form_id) {
-        unset($form_items[$form_item]);
-    }
-
-    function form_item_get_all($form_id) {
-        if (isset($form_items)) {
-            return $form_items;
-        }
-
-        return array();
-    }
-
-    function form_get_all() {
-        return $this->form_items;
-    }
-
-    function form_get_form_id() {
-        return array_keys($this->form_items);
-    }
-
-    /**
-     * Get CSRF Hash
-     *
-     * Getter Method
-     *
-     * @return string self::_csrf_hash
-     */
-    function csrf_get_hash() {
-        return $this->_csrf_hash;
-    }
-
-    /**
-     * Get CSRF Token Name
-     *
-     * Getter Method
-     *
-     * @return string self::csrf_token_name
-     */
-    function csrf_get_token_name() {
-        return $this->_csrf_token_name;
-    }
-
-    /**
-     * Set Cross Site Request Forgery Protection Cookie
-     *
-     * @return string
-     */
-    private function _csrf_set_hash() {
-        if ($this->_csrf_hash == '') {
-            // If the cookie exists we will use it's value.
-            // We don't necessarily want to regenerate it with
-            // each page load since a page could contain embedded
-            // sub-pages causing this feature to fail
-            $csrf_hash = $this->CI->session->userdata('csrf');
-            if (isset($csrf_hash['expire']) && $csrf_hash['expire'] >= time()) {
-                return $this->_csrf_hash = $csrf_hash['value'];
-            }
-
-            $csrf_hash = array(
-                'csrf' => array(
-                    'expire' => time() + $this->_csrf_expire,
-                    'value' => do_hash(uniqid(rand(), TRUE))
-                )
-            );
-            $this->CI->session->set_userdata($csrf_hash);
-
-            return $this->_csrf_hash = $csrf_hash['csrf']['value'];
-        }
-
-        return $this->_csrf_hash;
     }
 }

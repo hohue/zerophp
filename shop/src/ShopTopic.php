@@ -322,7 +322,7 @@ class ShopTopic extends Entity {
 
     function create_start_form_validate($form_id, $form, &$form_value) {
         if (!is_numeric($form_value['category_id']) || !$form_value['category_id']) {
-            $this->CI->theme->messages_add('Vui lòng chọn danh mục bạn muốn đăng tin.', 'error');
+            zerophp_get_instance()->response->addMessage('Vui lòng chọn danh mục bạn muốn đăng tin.', 'error');
             return false;
         }
 
@@ -341,8 +341,8 @@ class ShopTopic extends Entity {
 
         $form_value['category_id'] = $this->CI->session->userdata('shop_topic_create_category_id');
         if (!$form_value['category_id']) {
-            $this->CI->theme->messages_add('Bạn phải chọn một danh mục trước.', 'error');
-            redirect('shop_topic/start');
+            zerophp_get_instance()->response->addMessage('Bạn phải chọn một danh mục trước.', 'error');
+            \Redirect::to('shop_topic/start');
         }
         //$this->CI->session->unset_userdata('shop_topic_create_category_id');
     }

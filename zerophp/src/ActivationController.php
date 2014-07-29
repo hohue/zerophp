@@ -21,8 +21,8 @@ class ActivationController {
             $zerophp->response->addContent('activation_success|activation', zerophp_lang('success') );
         }
         else {
-            $this->response->messages_add(lang('Your activation code is not match or has expired.'), 'error');
-            redirect();
+            $this->response->addMessage(lang('Your activation code is not match or has expired.'), 'error');
+            \Redirect::to();
         }
     }
 

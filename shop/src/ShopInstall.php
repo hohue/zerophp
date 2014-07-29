@@ -202,6 +202,12 @@ class ShopInstall {
                 'method' => 'showItems',
             ),
         ));
+
+        \DB::table('role')->insert(array(
+            array(
+                'title' => 'Salesman',
+            ),
+        ));
     }
 
     private static function down_0_01() {

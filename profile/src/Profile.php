@@ -131,7 +131,7 @@ class Profile extends Entity {
             ),
         );
 
-        $this->CI->theme->breadcrumbs_add($crud);
+        zerophp_get_instance()->response->breadcrumbs_add($crud);
         return parent::crud_update($entity, $url_prefix);
     }
 
@@ -156,7 +156,7 @@ class Profile extends Entity {
             if (!empty($user->user_id)) {
                 $entity = new stdClass();
                 $entity->user_id = $user->user_id;
-                $entity_id = $this->entity_save($entity);
+                $entity_id = $this->saveEntity($entity);
 
                 return $this->loadEntity($entity_id);
             }

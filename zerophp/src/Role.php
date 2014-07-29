@@ -112,7 +112,7 @@ class Role extends Entity {
         $this->CI->load->model('roles_model');
         $this->CI->roles_model->access_set_list($data);
         $this->CI->cachef->del_system('users-access_get_list');
-        $this->CI->theme->messages_add(lang('Your data was updated successfully.'));
+        zerophp_get_instance()->response->addMessage(lang('Your data was updated successfully.'));
     }
 
     function access_check($path = null, $user_id = null, $access_key = array()) {

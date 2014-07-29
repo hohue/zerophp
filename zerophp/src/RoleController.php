@@ -6,7 +6,7 @@ class RoleController{
 
     
     function index() {
-        redirect('admin/e/index/roles');
+        \Redirect::to('admin/e/index/roles');
     }
 
     function permissions() {

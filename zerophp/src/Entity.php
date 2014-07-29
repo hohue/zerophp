@@ -145,8 +145,7 @@ class Entity {
             foreach ($reference as $ref_id) {
                 if ($ref_id) {
                     $attributes['filter'] = false;
-                    $reference_entity_obj = $this->loadEntityObject($field['#reference']['class']);
-                    $reference_entity = $reference_entity_obj->loadEntity($ref_id, $attributes);
+                    $reference_entity = $ref->loadEntity($ref_id->{$ref_structure['#id']}, $attributes);
 
                     //if ($field['#name'] == 'district_id') {
                         //fw_devel_print($field, $ref, $ref_structure);
@@ -194,15 +193,7 @@ class Entity {
         foreach ($this->structure['#fields'] as $field) {
             // Save Reference fields to temp
             if (!empty($field['#reference']) && isset($entity->{$field['#name']})) {
-                if (!is_array($entity->{$field['#name']})) {
-                    $reference_field = array(
-                        $entity->{$field['#name']},
-                    );
-                }
-                else {
-                    $reference_field = $entity->{$field['#name']};
-                }
-                $reference[$field['#name']] = $reference_field;
+                $reference[$field['#name']] = array_filter((array) $entity->{$field['#name']});
 
                 if (empty($field['#reference']['type']) || $field['#reference']['type'] != 'internal') {
                     unset($entity->{$field['#name']});
@@ -218,7 +209,7 @@ class Entity {
             ));
 
             if (!empty($entity_old->{$this->structure['#id']})) {
-                $entity_id = EntityModel::update($entity, $this->structure);
+                $entity_id = EntityModel::updateEntity($entity, $this->structure);
 
                 $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['#name'];
                 \Cache::forget($cache_name);
@@ -230,7 +221,7 @@ class Entity {
         }
 
         if (!$update) {
-            $entity_id = EntityModel::create($entity, $this->structure);
+            $entity_id = EntityModel::createEntity($entity, $this->structure);
         }
 
         // Save reference fields from temp to database
@@ -245,6 +236,190 @@ class Entity {
         EntityModel::saveReference($reference, $entity_id, $this->structure);
     }
 
+    function crudCreateForm() {
+        $form = $this->structure['#fields'];
+
+        $form['entity_name'] = array(
+            '#name' => 'entity_name',
+            '#type' => 'hidden',
+            '#value' => $this->structure['#name'],
+        );
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Save'),
+        );
+
+        $form['#validate'][] = array(
+            'class' => $this->structure['#class'],
+            'method' => 'crudCreateFormValidate',
+        );
+
+        $form['#submit'][] = array(
+            'class' => $this->structure['#class'],
+            'method' => 'crudCreateFormSubmit',
+        );
+
+        return $form;
+    }
+
+    function crudCreateFormValidate($form_id, $form, &$form_values) {
+        $rules = array();
+        foreach ($this->structure['#fields'] as $key => $value) {
+            $form_values[$key] = isset($form_values[$key]) ? $form_values[$key] : 
+                (isset($value['#default']) ? $value['#default'] : '');
+            if (isset($value['#validate'])) {
+                $rules['value'][$key] = $form_values[$key];
+                $rules['rule'][$key] = $value['#validate'];
+            }
+        }
+
+        if (count($rules)) {
+            //zerophp_devel_print($rules);
+            $validator = \Validator::make($rules['value'], $rules['rule']);
+        }
+
+        if ($validator->fails()) {
+            zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
+            return false;
+        }
+
+        // Textarea clean
+        foreach ($this->structure['#fields'] as $key => $value) {
+            if ($value['#type'] == 'textarea' && !empty($form_values[$key])) {
+                if (!empty($value['#rte_enable'])) {
+                    // Make safe and standard html document
+                    require_once ROOT . '/libraries/htmlpurifier/library/HTMLPurifier.auto.php';
+                    $config = HTMLPurifier_Config::createDefault();
+                    $purifier = new HTMLPurifier($config);
+                    $form_values[$key] = $purifier->purify($form_values[$key]);
+
+                    $text = new DOMDocument();
+                    @$text->loadHTML('<?xml encoding="UTF-8"?>' . $form_values[$key]); //LIBXML_HTML_NOIMPLIED
+
+                    $images = $text->getElementsByTagName('img');
+                    foreach ($images as $image) {
+                        $lazyload = $text->createAttribute('data-original');
+                        $lazyload->value = $image->getAttribute('src');
+                        $image->appendChild($lazyload);
+
+                        $image->removeAttribute('src');
+
+                        $class = $text->createAttribute('class');
+                        $class->value .= 'loading lazy';
+                        $image->appendChild($class);
+                    }
+
+                    $anchors = $text->getElementsByTagName('a');
+                    foreach($anchors as $anchor) {
+                        $nofollow = $text->createAttribute('rel');
+                        $nofollow->value .= 'nofollow';
+                        $anchor->appendChild($nofollow);
+
+                        $target = $text->createAttribute('target');
+                        $target->value .= '_blank';
+                        $anchor->appendChild($target);
+                    }
+
+                    $body = $text->getElementsByTagName('body')->item(0);
+                    $form_values[$key] = str_replace("</body>", '', str_replace("<body>", '', $text->saveHTML($body)));
+                }
+                else {
+                    $form_values[$key] = strip_tags($form_values[$key]);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    function crudCreateFormSubmit($form_id, $form, &$form_values, $message = '') {
+        $entity = new \stdClass();
+
+        // Fetch via structure to skip unexpected fields (alter form another modules)
+        foreach ($this->structure['#fields'] as $key => $value) {
+            if ($value['#type'] == 'file'
+                && file_exists($_FILES[$key]['tmp_name'])
+                && is_uploaded_file($_FILES[$key]['tmp_name'])
+            ) {
+                $this->CI->config->load('upload');
+                $upload_config = config_item('upload');
+                $upload = false;
+                switch ($value['widget']) {
+                    case 'image':
+                        $upload_config = $upload_config['image'];
+                        $upload_config['upload_path'] = 'files/images/';
+                        $upload = true;
+                        break;
+
+                    //@todo 9 cho phep upload file
+                    /* case 'file':
+                        $upload_config = $upload_config['file'];
+                        $upload_config['upload_path'] = 'files/';
+                        $upload = true;
+                        break; */
+                }
+
+                if ($upload) {
+                    $upload_config['upload_path'] .= zerophp_user_current() . '/';
+
+                    if (!is_dir($upload_config['upload_path'])) {
+                        mkdir($upload_config['upload_path'], 0777, true);
+                    }
+
+                    $entity = Entity::loadEntityObject('upload', $upload_config);
+                    $this->CI->upload->initialize($upload_config);
+                    $result = $this->CI->upload->do_upload($key);
+
+                    if ($result === false) {
+                        zerophp_get_instance()->response->addMessage($this->CI->upload->display_errors(), 'error');
+                        unset($form_values[$key]);
+                    }
+                    else {
+                        $file = $this->CI->upload->data();
+                        $form_values[$key] = $upload_config['upload_path'] . $file['file_name'];
+                    }
+                }
+            }
+
+            switch ($key) {
+                case 'created_by':
+                    if (empty($entity->{$key})) {
+                        $entity->{$key} = zerophp_user_current();
+                    }
+                    break;
+
+                case 'updated_by':
+                    $entity->{$key} = zerophp_user_current();
+                    break;
+
+                case 'created_at':
+                    if (empty($form_values[$this->structure['#id']])) {
+                        $entity->{$key} = date('Y-m-d H:i:s');
+                    }
+                    break;
+
+                case 'updated_at':
+                    $entity->{$key} = $entity->{$key} = date('Y-m-d H:i:s');
+                    break;
+
+                default:
+                    if (isset($form_values[$key])) {
+                        $entity->{$key} = $form_values[$key];
+                    }
+                    elseif (isset($value['#default']) && !isset($form_values[$this->structure['#id']])) {
+                        $entity->{$key} = $value['#default'];
+                    }
+            }
+        }
+
+        $form_values[$this->structure['#id']] = $this->saveEntity($entity);
+
+        $message = $message ? $message : zerophp_lang('Your data was updated successfully.');
+        zerophp_get_instance()->response->addMessage($message, 'success');
+    }
+
 
 
 
@@ -255,13 +430,13 @@ class Entity {
 
     function crud_list($url_prefix = '', $page = 1) {
         $template = "entity_list_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = $this->CI->theme->template_check($template, $this->structure['#name']) ? $template : 'entity_list';
+        $template = zerophp_get_instance()->response->template_check($template, $this->structure['#name']) ? $template : 'entity_list';
 
         $attributes = array(
             'page' => $page,
         );
 
-        if ($this->CI->theme->admin_get()) {
+        if (zerophp_get_instance()->response->admin_get()) {
             $attributes['check_active'] = false;
             $attributes['cache'] = false;
         }
@@ -289,7 +464,7 @@ class Entity {
 
     function crud_create($type = 'create', $entity = null, $url_prefix = '', $action = '') {
         $template = "entity_create_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = $this->CI->theme->template_check($template, $this->structure['#name']) ? $template : 'entity_create';
+        $template = zerophp_get_instance()->response->template_check($template, $this->structure['#name']) ? $template : 'entity_create';
 
         // Update
         if ($type == 'update' && $entity) {
@@ -333,7 +508,7 @@ class Entity {
 
     function crud_read($entity, $url_prefix = '') {
         $template = "entity_read_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = $this->CI->theme->template_check($template) ? $template : 'entity_read';
+        $template = zerophp_get_instance()->response->template_check($template) ? $template : 'entity_read';
 
         $data = array(
             'entity' => $entity,
@@ -343,10 +518,10 @@ class Entity {
         $page_title = isset($entity->title) ? $entity->title : $this->structure->title;
 
 
-        $this->CI->theme->breadcrumbs_add(array(array('item' => $page_title)));
+        zerophp_get_instance()->response->breadcrumbs_add(array(array('item' => $page_title)));
 
         if (!empty($entity->{$this->structure['#id']})) {
-            $this->CI->theme->tabs_add($this->link_tab($this->link_action($entity->{$this->structure['#id']}, $url_prefix, 'read')));
+            zerophp_get_instance()->response->tabs_add($this->link_tab($this->link_action($entity->{$this->structure['#id']}, $url_prefix, 'read')));
         }
 
         return array(
@@ -373,7 +548,7 @@ class Entity {
         }
 
         $template = "entity_delete_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = $this->CI->theme->template_check($template, $this->structure['#name']) ? $template : 'entity_delete';
+        $template = zerophp_get_instance()->response->template_check($template, $this->structure['#name']) ? $template : 'entity_delete';
 
         $data = array(
             'form_id' => $this->crud_delete_form($entity->{$this->structure['#id']}, $url_prefix),
@@ -427,7 +602,7 @@ class Entity {
 
             case 'crud_read':
                 if (! $entity = $this->CI->{$attributes['entity_name']}->entity_exists($attributes['entity_id'])) {
-                    redirect(fw_variable_get('url page 404', 'dashboard/e404'));
+                    \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
                 }
                 $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}($entity, $url_prefix);
 
@@ -438,14 +613,14 @@ class Entity {
             case 'crud_delete':
             case 'crud_duplicate':
                 if (! $entity = $this->CI->{$attributes['entity_name']}->entity_exists($attributes['entity_id'], false, false)) {
-                    redirect(fw_variable_get('url page 404', 'dashboard/e404'));
+                    \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
                 }
                 $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}($entity, $url_prefix);
 
                 break;
 
             default:
-                redirect(fw_variable_get('url page 404', 'dashboard/e404'));
+                \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
         }
 
         $body_class = 'entity';
@@ -537,7 +712,7 @@ class Entity {
         }
 
         foreach ($this->structure['#fields'] as $value) {
-            if ($value['type'] == 'textarea' && !empty($value['rte_enable']) && !empty($entity->{$value['#name']})) {
+            if ($value['#type'] == 'textarea' && !empty($value['#rte_enable']) && !empty($entity->{$value['#name']})) {
                 $text = new DOMDocument();
                 @$text->loadHTML('<?xml encoding="UTF-8"?>' . $entity->{$value['#name']});
 
@@ -553,172 +728,19 @@ class Entity {
             }
 
             // Default value
-            if (!isset($entity->{$value['#name']}) && isset($value['default'])) {
+            if (!isset($entity->{$value['#name']}) && isset($value['#default'])) {
                 if (isset($value['#reference'])) {
                     $entity = Entity::loadEntityObject($value['#reference']);
-                    $value['default'] = $this->CI->{$value['#reference']}->loadEntity($value['default']);
+                    $value['#default'] = $this->CI->{$value['#reference']}->loadEntity($value['#default']);
                 }
 
-                $entity->{$value['#name']} = $value['default'];
+                $entity->{$value['#name']} = $value['#default'];
             }
         }
 
         $this->CI->form->form_build($form_id, $form, $entity);
 
         return $form_id;
-    }
-
-    function crud_create_form_validate($form_id, $form, &$form_values) {
-        $entity = Entity::loadEntityObject('form_validation');
-
-        $validate = false;
-        foreach ($this->structure['#fields'] as $key => $value) {
-            if (isset($value['validate'])) {
-                $this->CI->form_validation->set_rules($key, $value['title'],$value['validate']);
-                $validate = true;
-            }
-        }
-
-        if ($validate && $this->CI->form_validation->run() == FALSE) {
-            $this->CI->theme->messages_add(validation_errors(), 'error');
-            return false;
-        }
-
-        // Textarea clean
-        foreach ($this->structure['#fields'] as $key => $value) {
-            if ($value['type'] == 'textarea' && !empty($form_values[$key])) {
-                if (!empty($value['rte_enable'])) {
-                    // Make safe and standard html document
-                    $entity = Entity::loadEntityObject('html');
-                    $form_values[$key] = $this->CI->html->clean($form_values[$key]);
-
-                    $text = new DOMDocument();
-                    @$text->loadHTML('<?xml encoding="UTF-8"?>' . $form_values[$key]); //LIBXML_HTML_NOIMPLIED
-
-                    $images = $text->getElementsByTagName('img');
-                    foreach ($images as $image) {
-                        $lazyload = $text->createAttribute('data-original');
-                        $lazyload->value = $image->getAttribute('src');
-                        $image->appendChild($lazyload);
-
-                        $image->removeAttribute('src');
-
-                        $class = $text->createAttribute('class');
-                        $class->value .= 'loading lazy';
-                        $image->appendChild($class);
-                    }
-
-                    $anchors = $text->getElementsByTagName('a');
-                    foreach($anchors as $anchor) {
-                        $nofollow = $text->createAttribute('rel');
-                        $nofollow->value .= 'nofollow';
-                        $anchor->appendChild($nofollow);
-
-                        $target = $text->createAttribute('target');
-                        $target->value .= '_blank';
-                        $anchor->appendChild($target);
-                    }
-
-                    $body = $text->getElementsByTagName('body')->item(0);
-                    $form_values[$key] = str_replace("</body>", '', str_replace("<body>", '', $text->saveHTML($body)));
-                }
-                else {
-                    $form_values[$key] = strip_tags($form_values[$key]);
-                }
-            }
-        }
-
-        return true;
-    }
-
-    function crud_create_form_submit($form_id, $form, &$form_values, $message = '') {
-        $entity = new stdClass();
-
-        // Fetch via structure to skip unexpected fields (alter form another modules)
-        foreach ($this->structure['#fields'] as $key => $value) {
-            if ($value['type'] == 'upload'
-                && file_exists($_FILES[$key]['tmp_name'])
-                && is_uploaded_file($_FILES[$key]['tmp_name'])
-            ) {
-                $this->CI->config->load('upload');
-                $upload_config = config_item('upload');
-                $upload = false;
-                switch ($value['widget']) {
-                    case 'image':
-                        $upload_config = $upload_config['image'];
-                        $upload_config['upload_path'] = 'files/images/';
-                        $upload = true;
-                        break;
-
-                    //@todo 9 cho phep upload file
-                    /* case 'file':
-                        $upload_config = $upload_config['file'];
-                        $upload_config['upload_path'] = 'files/';
-                        $upload = true;
-                        break; */
-                }
-
-                if ($upload) {
-                    $upload_config['upload_path'] .= zerophp_user_current() . '/';
-
-                    if (!is_dir($upload_config['upload_path'])) {
-                        mkdir($upload_config['upload_path'], 0777, true);
-                    }
-
-                    $entity = Entity::loadEntityObject('upload', $upload_config);
-                    $this->CI->upload->initialize($upload_config);
-                    $result = $this->CI->upload->do_upload($key);
-
-                    if ($result === false) {
-                        $this->CI->theme->messages_add($this->CI->upload->display_errors(), 'error');
-                        unset($form_values[$key]);
-                    }
-                    else {
-                        $file = $this->CI->upload->data();
-                        $form_values[$key] = $upload_config['upload_path'] . $file['file_name'];
-                    }
-                }
-            }
-
-            switch ($key) {
-                case 'created_by':
-                    if (empty($entity->{$key})) {
-                        $entity->{$key} = zerophp_user_current();
-                    }
-                    break;
-
-                case 'updated_by':
-                    $entity->{$key} = zerophp_user_current();
-                    break;
-
-                case 'created_at':
-                    if (!isset($form_values[$this->structure['#id']])) {
-                        $widget = 'entity_widget_' . $value['widget'] . '_make';
-                        $entity->{$key} = $widget(time());
-                    }
-                    break;
-
-                case 'updated_at':
-                    $widget = 'entity_widget_' . $value['widget'] . '_make';
-                    $entity->{$key} = $widget(time());
-                    break;
-
-                default:
-                    if (isset($form_values[$key])) {
-                        $entity->{$key} = $form_values[$key];
-                    }
-                    elseif (isset($value['default']) && !isset($form_values[$this->structure['#id']])) {
-                        $entity->{$key} = $value['default'];
-                    }
-            }
-        }
-
-        $form_values[$this->structure['#id']] = $this->entity_save($entity);
-
-        $message = $message ? $message : zerophp_lang('Your data was updated successfully.');
-        $this->CI->theme->messages_add($message, 'success');
-
-        $this->crud_create_form_submit_hook($form_values);
     }
 
     function crud_create_form_submit_hook(&$form_values) {
@@ -780,7 +802,7 @@ class Entity {
 
     function crud_delete_form_submit($form_id, $form, &$form_values, $message = '') {
         $this->entity_delete($form_values['#delete']);
-        $this->CI->theme->messages_add($message ? $message : zerophp_lang('Your data was deleted successfully.'), 'success');
+        zerophp_get_instance()->response->addMessage($message ? $message : zerophp_lang('Your data was deleted successfully.'), 'success');
     }
 
     function crud_list_form($entities, $url_prefix = '', $page = 1) {
@@ -794,7 +816,7 @@ class Entity {
                     $field_name = $value['#name'] . '_' . $entity->{$this->structure['#id']};
 
                     $form_item = array(
-                        'type' => $value['type'],
+                        'type' => $value['#type'],
                         'name' => $field_name,
                         'value' => $entity->{$value['#name']},
                     );
@@ -862,16 +884,16 @@ class Entity {
                 foreach ($this->structure['#fields'] as $value) {
                     if (isset($value['fast_edit']) && $value['fast_edit'] && isset($form_values[$value['#name'] . '_' . $row])) {
                         $form_values['#update'][$row][$value['#name']] = $form_values[$value['#name'] . '_' . $row];
-                        if (isset($value['validate'])) {
-                            $this->CI->form_validation->set_rules($value['#name'] . '_' . $row, $value['title'], $value['validate']);
+                        if (isset($value['#validate'])) {
+                            $this->CI->form_validation->set_rules($value['#name'] . '_' . $row, $value['title'], $value['#validate']);
                             $validate = true;
                         }
                     }
                 }
             }
 
-            if ($validate && $this->CI->form_validation->run() == FALSE) {
-                $this->CI->theme->messages_add(validation_errors(), 'error');
+            if ($validator->fails()) {
+                zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
                 return false;
             }
         }
@@ -891,7 +913,7 @@ class Entity {
         }
 
         $this->entity_update_all($entities);
-        $this->CI->theme->messages_add(lang('Your data was updated successfully.'), 'success');
+        zerophp_get_instance()->response->addMessage(lang('Your data was updated successfully.'), 'success');
     }
 
     function entity_delete($entity_ids) {
@@ -902,7 +924,7 @@ class Entity {
 
     function entity_update_all($entities, $where_key = null) {
         
-        EntityModel::update_all($entities, $this->structure, $where_key);
+        EntityModel::updateEntity_all($entities, $this->structure, $where_key);
     }
 
     function entity_name_exists($entity_name = '') {
@@ -1086,8 +1108,8 @@ class Entity {
             return $this->access($type, $entity_name);
         }
 
-        $this->CI->theme->messages_add(lang('Forbidden: You do not have permission to access.') . current_url());
-        redirect();
+        zerophp_get_instance()->response->addMessage(lang('Forbidden: You do not have permission to access.') . current_url());
+        \Redirect::to();
     }
 
     function access_own_entity($path) {

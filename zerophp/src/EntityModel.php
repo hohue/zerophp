@@ -14,18 +14,18 @@ class EntityModel {
             }
         }
 
-        if (!isset($order['weight']) && isset($structure['fields']['weight'])) {
+        if (!isset($order['weight']) && isset($structure['#fields']['weight'])) {
             $db->orderBy('weight', 'ASC');
         }
 
-        if (!isset($order['updated_at']) && isset($structure['fields']['updated_at'])) {
+        if (!isset($order['updated_at']) && isset($structure['#fields']['updated_at'])) {
             $db->orderBy('updated_at', 'DESC');
         }
-        elseif (!isset($order['created_at']) && isset($structure['fields']['created_at'])) {
+        elseif (!isset($order['created_at']) && isset($structure['#fields']['created_at'])) {
             $db->orderBy('created_at', 'DESC');
         }
 
-        if (!isset($order['title']) && isset($structure['fields']['title'])) {
+        if (!isset($order['title']) && isset($structure['#fields']['title'])) {
             $db->orderBy('title', 'ASC');
         }
         ##### end ORDER #####
@@ -71,7 +71,7 @@ class EntityModel {
             if ((!isset($attributes['filter']) || $attributes['filter'] == true)
                 && count($filter) > 1 && !empty($filter['name']) && $filter['name'] == $structure['#name']) {
                 foreach ($filter as $key => $value) {
-                    if (isset($structure['fields'][$key])) {
+                    if (isset($structure['#fields'][$key])) {
                         $attributes['where'][$key] = $value;
                     }
                 }
@@ -92,14 +92,14 @@ class EntityModel {
 
         if ((!isset($attributes['where']) || !isset($attributes['where']['active']))
             && (!isset($attributes['check_active']) || $attributes['check_active'])
-            && isset($structure['fields']['active'])) {
+            && isset($structure['#fields']['active'])) {
             $db->where('active', 1);
         }
     }
 
     public static function createEntity($entity, $structure) {
         $db = \DB::table($structure['#name']);
-        return $db->insertGetId($entity);
+        return $db->insertGetId(zerophp_object_to_array($entity));
     }
 
     public static function deleteEntity($entity_ids, $structure) {
@@ -116,9 +116,11 @@ class EntityModel {
     }
 
     public static function updateEntity($entity, $structure) {
-        $db = \DB::table($structure['#name']);
-        $db->where($structure['#id'], $entity->{$structure['#id']});
-        $db->update($entity);
+        $db = \DB::table($structure['#name'])
+            ->where($structure['#id'], '=', $entity->{$structure['#id']})
+            ->update(zerophp_object_to_array($entity));
+
+        return $entity->{$structure['#id']};
     }
 
     /*public static function updateEntityAll($entities, $structure, $where_key = null) {
@@ -128,33 +130,37 @@ class EntityModel {
 
     public static function saveReference($reference, $entity_id, $structure) {
         foreach (array_keys($reference) as $key) {
-            $db = \DB::table($structure['#name'] . '_' . $structure['fields'][$key]['reference']['name']);
+            // Delete all of reference
+            $db = \DB::table($structure['#name'] . '_' . $structure['#fields'][$key]['#reference']['name']);
             $db->where($structure['#id'], $entity_id);
             $db->where('field', $key);
             $db->delete();
 
-            $ref_obj = Entity::loadEntityObject($structure['fields'][$key]['reference']['class']);
-            $ref_structure = $ref_obj->getStructure();
+            // Update new reference
+            if (count($reference[$key])) {
+                $ref_obj = Entity::loadEntityObject($structure['#fields'][$key]['#reference']['class']);
+                $ref_structure = $ref_obj->getStructure();
 
-            $data = array();
-            foreach ($reference[$key] as $value) {
-                if (is_object($value)) {
-                    $value = $value->{$ref_structure['id']};
+                $data = array();
+                foreach ($reference[$key] as $value) {
+                    if (is_object($value)) {
+                        $value = $value->{$ref_structure['#id']};
+                    }
+
+                    $data[] = array(
+                        'field' => $key,
+                        $structure['#id'] => $entity_id,
+                        $ref_structure['#id'] => $value,
+                    );
                 }
 
-                $data[] = array(
-                    'field' => $key,
-                    $structure['#id'] => $entity_id,
-                    $ref_structure['id'] => $value,
-                );
+                $db->insert($data);
             }
-
-            $db->insert($structure['#name'] . '_' . $key, $data);
         }
     }
 
     public static function loadReference($field, $entity_id, $structure, $ref_structure) {
-        $db = \DB::table($structure['#name'] . '_' . $ref_structure->name);
+        $db = \DB::table($structure['#name'] . '_' . $ref_structure['#name']);
 
         $db->where('field', $field);
         $db->where($structure['#id'], $entity_id);
@@ -162,15 +168,11 @@ class EntityModel {
 
         $reference = array();
         foreach ($query as $row) {
-            $reference[$row->{$ref_structure['id']}] = $row;
+            $reference[$row->{$ref_structure['#id']}] = $row;
         }
 
         return $reference;
     }
-
-
-
-
-
-    
 }
+
+// CHECKED

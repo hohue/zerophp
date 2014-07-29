@@ -40,7 +40,7 @@ class ImageStyle extends Entity {
                         'scale' => zerophp_lang('Scale'),
                     ),
                     '#required' => true,
-                    '#validate' => 'required|max_length[32]',
+                    '#validate' => 'required|max:12',
                 ),
             ),
             '#can_not_delete' => array(1, 2),
@@ -132,7 +132,7 @@ class ImageStyle extends Entity {
             }
 
             if ($error) {
-                $this->CI->theme->messages_add($this->CI->image_lib->display_errors(), 'error');
+                zerophp_get_instance()->response->addMessage($this->CI->image_lib->display_errors(), 'error');
             }
         }
 

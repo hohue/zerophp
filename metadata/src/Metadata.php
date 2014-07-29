@@ -61,10 +61,10 @@ class Metadata extends Entity {
     }
 
     function metadata_load() {
-        $header = $this->CI->theme->header_get();
+        $header = zerophp_get_instance()->response->header_get();
         $keywords = !empty($header['keywords']) ? $header['keywords'] : '';
         $description = !empty($header['description']) ? $header['description'] : '';
-        $path_title = $this->CI->theme->page_title_get();
+        $path_title = zerophp_get_instance()->response->page_title_get();
 
         // Load specific metadata (for alias url)
         $alias = $this->CI->uri->alias_string();
@@ -99,8 +99,8 @@ class Metadata extends Entity {
             }
         }
 
-        $this->CI->theme->page_title_set($path_title);
-        $this->CI->theme->header_add('<meta name="keywords" content="' . $keywords . '" />', 'keywords');
-        $this->CI->theme->header_add('<meta name="description" content="' . $description . '" />', 'description');
+        zerophp_get_instance()->response->page_title_set($path_title);
+        zerophp_get_instance()->response->header_add('<meta name="keywords" content="' . $keywords . '" />', 'keywords');
+        zerophp_get_instance()->response->header_add('<meta name="description" content="' . $description . '" />', 'description');
     }
 }
