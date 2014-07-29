@@ -7,17 +7,25 @@ use ZeroPHP\ZeroPHP\Form;
 class UserController {
     private $fields;
 
-    function __construct() {
+    /*function __construct() {
         $fields = Entity::loadEntityObject('\ZeroPHP\ZeroPHP\Users')->getStructure();
         unset($fields['#fields']['active'], $fields['#fields']['remember_token'], $fields['#fields']['last_activity'],
             $fields['#fields']['created_at'], $fields['#fields']['updated_at'], $fields['#fields']['deleted_at']);
         $this->fields = $fields['#fields'];
+    }*/
+
+    private function _unsetFormItem(&$form) {
+        unset($form['active'], $form['remember_token'], $form['last_activity'],
+            $form['created_at'], $form['updated_at'], $form['deleted_at']);
     }
+
     function showRegisterForm($zerophp) {
-        $form = $this->fields;
+        $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $form = $user->crudCreateForm();
+        $this->_unsetFormItem($form);
         unset($form['user_id'], $form['roles']);
 
-        $form['#title'] = zerophp_lang('Register a new user');
+        $form['#variable']['title'] = zerophp_lang('Register a new user');
 
         $form['password_confirm'] = $form['password'];
         $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
@@ -26,27 +34,13 @@ class UserController {
         $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
         $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
 
+        $form['#actions']['submit']['#value'] = zerophp_lang('Register');
 
-        $form['submit'] = array(
-            '#name' => 'submit',
-            '#type' => 'submit',
-            '#value' => zerophp_lang('Register'),
-        );
-
-        $form['#validate'][] = array(
-            'class' => 'users',
-            'method' => 'login_form_validate',
-        );
-
-        $redirect = '/';
+        /*$redirect = '/';
         if ($dest = $zerophp->request->query('destination')) {
             $redirect = $dest;
         }
-        $form['#redirect'] = \URL::to($redirect);
-
-        //zerophp_devel_print($form);
-
-        //$zerophp->response->addContent(zerophp_view('form', $form), zerophp_lang('Login'));
+        $form['#redirect'] = \URL::to($redirect);*/
 
         $zerophp->response->addContent(Form::build($form), zerophp_lang('Login'));
     }
@@ -80,7 +74,7 @@ class UserController {
 
     function logout() {
         $this->users->logout();
-        redirect(!empty($zerophp->request->query('destination')) ? trim($zerophp->request->query('destination')) : '');
+        \Redirect::to(!empty($zerophp->request->query('destination')) ? trim($zerophp->request->query('destination')) : '');
     }
 
     function forgot_pass() {

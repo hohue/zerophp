@@ -4,7 +4,7 @@ namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
 
-//@todo 9 Add URL alias when use Entity::entity_save();
+//@todo 9 Add URL alias when use Entity::saveEntity();
 // Write re-build feature for url_alias
 // Add url_alias & url_real folder to .gitignore
 
@@ -134,7 +134,7 @@ class UrlAlias extends Entity {
                 $this->CI->cachef->set_url_real($url_real, $url_alias);
 
                 $alias->url_alias = $url_alias;
-                $this->entity_save($alias);
+                $this->saveEntity($alias);
             }
         }
         // Save a new url alias for new url real
@@ -145,7 +145,7 @@ class UrlAlias extends Entity {
 
             $alias->url_real = $url_real;
             $alias->url_alias = $url_alias;
-            $this->entity_save($alias);
+            $this->saveEntity($alias);
         }
     }
 
@@ -162,7 +162,7 @@ class UrlAlias extends Entity {
         $this->url_alias_create($form_values['url_real'], $form_values['url_alias']);
 
         $message = $message ? $message : zerophp_lang('Your data was updated successfully.');
-        $this->CI->theme->messages_add($message, 'success');
+        zerophp_get_instance()->response->addMessage($message, 'success');
 
         $this->crud_create_form_submit_hook();
     }

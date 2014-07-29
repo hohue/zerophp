@@ -1,20 +1,30 @@
 <?php 
 namespace ZeroPHP\ZeroPHP;
 
-define('VERSION_ZEROPHP_ZEROPHP', 0.01);
+define('VERSION_ZEROPHP_ZEROPHP', 0.01001);
 
 class SystemInstall {
     public static function up($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_ZEROPHP && VERSION_ZEROPHP_ZEROPHP <= 0.01) {
-            self::up_0_01();
-        }
+        if ($prev_version < 0.01)    self::up_0_01();
+        if ($prev_version < 0.01001) self::up_0_01001();
     }
 
     public static function down($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_ZEROPHP && VERSION_ZEROPHP_ZEROPHP <= 0.01) {
-            self::down_0_01();
-        }
+        if ($prev_version < 0.01)    self::down_0_01();
+        if ($prev_version < 0.01001) self::down_0_01001();
     }
+
+    private static function up_0_01001() {
+        $user = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $admin = new \stdClass();
+        $admin->user_id = 1;
+        $user->title = 'Administrator';
+        $user->email = 'admin@localhost.com';
+        $user->password = '12345678';
+        $user->active = 1;
+    }
+
+    private static function down_0_01001() {}
 
     private static function up_0_01() {
         // Create Tables
@@ -240,6 +250,20 @@ class SystemInstall {
                 'method' => 'userResetPasswordForm',
             ),
         ));
+        \DB::table('role')->insert(array(
+            array(
+                'title' => 'Anonymous User',
+            ),
+            array(
+                'title' => 'Registered User',
+            ),
+            array(
+                'title' => 'Administrator',
+            ),
+            array(
+                'title' => 'Editor',
+            ),
+        ));
 
 
         //Set Variables
@@ -252,6 +276,5 @@ class SystemInstall {
         \Schema::drop('block');
         \Schema::drop('hook');
         \Schema::drop('image_style');
-        \Schema::drop('variable');
     }
 }
