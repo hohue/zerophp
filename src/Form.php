@@ -45,6 +45,8 @@ class Form {
 
         $form = self::_build($form_id, $form);
 
+        //zerophp_devel_print(zerophp_view($form['#theme'], array('form' => $form)));
+
         return zerophp_view($form['#theme'], array('form' => $form));
     }
 
