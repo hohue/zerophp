@@ -10,6 +10,9 @@ class Users extends Entity {
             '#name' => 'users',
             '#class' => 'ZeroPHP\ZeroPHP\Users',
             '#title' => zerophp_lang('Users'),
+            '#link' => array(
+                //'admin' => 'user/users',
+            ),
             '#fields' => array(
                 'user_id' => array(
                     '#name' => 'user_id',

@@ -137,7 +137,7 @@ class Profile extends Entity {
 
     function users_profile_update_form_value_alter($form_id, $form, &$form_values) {
         $form_values['fullname'] = $this->CI->users->user_get()->title;
-        $form_values['user_id'] = zerophp_user_current();
+        $form_values['user_id'] = zerophp_userid();
     }
 
     function entity_exists($entity_id, $active = true, $cache = true) {

@@ -9,51 +9,51 @@ class ShoptopicController {
 
     
     function start() {
-        $this->load->library('shop_topic');
+        $shop_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\Shop\ShopTopic');
 
         $vars = array(
-            'form_id' => $this->shop_topic->create_start_form(),
+            'form_id' => $shop_obj->create_start_form(),
         );
 
-        $zerophp->response->addContent('shop_topic_start|shop_topic', 'Chọn Chuyên Mục', $vars);
+        $zerophp->response->addContent(zerophp_view('shop_topic_start|shop_topic', $vars));
     }
 
-    function  finalize() {
+    function finalize() {
         $vars = array();
-        $zerophp->response->addContent('shop_topic_finalize|shop_topic', 'Đăng Tin Thành Công', $vars);
+        $zerophp->response->addContent(zerophp_view('shop_topic_finalize|shop_topic', $vars));
     }
 
     function start_get_level2() {
-        $this->load->library('shop_topic');
+        $shop_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\Shop\ShopTopic');
         $data = $this->input->get();
 
         $result = '';
         if (!empty($data['category_level1']) && is_numeric($data['category_level1'])) {
-            $form_item = $this->shop_topic->create_start_form('category_level2');
-            $form_item['#item']['options'] = $this->shop_topic->category_option_get_all(3, $data['category_level1']);
+            $form_item = $shop_obj_topic->create_start_form('category_level2');
+            $form_item['#item']['options'] = $shop_obj_topic->category_option_get_all(3, $data['category_level1']);
 
             if (count($form_item['#item']['options'])) {
                 $result = form_render($form_item);
             }
         }
 
-        $this->response->content_set($result);
+        $zerophp->content_set($result);
     }
 
     function start_get_level3() {
-        $this->load->library('shop_topic');
+        $shop_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\Shop\ShopTopic');
         $data = $this->input->get();
 
         $result = '';
         if (!empty($data['category_level2']) && is_numeric($data['category_level2'])) {
-            $form_item = $this->shop_topic->create_start_form('category_level3');
-            $form_item['#item']['options'] = $this->shop_topic->category_option_get_all(4, $data['category_level2']);
+            $form_item = $shop_obj_topic->create_start_form('category_level3');
+            $form_item['#item']['options'] = $shop_obj_topic->category_option_get_all(4, $data['category_level2']);
 
             if (count($form_item['#item']['options'])) {
                 $result = form_render($form_item);
             }
         }
 
-        $this->response->content_set($result);
+        $zerophp->content_set($result);
     }
 }

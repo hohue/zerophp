@@ -24,6 +24,6 @@ class SitemapController {
                 }
             }
 
-            $zerophp->response->addContent('sitemap_category_product|sitemap', 'Chọn Chuyên Mục', array('category' => $result));
+            $zerophp->response->addContent(zerophp_view('sitemap_category_product', array('category' => $result)));
     }
 }

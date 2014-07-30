@@ -25,6 +25,6 @@ class ProfileController {
 
         $form_item = $this->form->form_item_generate($structure['#fields']['district_id']);
 
-        $this->response->content_set(form_render($form_item, null, null, false));
+        $zerophp->content_set(form_render($form_item, null, null, false));
     }
 }

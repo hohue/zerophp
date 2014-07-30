@@ -200,7 +200,7 @@ class Activation extends Entity {
 
         if (!$activation->destination_id) {
             zerophp_get_instance()->response->addMessage(lang('Your reset password link is not match or has expired.'), 'error');
-            \Redirect::to(\URL::to());
+            return \Redirect::to(\URL::to());
         }
 
         $form['password'] = array(

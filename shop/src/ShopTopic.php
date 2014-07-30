@@ -243,7 +243,7 @@ class ShopTopic extends Entity {
                 '#name' => 'category_choose',
                 '#type' => 'select_build',
                 'size' => 15,
-                '#options' => $this->category_get_posted(zerophp_user_current()),
+                '#options' => $this->category_get_posted(zerophp_userid()),
             ),
         );
 
@@ -342,7 +342,7 @@ class ShopTopic extends Entity {
         $form_value['category_id'] = $this->CI->session->userdata('shop_topic_create_category_id');
         if (!$form_value['category_id']) {
             zerophp_get_instance()->response->addMessage('Bạn phải chọn một danh mục trước.', 'error');
-            \Redirect::to('shop_topic/start');
+            return \Redirect::to('shop_topic/start');
         }
         //$this->CI->session->unset_userdata('shop_topic_create_category_id');
     }

@@ -15,16 +15,46 @@ class SystemInstall {
     }
 
     private static function up_0_01001() {
-        $user = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        /*$user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
         $admin = new \stdClass();
         $admin->user_id = 1;
-        $user->title = 'Administrator';
-        $user->email = 'admin@localhost.com';
-        $user->password = '12345678';
-        $user->active = 1;
+        $admin->title = 'AdministratorUser';
+        $admin->email = 'admin@localhost.com';
+        $admin->password = '12345678';
+        $admin->active = 1;
+        $admin->roles = array(3);
+        $user->saveEntity($admin);*/
+
+        \DB::table('menu')->insert(array(
+            array(
+                'title' => 'User register success',
+                'path' => 'user/register/success',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'showRegisterSuccess',
+            ),
+            array(
+                'title' => 'Clear Cache',
+                'path' => 'performance/clear/cache',
+                'class' => 'ZeroPHP\\ZeroPHP\\PerformanceController',
+                'method' => 'clearCache',
+            ),
+            array(
+                'title' => 'Clear OPCache',
+                'path' => 'performance/clear/opcache',
+                'class' => 'ZeroPHP\\ZeroPHP\\PerformanceController',
+                'method' => 'clearOPCache',
+            ),
+        ));
     }
 
-    private static function down_0_01001() {}
+    private static function down_0_01001() {
+        // Remove menu
+        \DB::table('menu')->whereIn('path', array(
+                'user/register/success',
+                'performance/clear/cache',
+                'performance/clear/opcache',
+            ))->delete();
+    }
 
     private static function up_0_01() {
         // Create Tables
@@ -250,6 +280,7 @@ class SystemInstall {
                 'method' => 'userResetPasswordForm',
             ),
         ));
+
         \DB::table('role')->insert(array(
             array(
                 'title' => 'Anonymous User',

@@ -2,13 +2,8 @@
 namespace ZeroPHP\ZeroPHP;
 
 class SearchController {
-
-
-
-    
-    function  search_no_result() {
-        $vars = array(
-        );
-        $zerophp->response->addContent('search_search_no_result|search', 'KẾT QUẢ TÌM KIẾM', $vars);
+    function  searchResultEmpty() {
+        $vars = array();
+        $zerophp->response->addContent(zerophp_view('search_search_no_result', $vars));
     }
 }

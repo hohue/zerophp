@@ -10,6 +10,6 @@ class LocationController {
             $this->CI->session->set_userdata('location_current', $location_id);
         }
         
-        \Redirect::to(\URL::to($zerophp->request->query('destination')));
+        return \Redirect::to(\URL::to($zerophp->request->query('destination')));
     }
 }

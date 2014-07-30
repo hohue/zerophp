@@ -92,9 +92,28 @@ function zerophp_view($template, $data = array()) {
     return \View::make($template, $data)->render();
 }
 
-//@todo 4 tra ve user id hien tai
-function zerophp_user_current() {
-    return 0;
+function zerophp_userid() {
+    if ($id = zerophp_static(__FUNCTION__)) {
+        return $id;
+    }
+
+    $id = Auth::id();
+    return zerophp_static(__FUNCTION__, $id ? $id : 0);
+}
+
+function zerophp_user() {
+    if ($user = zerophp_static(__FUNCTION__)) {
+        return $user;
+    }
+
+    $user = new \stdClass();
+
+    if ($userid= zerophp_userid()) {
+        $user_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $user = $user_obj->loadEntity($userid);
+    }
+
+    return zerophp_static(__FUNCTION__, $user);
 }
 
 function zerophp_anchor($url, $title, $attributes = array()) {
@@ -102,7 +121,7 @@ function zerophp_anchor($url, $title, $attributes = array()) {
 }
 
 function zerophp_anchor_shop($url, $title, $attributes = array()) {
-    if (zerophp_user_current()) {
+    if (zerophp_userid()) {
         return zerophp_anchor($url, $title, $attributes);
     }
 
@@ -134,6 +153,10 @@ function zerophp_is_adminpanel() {
 
 function zerophp_message() {
     return zerophp_get_instance()->response->getMessage();
+}
+
+function zerophp_page_title() {
+    return zerophp_get_instance()->response->getPageTitle();
 }
 
 function &zerophp_get_instance() {

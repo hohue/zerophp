@@ -32,7 +32,7 @@ class CategoryController {
             unset($form_item['#item']['options'][$category->category_id]);
         }
 
-        $this->response->content_set(form_render($form_item, null, null, false));
+        $zerophp->content_set(form_render($form_item, null, null, false));
     }
 
     function children_get_from_parent() {
@@ -55,6 +55,6 @@ class CategoryController {
 
         $form_item = $this->form->form_item_generate($structure['#fields']['district_id']);
 
-        $this->response->content_set(form_render($form_item, null, null, false));
+        $zerophp->content_set(form_render($form_item, null, null, false));
     }
 }

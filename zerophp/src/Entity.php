@@ -260,6 +260,8 @@ class Entity {
             'class' => $this->structure['#class'],
             'method' => 'crudCreateFormSubmit',
         );
+        
+        $form['#redirect'] = !empty($this->structure['#link']['admin']) ? $this->structure['#link']['admin'] : '/';
 
         return $form;
     }
@@ -362,7 +364,7 @@ class Entity {
                 }
 
                 if ($upload) {
-                    $upload_config['upload_path'] .= zerophp_user_current() . '/';
+                    $upload_config['upload_path'] .= zerophp_userid() . '/';
 
                     if (!is_dir($upload_config['upload_path'])) {
                         mkdir($upload_config['upload_path'], 0777, true);
@@ -386,12 +388,12 @@ class Entity {
             switch ($key) {
                 case 'created_by':
                     if (empty($entity->{$key})) {
-                        $entity->{$key} = zerophp_user_current();
+                        $entity->{$key} = zerophp_userid();
                     }
                     break;
 
                 case 'updated_by':
-                    $entity->{$key} = zerophp_user_current();
+                    $entity->{$key} = zerophp_userid();
                     break;
 
                 case 'created_at':
@@ -575,7 +577,7 @@ class Entity {
 
         switch ($attributes['entity_id']) {
             case 'me':
-                $attributes['entity_id'] = zerophp_user_current();
+                $attributes['entity_id'] = zerophp_userid();
                 break;
 
             case 'sess':
@@ -602,7 +604,7 @@ class Entity {
 
             case 'crud_read':
                 if (! $entity = $this->CI->{$attributes['entity_name']}->entity_exists($attributes['entity_id'])) {
-                    \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
+                    return \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
                 }
                 $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}($entity, $url_prefix);
 
@@ -613,14 +615,14 @@ class Entity {
             case 'crud_delete':
             case 'crud_duplicate':
                 if (! $entity = $this->CI->{$attributes['entity_name']}->entity_exists($attributes['entity_id'], false, false)) {
-                    \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
+                    return \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
                 }
                 $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}($entity, $url_prefix);
 
                 break;
 
             default:
-                \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
+                return \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
         }
 
         $body_class = 'entity';
@@ -631,7 +633,7 @@ class Entity {
 
         $zerophp =& ZeroPHP::getInstance();
         $zerophp->response->addBodyClass($body_class);
-        $zerophp->response->addContent($vars['template'], $vars['page_title'], $vars['data']);
+        $zerophp->response->addContent(zerophp_view($vars['template'], $vars['data']));
     }
 
     function crud_create_form($type = 'create', $entity = null, $update = false, $url_prefix = '', $action = '') {
@@ -1109,7 +1111,7 @@ class Entity {
         }
 
         zerophp_get_instance()->response->addMessage(lang('Forbidden: You do not have permission to access.') . current_url());
-        \Redirect::to();
+        return \Redirect::to();
     }
 
     function access_own_entity($path) {

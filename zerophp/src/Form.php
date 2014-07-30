@@ -295,7 +295,7 @@ class Form {
 
         // Redirect after submit finalize
         if ($redirect) {
-            switch ($zerophp->response->output_type_get()) {
+            switch ($zerophp->response->getOutputType()) {
                 case 'json':
                 case 'html':
                     $data = array(
@@ -306,7 +306,7 @@ class Form {
                     return false;
 
                 default:
-                    \Redirect::to($redirect);
+                    return \Redirect::to($redirect);
             }
         }
 

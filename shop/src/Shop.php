@@ -195,10 +195,10 @@ class Shop extends Entity {
     function shop_create_form_alter($form_id, &$form) {
         if ($form_id == 'entity_crud_create_shop') {
             // Check shop registered
-            $shop = $this->loadEntity_by_user(zerophp_user_current());
+            $shop = $this->loadEntity_by_user(zerophp_userid());
             if (!empty($shop->shop_id)) {
                 zerophp_get_instance()->response->addMessage('Bạn chỉ có thể mở một shop.', 'error');
-                \Redirect::to();
+                return \Redirect::to();
             }
 
             unset($form['paymenth_method']);
@@ -253,7 +253,7 @@ class Shop extends Entity {
         $role_id = reset(fw_variable_get('shop roles salesman', array()));
 
         if ($role_id) {
-            $user = $this->CI->users->loadEntity(zerophp_user_current());
+            $user = $this->CI->users->loadEntity(zerophp_userid());
             $user->roles[] = $role_id;
             $this->CI->users->saveEntity($user);
         }
@@ -263,13 +263,13 @@ class Shop extends Entity {
     }
 
     function shop_update_form_alter($form_id, &$form) {
-        $this->shop_create_form_alter($form_id, $form);
+        $shop_obj_create_form_alter($form_id, $form);
 
         // Check shop updated
-        $shop = $this->loadEntity_by_user(zerophp_user_current());
+        $shop = $this->loadEntity_by_user(zerophp_userid());
         if (empty($shop->shop_id) || $shop->shop_id != $form['shop_id']['#item']['shop_id']) {
             zerophp_get_instance()->response->addMessage('Bạn không có quyền truy cập vào trang này', 'error');
-            \Redirect::to();
+            return \Redirect::to();
         }
 
         $form['url_alias']['#disabled'] = 'disabled';
@@ -281,7 +281,7 @@ class Shop extends Entity {
         if (isset($attributes['entity_id']) && $attributes['entity_id'] == 'me') {
             $attributes['entity_id'] = 0;
 
-            $shop = $this->loadEntity_by_user(zerophp_user_current());
+            $shop = $this->loadEntity_by_user(zerophp_userid());
             if (!empty($shop->shop_id)) {
                 $attributes['entity_id'] = $shop->shop_id;
             }

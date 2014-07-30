@@ -49,7 +49,7 @@ class EntityController {
         }
 
         if (!$this->entity->entity_name_exists($attributes['entity_name'])) {
-            \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
+            return \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
         }
 
         $this->load->library($attributes['entity_name']);

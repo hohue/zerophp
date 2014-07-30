@@ -3,12 +3,6 @@ namespace ZeroPHP\ZeroPHP;
 
 class RoleController{
 
-
-    
-    function index() {
-        \Redirect::to('admin/e/index/roles');
-    }
-
     function permissions() {
         $roles = $this->roles->loadEntityAll(array('cache' => false));
         $access = $this->roles->access_get_list('', false);
@@ -22,6 +16,6 @@ class RoleController{
             'permissions' => $permissions,
             'access' => $access,
         );
-        $zerophp->response->addContent('admin_roles_permissions', zerophp_lang('Users permissions'), $vars);
+        $zerophp->response->addContent(zerophp_view('admin_roles_permissions', $vars));
     }
 }
