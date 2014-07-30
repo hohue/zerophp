@@ -160,7 +160,7 @@ class Entity {
 
         // Set to cache
         if (!isset($attributes['cache']) || $attributes['cache'] == true) {
-            \Cache::put($cache_name, $result);
+            \Cache::put($cache_name, $result, ZEROPHP_CACHE_EXPIRE_TIME);
         }
 
         return $result;
@@ -261,32 +261,12 @@ class Entity {
             'method' => 'crudCreateFormSubmit',
         );
         
-        $form['#redirect'] = !empty($this->structure['#link']['admin']) ? $this->structure['#link']['admin'] : '/';
+        $form['#redirect'] = !empty($this->structure['#links']['list']) ? $this->structure['#links']['list'] : '/';
 
         return $form;
     }
 
     function crudCreateFormValidate($form_id, $form, &$form_values) {
-        $rules = array();
-        foreach ($this->structure['#fields'] as $key => $value) {
-            $form_values[$key] = isset($form_values[$key]) ? $form_values[$key] : 
-                (isset($value['#default']) ? $value['#default'] : '');
-            if (isset($value['#validate'])) {
-                $rules['value'][$key] = $form_values[$key];
-                $rules['rule'][$key] = $value['#validate'];
-            }
-        }
-
-        if (count($rules)) {
-            //zerophp_devel_print($rules);
-            $validator = \Validator::make($rules['value'], $rules['rule']);
-        }
-
-        if ($validator->fails()) {
-            zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
-            return false;
-        }
-
         // Textarea clean
         foreach ($this->structure['#fields'] as $key => $value) {
             if ($value['#type'] == 'textarea' && !empty($form_values[$key])) {

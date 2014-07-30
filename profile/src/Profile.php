@@ -197,7 +197,7 @@ class Profile extends Entity {
             $result = array_merge($result, $categories);
         }
 
-        \Cache::put($cache_name, $result);
+        \Cache::put($cache_name, $result, ZEROPHP_CACHE_EXPIRE_TIME);
         return $result;
     }
 }

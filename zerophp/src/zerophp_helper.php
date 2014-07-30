@@ -92,6 +92,10 @@ function zerophp_view($template, $data = array()) {
     return \View::make($template, $data)->render();
 }
 
+function zerophp_form($template, $data = array()) {
+    return \View::make($template, $data)->render();
+}
+
 function zerophp_userid() {
     if ($id = zerophp_static(__FUNCTION__)) {
         return $id;
@@ -200,10 +204,6 @@ function zerophp_variable_set($key, $value) {
     return \ZeroPHP\ZeroPHP\VariableModel::set($key, $value);
 }
 
-function zerophp_form($template, $data = array()) {
-    return \View::make($template, $data)->render();
-}
-
 function zerophp_object_to_array($object) {
     return json_decode(json_encode($object), true);
 }
@@ -257,4 +257,98 @@ function zerophp_form_render_all(&$form) {
     }
 
     return $result;
+}
+
+if (!function_exists('template_item_list')) {
+    function template_item_list($items, $level = 1) {
+        $result = '<ul class="items-level-' . $level . '">';
+            foreach ($items as $value) {
+                $result .= '<li>';
+                    if (isset($value['#item'])) {
+                        $result .= $value['#item'];
+                    }
+
+                    if (isset($value['#children'])) {
+                        $result .= template_item_list($value['#children'], $level++);
+                    }
+
+                $result .= '</li>';
+            }
+        $result .= '</ul>';
+
+        return $result;
+    }
+}
+
+if (!function_exists('template_tree_build')) {
+    function template_tree_build($tree) {
+        $result = array();
+
+        $tree = zerophp_object_to_array($tree);
+
+        foreach ($tree as $key => $value) {
+            if (!empty($value['#parent'])) {
+                if (is_array($value['#parent'])) {
+                    $parent = reset(array_keys($value['#parent']));
+                }
+                else {
+                    $parent = $value['#parent'];
+                }
+                unset($value['#parent']);
+
+                if (!isset($result[$parent]['#children'])) {
+                    $result[$parent]['#children'] = array();
+                }
+
+                $result[$parent]['#children'][] = $value;
+            }
+            else {
+                if (isset($value['#parent'])) {
+                    unset($value['#parent']);
+                }
+                $result[$key] = $value;
+            }
+        }
+
+        return $result;
+    }
+}
+
+if (!function_exists('template_tree_build_option')) {
+    function template_tree_build_option($tree, $parent = 0, $load_children = true, $level = 0) {
+        $result = array();
+        $tree = template_tree_build($tree);
+
+        
+        if ($parent) {
+            if(!empty($tree[$parent]['#children'])) {
+                $tree = $tree[$parent]['#children'];
+            }
+            else {
+                return $result;
+            }
+        }
+
+        $prefix = '---';
+        foreach ($tree as $key => $value) {
+            if (isset($value['#title'])) {
+                $i = $level;
+                while ($i > 0) {
+                    $value['#title'] = $prefix . $value['#title'];
+                    $i--;
+                }
+            }
+
+            $result[$key] = $value;
+
+            if ($load_children) {
+                if (isset($value['#children']) && count($value['#children'])) {
+                    $result = array_merge($result, template_tree_build_option($value['#children'], $parent, $load_children, $level+1));
+                    $level-1;
+                }
+            }
+        }
+
+        return $result;
+    }
 }

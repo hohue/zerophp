@@ -17,7 +17,7 @@ class ActivationController {
                     'item' => zerophp_lang('authentication information')
                 )
             );
-            $zerophp->response->addBreadcrumb($items);
+            $zerophp->response->setBreadcrumb($items);
             $zerophp->response->addContent(zerophp_view('activation_success'));
         }
         else {

@@ -10,6 +10,7 @@ class Form {
         // Rebuild from error form
         $cache_name_error_form = __CLASS__ . "-build-$form_id-" . csrf_token();
         if ($cache_value = \Cache::get($cache_name_error_form)) {
+            \Cache::forget($cache_name_error_form);
             $form = $cache_value;
         }
         else {
@@ -27,7 +28,6 @@ class Form {
 
                 // Call form_alter functions
                 self::_alter($form_id, $form);
-                $form = self::_build($form_id, $form);
 
                 \Cache::forever($cache_name, $form);
             }
@@ -38,11 +38,12 @@ class Form {
 
             // Set default value for form
             $form = self::_setValues($form_id, $form, $form_values);
-
         }
 
         // Create cache to use when form submitted
         \Cache::put($cache_name_error_form, $form, \Config::get('session.lifetime', 120));
+
+        $form = self::_build($form_id, $form);
 
         return zerophp_view($form['#theme'], array('form' => $form));
     }
@@ -68,6 +69,22 @@ class Form {
         $form['#theme'] = isset($form['#theme']) ? $form['#theme'] : 'form';
         $form['#actions'] = isset($form['#actions']) ? $form['#actions'] :  array();
         $form['#variable'] = isset($form['#variable']) ? $form['#variable'] :  array();
+        $form['#error'] = isset($form['#error']) ? $form['#error'] :  array();
+        $form['#message'] = isset($form['#message']) ? $form['#message'] :  array();
+
+        if (zerophp_get_instance()->response->getOutputType() == 'ajax') {
+            if (!isset($form['#form']['class'])) {
+                $form['#form']['class'] = '';
+            }
+            $form['#form']['class'] .= ' ajax';
+        }
+        elseif (isset($form['#form']['class'])) {
+            $form['#form']['class'] = str_replace(' ajax', '', $form['#form']['class']);
+
+            if (empty($form['#form']['class'])) {
+                unset($form['#form']['class']);
+            }
+        }
 
         // Move submit to $form['actions']
         if (isset($form['submit'])) {
@@ -78,7 +95,7 @@ class Form {
         foreach ($form as $key => $value) {
             if (substr($key, 0, 1) == '_') {
                 \App::error(function(InvalidUserException $exception) {
-                    $message = "Field name must not start with _";
+                    $message = zerophp_lang('Field name must not start with "_". Log in "zerophp\zerophp\Form::_build"');
                     \Log::error($message);
 
                     return $message;
@@ -87,6 +104,21 @@ class Form {
 
             // Don't care with #validate, #submit...
             if (substr($key, 0, 1) != '#') {
+                if (isset($form['#error']->$key)) {
+                    if (!isset($value['#error_messages'])) {
+                        $value['#error_messages'] = '';
+                    }
+                    else {
+                        $value['#error_messages'] .= '<br />';
+                    }
+                    $value['#error_messages'] .= implode('<br />', $form['#error']->$key);
+
+                    if (!isset($value['#class'])) {
+                        $value['#class'] = '';
+                    }
+                    $value['#class'] .= ' error';
+                }
+
                 $form[$key] = self::__buildItem($value);
             }
             elseif ($key == '#actions') {
@@ -234,27 +266,10 @@ class Form {
         }
 
         $form_values = \Input::all();
-        self::_submitValidate($form_id, $form, $form_values);
-
-        // Generate form_values
-        foreach ($form as $key => $value) {
-            if (isset($value['#type']) && $value['#type'] == 'date_group') {
-                if (!empty($form_values[$key]['year']) && is_numeric($form_values[$key]['year'])
-                    && 1000 <= $form_values[$key]['year'] && $form_values[$key]['year'] <= 9999
-                    && !empty($form_values[$key]['month']) && is_numeric($form_values[$key]['month'])
-                    && !empty($form_values[$key]['day']) && is_numeric($form_values[$key]['day'])
-                ) {
-                    $form_values[$key] = $form_values[$key]['year'] . '-' . $form_values[$key]['month'] . '-' . $form_values[$key]['day'];
-                }
-                else {
-                    $form_values[$key] = '';
-                }
-            }
-        }
 
         // Validate this form
-        $validate = true;
-        if (!empty($form['#validate'])) {
+        $validate = self::_submitValidate($form_id, $form, $form_values);
+        if ($validate && !empty($form['#validate'])) {
             foreach ($form['#validate'] as $value) {
                 $class = '\\' . ltrim($value['class'], '\\');
                 $entity = new $class;
@@ -290,14 +305,19 @@ class Form {
                     $form[$key]['#value'] = $value;
                 }
             }
-            \Cache::put($cache_name, $form);
+            \Cache::put($cache_name, $form, ZEROPHP_CACHE_EXPIRE_TIME);
+
+            /*$data = zerophp_message();
+            $zerophp->response->addContentJSON($data);
+            $zerophp->response->setOutputType('json');
+            return false;*/
         }
 
         // Redirect after submit finalize
         if ($redirect) {
             switch ($zerophp->response->getOutputType()) {
                 case 'json':
-                case 'html':
+                case 'ajax':
                     $data = array(
                         'form_redirect' => $redirect,
                     );
@@ -314,22 +334,57 @@ class Form {
     }
 
     // Validate & reset $form_values
-    private static function _submitValidate($form_id, $form, &$form_values) {
-        if (count($form)) {
-            // Client edit disabled field
-            foreach ($form as $value) {
-                if (isset($value['#disabled']) && $value['#disabled']) {
-                    $form_values[$value['#name']] = $value['#value'];
-                }
-            }
+    private static function _submitValidate($form_id, &$form, &$form_values) {
+        $rules = array();
 
-            // Client add a new field
-            foreach ($form_values as $key => $value) {
-                if (!isset($form[$key])) {
-                    unset($form_values[$key]);
+        foreach ($form as $key => $value) {
+            if (substr($key, 0, 1) != '#') {
+                // Build value
+                if (isset($value['#type']) && $value['#type'] == 'date_group') {
+                    if (!empty($form_values[$key]['year']) && is_numeric($form_values[$key]['year'])
+                        && 1000 <= $form_values[$key]['year'] && $form_values[$key]['year'] <= 9999
+                        && !empty($form_values[$key]['month']) && is_numeric($form_values[$key]['month'])
+                        && !empty($form_values[$key]['day']) && is_numeric($form_values[$key]['day'])
+                    ) {
+                        $form_values[$key] = $form_values[$key]['year'] . '-' . $form_values[$key]['month'] . '-' . $form_values[$key]['day'];
+                    }
+                    else {
+                        $form_values[$key] = '';
+                    }
+                }
+
+                // Remove Client edit disabled field
+                if (isset($value['#disabled']) && $value['#disabled']) {
+                    $form_values[$key] = $value['#value'];
+                }
+                else {
+                    $form_values[$key] = isset($form_values[$key]) ? $form_values[$key] : 
+                        (isset($value['#default']) ? $value['#default'] : '');
+                    if (isset($value['#validate'])) {
+                        $rules['value'][$key] = $form_values[$key];
+                        $rules['rule'][$key] = $value['#validate'];
+                    }
                 }
             }
         }
+
+        // Remove Client add a new field
+        foreach ($form_values as $key => $value) {
+            if (!isset($form[$key])) {
+                unset($form_values[$key]);
+            }
+        }
+
+        if (count($rules)) {
+            $validator = \Validator::make($rules['value'], $rules['rule']);
+
+            if ($validator->fails()) {
+                $form['#error'] = json_decode($validator->messages());
+                return false;
+            }
+        }
+
+        return true;
     }
 
 
