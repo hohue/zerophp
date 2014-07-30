@@ -116,7 +116,7 @@ class Role extends Entity {
     }
 
     function access_check($path = null, $user_id = null, $access_key = array()) {
-        $user_id = $user_id ? $user_id : zerophp_user_current();$user = $this->CI->users->loadEntity($user_id);
+        $user_id = $user_id ? $user_id : zerophp_userid();$user = $this->CI->users->loadEntity($user_id);
 
         // true for user 1 (super admin)
         if ($user_id == 1) {

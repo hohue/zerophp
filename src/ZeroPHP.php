@@ -31,35 +31,27 @@ class ZeroPHP {
         $this->response = new Response();
         $this->response->setOutputType($this->request->prefix());
 
-        $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
-        $admin = new \stdClass();
-        $admin->user_id = 1;
-        $admin->title = 'AdministratorUser';
-        $admin->email = 'admin@localhost.com';
-        $admin->password = '12345678';
-        $admin->active = 1;
-        $admin->roles = array(3);
-        $user->saveEntity($admin);
-
         // Process form
-        $continue = true;
         if ($request_type == 'post') {
             $continue = Form::submit();
+
+            // Form redirect
+            if ($continue !== true && $continue !== false) {
+                return $continue;
+            }
         }
 
         // Run Controller
-        if ($continue) {
-            $controller = $this->request->getController();
-            if (isset($controller->title)) {
-                $this->response->addTitle(zerophp_lang($controller->title));
-            }
-            $controller->arguments = $controller->arguments ? explode('|', $controller->arguments) : array();
-            $arguments = array($this);
-            foreach($controller->arguments as $value) {
-                $arguments[] = is_numeric($value) ? $this->request->segment($value) : $value;
-            }
-            call_user_func_array(array(new $controller->class, $controller->method), $arguments);
+        $controller = $this->request->getController();
+        if (isset($controller->title)) {
+            $this->response->addTitle(zerophp_lang($controller->title));
         }
+        $controller->arguments = $controller->arguments ? explode('|', $controller->arguments) : array();
+        $arguments = array($this);
+        foreach($controller->arguments as $value) {
+            $arguments[] = is_numeric($value) ? $this->request->segment($value) : $value;
+        }
+        call_user_func_array(array(new $controller->class, $controller->method), $arguments);
 
         // Flush cache for Development Environment
         if (\Config::get('app.environment', 'production') == 'development') {

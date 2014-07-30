@@ -2,40 +2,21 @@
 namespace ZeroPHP\ZeroPHP;
 
 class PerformanceController {
+    function clearCache($zerophp) {
+        \Cache::flush();
 
+        $zerophp->addMessage(zerophp_lang('The cache was deleted successfully.'));
 
-
-
-    
-    function cache_clear_system() {
-        $this->cachef->clean_system();
-
-        $this->response->addMessage($this->lang->line('The system cache was deleted successfully.'));
-
-        $zerophp->response->addContent('dashboard', zerophp_lang('Clear cache: System'));
+        \Redirect::to('/admin');
     }
 
-    function cache_clear_content() {
-        $this->cachef->clean();
-
-        $this->response->addMessage($this->lang->line('The content cache was deleted successfully.'));
-
-        $zerophp->response->addContent('dashboard', zerophp_lang('Clear cache: Content'));
-    }
-
-    function cache_clear_file() {
-        $this->cachef->clean_file();
-
-        $this->response->addMessage($this->lang->line('The file cache was deleted successfully.'));
-
-        $zerophp->response->addContent('dashboard', zerophp_lang('Clear cache: File'));
-    }
-
-    function cache_clear_opcache() {
+    function clearOPCache($zerophp) {
         opcache_reset();
 
-        $this->response->addMessage($this->lang->line('The opcache was deleted successfully.'));
+        $zerophp->addMessage(zerophp_lang('The opcache was deleted successfully.'));
 
-        $zerophp->response->addContent('dashboard', zerophp_lang('Clear cache: Opcache'));
+        \Redirect::to('/admin');
     }
 }
+
+//Cache

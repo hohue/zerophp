@@ -18,11 +18,11 @@ class ActivationController {
                 )
             );
             $zerophp->response->addBreadcrumb($items);
-            $zerophp->response->addContent('activation_success|activation', zerophp_lang('success') );
+            $zerophp->response->addContent(zerophp_view('activation_success'));
         }
         else {
-            $this->response->addMessage(lang('Your activation code is not match or has expired.'), 'error');
-            \Redirect::to();
+            $zerophp->addMessage(lang('Your activation code is not match or has expired.'), 'error');
+            return \Redirect::to();
         }
     }
 
@@ -31,7 +31,7 @@ class ActivationController {
         $vars = array(
             'form_id' => $this->activation->resend_users_form(),
         );
-        $zerophp->response->addContent('activation_users_resend|activation', zerophp_lang('Resend activation email'), $vars);
+        $zerophp->response->addContent(zerophp_view('activation_users_resend'$vars));
     }
 
     function users_reset_pass($hash) {
@@ -39,6 +39,6 @@ class ActivationController {
         $vars = array(
             'form_id' => $this->activation->users_reset_pass_form($hash),
         );
-        $zerophp->response->addContent('activation_users_reset_pass|activation', zerophp_lang('Reset a new password'), $vars);
+        $zerophp->response->addContent(zerophp_view('activation_users_reset_pass', $vars));
     }
 }
