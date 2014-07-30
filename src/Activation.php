@@ -167,7 +167,7 @@ class Activation extends Entity {
         }
 
         // Account activated
-        $user = $this->CI->users->loadEntity_from_email($form_values['email'], array(
+        $user = $this->CI->users->loadEntityByEmail($form_values['email'], array(
             'where' => array(
                 'active' => 0,
             ),

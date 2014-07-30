@@ -32,6 +32,7 @@ class ZeroPHP {
         $this->response->setOutputType($this->request->prefix());
 
         // Process form
+        $continue = true;
         if ($request_type == 'post') {
             $continue = Form::submit();
 
@@ -42,16 +43,18 @@ class ZeroPHP {
         }
 
         // Run Controller
-        $controller = $this->request->getController();
-        if (isset($controller->title)) {
-            $this->response->addTitle(zerophp_lang($controller->title));
+        if ($continue) {
+            $controller = $this->request->getController();
+            if (isset($controller->title)) {
+                $this->response->addTitle(zerophp_lang($controller->title));
+            }
+            $controller->arguments = $controller->arguments ? explode('|', $controller->arguments) : array();
+            $arguments = array($this);
+            foreach($controller->arguments as $value) {
+                $arguments[] = is_numeric($value) ? $this->request->segment($value) : $value;
+            }
+            call_user_func_array(array(new $controller->class, $controller->method), $arguments);
         }
-        $controller->arguments = $controller->arguments ? explode('|', $controller->arguments) : array();
-        $arguments = array($this);
-        foreach($controller->arguments as $value) {
-            $arguments[] = is_numeric($value) ? $this->request->segment($value) : $value;
-        }
-        call_user_func_array(array(new $controller->class, $controller->method), $arguments);
 
         // Flush cache for Development Environment
         if (\Config::get('app.environment', 'production') == 'development') {

@@ -4,7 +4,7 @@ namespace ZeroPHP\ZeroPHP;
 class ResponseController {
     function showMessage($zerophp) {
         $vars = array(
-            'messages' => $zerophp->response->getMessage(),
+            'messages' => zerophp_message(),
         );
         $zerophp->response->addContent(zerophp_view('response_message', $vars));
     }

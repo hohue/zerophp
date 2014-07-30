@@ -10,8 +10,8 @@ class Users extends Entity {
             '#name' => 'users',
             '#class' => 'ZeroPHP\ZeroPHP\Users',
             '#title' => zerophp_lang('Users'),
-            '#link' => array(
-                //'admin' => 'user/users',
+            '#links' => array(
+                //'list' => 'user/users',
             ),
             '#fields' => array(
                 'user_id' => array(
@@ -48,7 +48,7 @@ class Users extends Entity {
                     '#name' => 'password',
                     '#title' => zerophp_lang('Password'),
                     '#type' => 'password',
-                    '#validate' => 'min:8|max:12',
+                    '#validate' => 'min:8|max:36',
                     '#attributes' => array(
                         'data-validate' => 'password',
                     ),
@@ -127,7 +127,62 @@ class Users extends Entity {
             $entity->password = \Hash::make($entity->password);
         }
 
+        if (!empty($entity->user_id)) {
+            $old = $this->loadEntityByEmail($entity->email);
+            if (isset($old->email)) {
+                \Log::error(zerophp_lang('Can not create this user because this email was exists: %email. Log in %function', array('%email' => $entity->email, '%function' => 'zerophp/zerophp/src/Users::saveEntity')));
+                return false;
+            }
+        }
+
         return parent::saveEntity($entity);
+    }
+
+    function login($form_id, $form, &$form_values) {
+        $structure = $this->getStructure();
+
+        ##### LOGIN #####
+        $user = new stdClass();
+        if ($this->login_check($form_values['email'], $form_values['password'], $user)) {
+            // Update last_activity field
+            $user_update = new stdClass();
+            $user_update->user_id = $user->user_id;
+            $user_update->last_activity = date('Y-m-d H:i:s');
+            $this->saveEntity($user_update);
+
+            if ($user->active == 1) {
+                $user_update->user_id = $user->user_id;
+                $user_update->title = $user->title;
+                $user_update->email = $user->email;
+                $user_update->roles = $user->roles;
+                $user_update->expired = isset($form_values['remember_me']) && $form_values['remember_me'] ? 0 : $this->expired;
+
+                $data = array(
+                    'users-user' => $user_update,
+                );
+                $this->CI->session->set_userdata($data);
+                $this->setUser();
+
+                zerophp_get_instance()->response->addMessage(lang('You have been successfully logged in...'));
+            }
+            elseif ($user->active == 2) {
+                zerophp_get_instance()->response->addMessage(lang('Your account was blocked. Please contact the administrator.'), 'error');
+            }
+            else {
+                zerophp_get_instance()->response->addMessage(lang('Your account is not active yet.'), 'error');
+            }
+
+            return true;
+        }
+
+        zerophp_get_instance()->response->addMessage(lang('Your password is incorrect. Please try again.'), 'error');
+        return false;
+    }
+
+    function loadEntityByEmail($email, $attributes = array()) {
+        $attributes['load_all'] = false;
+        $attributes['where']['email'] = $email;
+        return reset($this->loadEntityExecutive(null, $attributes));
     }
 
 
@@ -169,74 +224,18 @@ class Users extends Entity {
         $_SESSION['user_id'] = $this->user->user_id;
     }
 
-    function loadEntity_from_email($email, $attributes = array()) {
-        $attributes['load_all'] = false;
-        $attributes['where']['email'] = $email;
-        return reset($this->loadEntityExecutive(null, $attributes));
-    }
-
     function login_check($email, $password, &$user = null) {
         $attributes = array(
             'check_active' => false,
             'cache' => false,
             '#load_hidden' => true,
         );
-        $user = $this->loadEntity_from_email($email, $attributes);
+        $user = $this->loadEntityByEmail($email, $attributes);
 
         if (isset($user->password) && $this->password_verify($password, $user->password)) {
             return true;
         }
 
-        return false;
-    }
-
-    function login_form_validate($form_id, $form, &$form_values) {
-        $structure = $this->getStructure();
-        $entity = Entity::loadEntityObject('form_validation');
-
-        $this->CI->form_validation->set_rules('email', zerophp_lang('Email'), $structure['#fields']['email']['#validate'] . '|is_exists[users.email]');
-        $this->CI->form_validation->set_rules('password', zerophp_lang('Password'), $structure['#fields']['password']['#validate']);
-
-        if ($this->CI->form_validation->run() == FALSE) {
-            zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
-            return false;
-        }
-
-        ##### LOGIN #####
-        $user = new stdClass();
-        if ($this->login_check($form_values['email'], $form_values['password'], $user)) {
-            // Update last_activity field
-            $user_update = new stdClass();
-            $user_update->user_id = $user->user_id;
-            $user_update->last_activity = date('Y-m-d H:i:s');
-            $this->saveEntity($user_update);
-
-            if ($user->active == 1) {
-                $user_update->user_id = $user->user_id;
-                $user_update->title = $user->title;
-                $user_update->email = $user->email;
-                $user_update->roles = $user->roles;
-                $user_update->expired = isset($form_values['remember_me']) && $form_values['remember_me'] ? 0 : $this->expired;
-
-                $data = array(
-                    'users-user' => $user_update,
-                );
-                $this->CI->session->set_userdata($data);
-                $this->setUser();
-
-                zerophp_get_instance()->response->addMessage(lang('You have been successfully logged in...'));
-            }
-            elseif ($user->active == 2) {
-                zerophp_get_instance()->response->addMessage(lang('Your account was blocked. Please contact the administrator.'), 'error');
-            }
-            else {
-                zerophp_get_instance()->response->addMessage(lang('Your account is not active yet.'), 'error');
-            }
-
-            return true;
-        }
-
-        zerophp_get_instance()->response->addMessage(lang('Your password is incorrect. Please try again.'), 'error');
         return false;
     }
 
@@ -288,7 +287,7 @@ class Users extends Entity {
 
         // Set to cache
         if (!isset($attributes['cache']) || $attributes['cache']) {
-            \Cache::put($cache_name, $result);
+            \Cache::put($cache_name, $result, ZEROPHP_CACHE_EXPIRE_TIME);
         }
 
         return $result;
@@ -311,7 +310,7 @@ class Users extends Entity {
 
         // Set to cache
         if (!isset($attributes['cache']) || $attributes['cache']) {
-            \Cache::put($cache_name, $entities);
+            \Cache::put($cache_name, $entities, ZEROPHP_CACHE_EXPIRE_TIME);
         }
 
         return $entities;
@@ -461,7 +460,7 @@ class Users extends Entity {
     }
 
     function forgot_pass_form_submit($form_id, $form, &$form_values) {
-        $user = $this->loadEntity_from_email($form_values['email']);
+        $user = $this->loadEntityByEmail($form_values['email']);
 
         $entity = Entity::loadEntityObject('activation');
         $hash = $this->CI->activation->hash_set($user->user_id, 'users_reset_pass');

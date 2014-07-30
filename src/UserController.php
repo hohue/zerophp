@@ -18,10 +18,13 @@ class UserController {
         $this->_unsetFormItem($form);
         unset($form['user_id'], $form['roles']);
 
+        // Validate email unique
+        $form['email']['#validate'] .= '|unique:users,email';
+
+        // Add password confirmation field
         $form['password_confirm'] = $form['password'];
         $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
         $form['password_confirm']['#name'] = 'password_confirm';
-        $form['password_confirm']['#id'] = 'fii_password_confirm';
         $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
         $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
 
@@ -29,25 +32,39 @@ class UserController {
 
         $form['#redirect'] = 'user/register/success';
 
-        $zerophp->response->addContent(zerophp_view(Form::build($form));
+        $zerophp->response->addContent(Form::build($form));
     }
 
     function showRegisterSuccess($zerophp) {
         $items = array(
-            0 => array(
-                'item' => zerophp_lang('User register'),
+            array(
+                '#item' => zerophp_lang('User register')
             )
         );
-        $zerophp->response->addBreadcrumb($items);
+        $zerophp->response->setBreadcrumb($items);
 
-        $vars = array(
-        );
-        $zerophp->response->addContent(zerophp_view(zerophp_form('users_register_success', $vars));
+        $vars = array();
+        $zerophp->response->addContent(zerophp_view('users_register_success', $vars));
     }
 
     function showLoginForm($zerophp) {
-        $vars = array();
-        $zerophp->response->addContent(zerophp_view(zerophp_form('users_login', $vars));
+        $form = array();
+        $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $structure = $user->getStructure();
+
+        $form['email'] = $structure['#fields']['email'];
+        $form['password'] = $structure['#fields']['password'];
+
+        $form['email']['#validate'] .= '|exists:users,email';
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'login',
+            ),
+        );
+
+        $zerophp->response->addContent(Form::build($form));
     }
 
 
@@ -65,13 +82,13 @@ class UserController {
         $vars = array(
             'form_id' => $this->users->forgot_pass_form(),
         );
-        $zerophp->response->addContent(zerophp_view('users_forgot_pass', zerophp_lang('Forgot Pass'), $vars);
+        $zerophp->response->addContent(zerophp_view('users_forgot_pass', $vars));
     }
 
     function changepass() {
         $vars = array(
             'form_id' => $this->users->change_pass_form(),
         );
-        $zerophp->response->addContent(zerophp_view('users_change_pass', zerophp_lang('Change Password'), $vars);
+        $zerophp->response->addContent(zerophp_view('users_change_pass', $vars));
     }
 }

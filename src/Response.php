@@ -183,7 +183,10 @@ class Response {
         }
         // Get message
         else {
-            return \Session::pull(__METHOD__, array());
+            $message = \Session::get(__METHOD__, array());
+            \Session::forget(__METHOD__);
+
+            return $message;
         }
     }
 
@@ -259,19 +262,19 @@ class Response {
     /**
      * @param array $items = array(
      *      0 => array(
-     *          'item' => '<a href="#"> Tat ca danh muc </a>'
+     *          '#item' => '<a href="#"> Tat ca danh muc </a>'
      *      ),
      *      1 => array(
-     *          'item' => '<a href="#"> thoi trang nam </a>',
+     *          '#item' => '<a href="#"> thoi trang nam </a>',
      *          '#children' => array(
      *              0 => array(
-     *                  'item' => '<a href="#"> Quan ao nam </a>'
+     *                  '#item' => '<a href="#"> Quan ao nam </a>'
      *              ),
      *              1 => array(
-     *                  'item' => '<a href="#"> giay dep nam </a>'
+     *                  '#item' => '<a href="#"> giay dep nam </a>'
      *              ),
      *              2 => array(
-     *                  'item' => '<a href="#"> phu kien nam </a>'
+     *                  '#item' => '<a href="#"> phu kien nam </a>'
      *              )
      *          )
      *      )
@@ -280,9 +283,9 @@ class Response {
     function setBreadcrumb($items = array()) {
         $this->data['breadcrumb'] = $items;
 
-        array_unshift($this->data['breadcrumb'], array(array(
-            'item' => zerophp_anchor(\URL::to('/'), zerophp_lang('Home')),
-        )));
+        array_unshift($this->data['breadcrumb'], array(
+            '#item' => zerophp_anchor(\URL::to('/'), zerophp_lang('Home')),
+        ));
     }
 
     function getBreadcrumb() {
