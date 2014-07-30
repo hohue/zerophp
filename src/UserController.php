@@ -54,9 +54,23 @@ class UserController {
         $structure = $user->getStructure();
 
         $form['email'] = $structure['#fields']['email'];
+        $form['email']['#validate'] .= '|exists:users,email';
+        unset($form['email']['#description']);
+
         $form['password'] = $structure['#fields']['password'];
 
-        $form['email']['#validate'] .= '|exists:users,email';
+        $form['remember_me'] = array(
+            '#name' => 'remember_me',
+            '#type' => 'checkbox',
+            '#value' => 1,
+            '#title' => zerophp_lang('Remember me'),
+        );
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Login'),
+        );
 
         $form['#submit'] = array(
             array(
@@ -64,6 +78,8 @@ class UserController {
                 'method' => 'login',
             ),
         );
+
+        $form['#theme'] = 'users_login';
 
         $zerophp->response->addContent(Form::build($form));
     }

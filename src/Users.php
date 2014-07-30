@@ -138,12 +138,25 @@ class Users extends Entity {
         return parent::saveEntity($entity);
     }
 
+    function loadEntityByEmail($email, $attributes = array()) {
+        $attributes['load_all'] = false;
+        $attributes['where']['email'] = $email;
+        return reset($this->loadEntityExecutive(null, $attributes));
+    }
+
+    function logout() {
+        \Auth::logout();
+        zerophp_get_instance()->response->addMessage(lang('You are successfully logout.'));
+
+        zerophp_redirect();
+    }
+
     function login($form_id, $form, &$form_values) {
         $structure = $this->getStructure();
 
         ##### LOGIN #####
         $user = new stdClass();
-        if ($this->login_check($form_values['email'], $form_values['password'], $user)) {
+        if (\Auth::attempt(array('email' => $form_values['email'], 'password' => $form_values['password']), $form_values['remember_me'])) {
             // Update last_activity field
             $user_update = new stdClass();
             $user_update->user_id = $user->user_id;
@@ -177,81 +190,22 @@ class Users extends Entity {
 
         zerophp_get_instance()->response->addMessage(lang('Your password is incorrect. Please try again.'), 'error');
         return false;
-    }
-
-    function loadEntityByEmail($email, $attributes = array()) {
-        $attributes['load_all'] = false;
-        $attributes['where']['email'] = $email;
-        return reset($this->loadEntityExecutive(null, $attributes));
-    }
-
-
-
-
-
-
-
-    function getUser() {
-        return $this->user;
-    }
-
-    function setUser() {
-        $user = $this->CI->session->userdata('users-user');
-        $last_activity = $this->CI->session->userdata('last_activity');
-
-        if (isset($user->expired) && ($user->expired == 0 || $user->expired >= (time() - $last_activity))) {
-            $this->user = $user;
-        }
-        // Login expired
-        elseif (isset($user->user_id)) {
-            $this->CI->session->unset_userdata('users-user');
-        }
-
-        // Anonymous user (user 0)
-        if (!isset($this->user->user_id)) {
-            $this->user = new stdClass();
-            $this->user->user_id = 0;
-            $this->user->roles = array(
-                1 => $this->CI->roles->loadEntity(1),
-            );
-        }
 
         // Hack for Responsive File Manager
         //@todo 9 Chuyen den hook_init
         if (session_status() == PHP_SESSION_NONE) {
             session_start();
         }
-        $_SESSION['user_id'] = $this->user->user_id;
+        $_SESSION['user_id'] = zerophp_userid();
     }
 
-    function login_check($email, $password, &$user = null) {
-        $attributes = array(
-            'check_active' => false,
-            'cache' => false,
-            '#load_hidden' => true,
-        );
-        $user = $this->loadEntityByEmail($email, $attributes);
 
-        if (isset($user->password) && $this->password_verify($password, $user->password)) {
-            return true;
-        }
 
-        return false;
-    }
 
-    function logout() {
-        $this->CI->session->unset_userdata('users-user');
-        $this->setUser();
-        zerophp_get_instance()->response->addMessage(lang('You are successfully logout.'));
-    }
 
-    function password_hash($password) {
-        return password_hash($password, PASSWORD_BCRYPT);
-    }
 
-    function password_verify($password, $hash) {
-        return password_verify($password, $hash);
-    }
+
+    
 
     function entity_reference($entity, $field, $attributes = array()) {
         $structure = $this->getStructure();
@@ -291,29 +245,6 @@ class Users extends Entity {
         }
 
         return $result;
-    }
-
-    function loadEntityExecutive($entity_id = null, $attributes = array(), $pager_sum = 1) {
-        // Get from cache
-        if (!isset($attributes['cache']) || $attributes['cache']) {
-            $cache_name = "Users-loadEntityExecutive-$entity_id-" . serialize($attributes);
-            if ($cache_content = \Cache::get($cache_name)) {
-                return $cache_content;
-            }
-        }
-
-        $entities = parent::loadEntityExecutive($entity_id, $attributes, $pager_sum);
-
-        foreach ($entities as $key => $entity) {
-            $entities[$key]->created_by = $entity->user_id;
-        }
-
-        // Set to cache
-        if (!isset($attributes['cache']) || $attributes['cache']) {
-            \Cache::put($cache_name, $entities, ZEROPHP_CACHE_EXPIRE_TIME);
-        }
-
-        return $entities;
     }
 
     function users_create_form_alter($form_id, &$form) {
@@ -376,37 +307,6 @@ class Users extends Entity {
                 'email' => $form_values->email,
             );
         }
-    }
-
-    function users_create_form_validate($form_id, $form, &$form_values) {
-        $structure = $this->getStructure();
-        $entity = Entity::loadEntityObject('form_validation');
-
-        if ($form_id =='entity_crud_create_users') {
-            $email_rule = 'is_unique[users.email]';
-        }
-        elseif ($form_id =='entity_crud_update_users') {
-            $email_rule = 'is_exists[users.email]';
-        }
-        $this->CI->form_validation->set_rules('email', $form['email']['#label'], $structure['#fields']['email']['#validate'] . '|' . $email_rule);
-
-        if (isset($form_values['password']) || isset($form_values['password_confirm']) || $form_id =='entity_crud_create_users') {
-            $this->CI->form_validation->set_rules('password_confirm', $form['password_confirm']['#label'], 'require');
-            $this->CI->form_validation->set_rules('password', $form['password']['#label'], $structure['#fields']['password']['#validate'] . '|matches[password_confirm]');
-
-            $form_values['password'] = $this->password_hash($form_values['password']);
-        }
-
-        if ($this->CI->form_validation->run() == FALSE) {
-            return false;
-        }
-
-        // Create user
-        if ($form_id =='entity_crud_create_users') {
-            $form_values['last_activity'] = entity_widget_date_timestamp_make(time());
-        }
-
-        return true;
     }
 
     function forgot_pass_form() {

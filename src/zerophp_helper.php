@@ -259,6 +259,14 @@ function zerophp_form_render_all(&$form) {
     return $result;
 }
 
+function zerophp_redirect($url = '/') {
+    if ($redirect = zerophp_get_instance()->request->query('destination')) {
+        $url = $redirect;
+    }
+
+    return \Redirect::to($url);
+}
+
 if (!function_exists('template_item_list')) {
     function template_item_list($items, $level = 1) {
         $result = '<ul class="items-level-' . $level . '">';
