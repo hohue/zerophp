@@ -21,18 +21,18 @@ class Article extends Entity {
                     '#title' => zerophp_lang('Title'),
                     '#type' => 'text',
                 ),
-                'image' => array(
+                /*'image' => array(
                     '#name' => 'image',
                     '#title' => zerophp_lang('Image'),
                     '#type' => 'file',
                     '#widget' => 'image',
                     '#display_hidden' => 1,
-                ),
+                ),*/
                 'content' => array(
                     '#name' => 'content',
                     '#title' => zerophp_lang('Content'),
                     '#type' => 'textarea',
-                    '#rte_enable' => 1,
+                    //'#rte_enable' => 1,
                     '#display_hidden' => 1,
                 ),
                 'created_at' => array(

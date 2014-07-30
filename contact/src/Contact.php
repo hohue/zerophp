@@ -23,17 +23,20 @@ class Contact extends Entity {
                     '#attributes' => array(
                         'placeholder' => zerophp_lang('Paolo Maldini'),
                     ),
+                    '#validate' => 'required',
+                    '#required' => true,
                 ),
                 'email' => array(
                     '#name' => 'email',
                     '#title' => zerophp_lang('Email'),
                     '#type' => 'text',
-                    '#validate' => 'email',
+                    '#validate' => 'required|email',
                     '#attributes' => array(
                         'data-validate' => 'email',
                         'placeholder' => zerophp_lang('paolo.maldini@gmail.com'),
                     ),
                     '#error_messages' => zerophp_lang('Invalid email'),
+                    '#required' => true,
                 ),
                 'title' => array(
                     '#name' => 'title',
@@ -46,12 +49,19 @@ class Contact extends Entity {
                     '#name' => 'content',
                     '#title' => zerophp_lang('Message'),
                     '#type' => 'textarea',
-                    '#validate' => '#required',
+                    '#validate' => 'required',
                     '#required' => true,
                 ),
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
+                    '#type' => 'text',
+                    '#widget' => 'date_timestamp',
+                    '#form_hidden' => 1,
+                ),
+                'updated_at' => array(
+                    '#name' => 'updated_at',
+                    '#title' => zerophp_lang('Updated date'),
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,

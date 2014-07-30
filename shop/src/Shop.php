@@ -83,7 +83,7 @@ class Shop extends Entity {
                     '#title' => zerophp_lang('Address'),
                     '#type' => 'text',
                     '#required' =>true,
-                    '#validate' => '#required',
+                    '#validate' => 'required',
                     '#attributes' => array(
                         'placeholder' => "123 Chánh Nghĩa",
                     ),

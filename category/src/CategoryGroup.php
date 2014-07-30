@@ -20,7 +20,7 @@ class CategoryGroup extends Entity {
                     '#name' => 'title',
                     '#title' => zerophp_lang('Title'),
                     '#type' => 'text',
-                    '#validate' => '#required',
+                    '#validate' => 'required',
                     '#required' => true,
                 ),
                 'weight' => array(

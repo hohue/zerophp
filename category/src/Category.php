@@ -20,7 +20,7 @@ class Category extends Entity {
                     '#name' => 'title',
                     '#title' => zerophp_lang('Title'),
                     '#type' => 'text',
-                    '#validate' => '#required',
+                    '#validate' => 'required',
                     '#required' => true,
                 ),
                 'category_group_id' => array(

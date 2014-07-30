@@ -99,7 +99,7 @@ class Profile extends Entity {
             '#required' => true,
             '#item' => array(
                 '#name' => 'fullname',
-                '#validate' => '#required',
+                '#validate' => 'required',
                 '#required' => 1,
                 '#type' => 'text',
                 'placeholder' => 'Nguyễn Văn Anh',

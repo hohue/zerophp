@@ -128,7 +128,7 @@ function zerophp_anchor_shop($url, $title, $attributes = array()) {
     return zerophp_anchor_popup("ajax/user/login?destination=$url", $title, $attributes);
 }
 
-function zerophp_anchor_popup($url, $title, $attributes) {
+function zerophp_anchor_popup($url, $title, $attributes = array()) {
     $class= 'cboxInline cboxInlineAjax cboxElement';
     $attributes['class'] = isset($attributes['class']) ? $attributes['class'] . ' ' . $class : $class;
 

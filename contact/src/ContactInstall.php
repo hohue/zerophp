@@ -1,19 +1,35 @@
 <?php 
 namespace ZeroPHP\Contact;
 
-define('VERSION_ZEROPHP_CONTACT', 0.01);
+define('VERSION_ZEROPHP_CONTACT', 0.01001);
 
 class ContactInstall {
     public static function up($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_CONTACT && VERSION_ZEROPHP_CONTACT <= 0.01) {
-            self::up_0_01();
-        }
+        if ($prev_version < 0.01)    { self::up_0_01(); }
+        if ($prev_version < 0.01001) { self::up_0_01001(); }
     }
 
     public static function down($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_CONTACT && VERSION_ZEROPHP_CONTACT <= 0.01) {
-            self::down_0_01();
-        }
+        if ($prev_version < 0.01)    { self::down_0_01(); }
+        if ($prev_version < 0.01001) { self::down_0_01001(); }
+    }
+
+    private static function up_0_01001() {
+        // Insert Default Data
+        \DB::table('menu')->insert(array(
+            array(
+                'title' => 'Contact Us',
+                'path' => 'contact',
+                'class' => 'ZeroPHP\\Contact\\ContactController',
+                'method' => 'createForm',
+            ),
+        ));
+    }
+
+    private static function down_0_01001() {
+        \DB::table('menu')->whereIn('path', array(
+            'contact'
+            ))->delete();
     }
 
     private static function up_0_01() {
@@ -28,17 +44,6 @@ class ContactInstall {
                 $table->integer('created_by')->default(0);
             });
         }
-
-        // Insert Default Data
-        /*\DB::table('menu')->insert(array(
-            array(
-                'title' => 'User Profile Update',
-                'path' => 'profile/%/update',
-                'class' => 'ZeroPHP\\Profile\\Profile',
-                'method' => 'crudUpdate',
-                'arguments' => '1',
-            ),
-        ));*/
     }
 
     private static function down_0_01() {
