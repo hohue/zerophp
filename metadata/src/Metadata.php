@@ -19,12 +19,12 @@ class Metadata extends Entity {
                 'path' => array(
                     '#name' => 'path',
                     '#title' => zerophp_lang('Path'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                 ),
                 'path_title' => array(
                     '#name' => 'path_title',
                     '#title' => zerophp_lang('Path title'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                 ),
                 'keywords' => array(
                     '#name' => 'keywords',
@@ -41,7 +41,7 @@ class Metadata extends Entity {
                 'updated_at' => array(
                     '#name' => 'updated_at',
                     '#title' => zerophp_lang('Updated date'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),

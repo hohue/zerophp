@@ -18,8 +18,8 @@ class Article extends Entity {
                 ),
                 'title' => array(
                     '#name' => 'title',
-                    '#title' => zerophp_lang('#title'),
-                    '#type' => 'input',
+                    '#title' => zerophp_lang('Title'),
+                    '#type' => 'text',
                 ),
                 'image' => array(
                     '#name' => 'image',
@@ -38,14 +38,14 @@ class Article extends Entity {
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at',
                     '#title' => zerophp_lang('Updated date'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),

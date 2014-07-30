@@ -20,7 +20,7 @@ class ShopProduct extends Entity {
                 'title' => array(
                     '#name' => 'title',
                     '#title' => 'Tên sản phẩm',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required',
                     '#attributes' => array(
                         'placeholder' => 'Tên sản phẩm',
@@ -38,13 +38,13 @@ class ShopProduct extends Entity {
                 'label' => array(
                     '#name' => 'label',
                     '#title' => 'Số thứ tự',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required',
                 ),
                 'price' => array(
                     '#name' => 'price',
                     '#title' => 'Giá Gốc',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required|numeric',
                     '#attributes' => array(
                         'placeholder' => 'Giá Gốc',
@@ -53,7 +53,7 @@ class ShopProduct extends Entity {
                 'promotion' => array(
                     '#name' => 'promotion',
                     '#title' => 'Giá Bán',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Giá Bán',
                     ),
@@ -71,19 +71,19 @@ class ShopProduct extends Entity {
                 'promotion_start' => array(
                     '#name' => 'promotion_start',
                     '#title' => 'Thời Gian Khuyến Mãi',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#form_hidden' => 1,
                 ),
                 'promotion_end' => array(
                     '#name' => 'promotion_end',
                     '#title' => 'đến',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#form_hidden' => 1,
                 ),
                 'created_by' => array(
                     '#name' => 'created_by',
                     '#title' => 'Tạo bởi',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
@@ -97,14 +97,14 @@ class ShopProduct extends Entity {
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => 'created_at',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at	',
                     '#title' => 'updated_at',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),

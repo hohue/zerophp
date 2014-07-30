@@ -19,7 +19,7 @@ class Contact extends Entity {
                 'fullname' => array(
                     '#name' => 'fullname',
                     '#title' => zerophp_lang('Fullname'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => zerophp_lang('Paolo Maldini'),
                     ),
@@ -27,7 +27,7 @@ class Contact extends Entity {
                 'email' => array(
                     '#name' => 'email',
                     '#title' => zerophp_lang('Email'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'email',
                     '#attributes' => array(
                         'data-validate' => 'email',
@@ -38,7 +38,7 @@ class Contact extends Entity {
                 'title' => array(
                     '#name' => 'title',
                     '#title' => zerophp_lang('Subject'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required',
                     '#required' => true,
                 ),
@@ -52,7 +52,7 @@ class Contact extends Entity {
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),

@@ -19,7 +19,7 @@ class Shop extends Entity {
                 'title' => array(
                     '#name' => 'title',
                     '#title' => 'Tên Shop',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#required' => true,
                     '#validate' => 'required|min_length[3]|max_length[100]',
                     '#attributes' => array(
@@ -29,7 +29,7 @@ class Shop extends Entity {
                 'url_alias' => array(
                     '#name' => 'url_alias',
                     '#title' => 'URL shop',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#required' => true,
                     '#validate' => 'required|min_length[3]|max_length[100]',
                     '#attributes' => array(
@@ -81,7 +81,7 @@ class Shop extends Entity {
                 'address' => array(
                     '#name' => 'address',
                     '#title' => zerophp_lang('Address'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#required' =>true,
                     '#validate' => '#required',
                     '#attributes' => array(
@@ -92,19 +92,19 @@ class Shop extends Entity {
                 'website' => array(
                     '#name' => 'website',
                     '#title' => zerophp_lang('Website'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#display_hidden' => 1,
                 ),
                 'homephone' => array(
                     '#name' => 'homephone',
                     '#title' => zerophp_lang('Homephone'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#display_hidden' => 1,
                 ),
                 'mobile' => array(
                     '#name' => 'mobile',
                     '#title' => zerophp_lang('Mobile'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#required' =>true,
                     '#validate' => 'required|integer',
                     '#display_hidden' => 1,
@@ -122,21 +122,21 @@ class Shop extends Entity {
                 'created_by' => array(
                     '#name' => 'created_by',
                     '#title' => zerophp_lang('Created by'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#form_hidden' => 1,
                     '#display_hidden' => 1,
                 ),
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at',
                     '#title' => zerophp_lang('Updated date'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),
