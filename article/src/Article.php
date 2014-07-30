@@ -24,7 +24,7 @@ class Article extends Entity {
                 'image' => array(
                     '#name' => 'image',
                     '#title' => zerophp_lang('Image'),
-                    '#type' => 'upload',
+                    '#type' => 'file',
                     '#widget' => 'image',
                     '#display_hidden' => 1,
                 ),
