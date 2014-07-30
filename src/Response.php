@@ -232,7 +232,7 @@ class Response {
                 break;
 
             case 'json':
-                $output = \Response::json(reset($this->getContent()));
+                $output = \Response::json($this->getContent());
                 break;
                 
             case 'esi':
