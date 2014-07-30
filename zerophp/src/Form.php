@@ -306,11 +306,6 @@ class Form {
                 }
             }
             \Cache::put($cache_name, $form, ZEROPHP_CACHE_EXPIRE_TIME);
-
-            /*$data = zerophp_message();
-            $zerophp->response->addContentJSON($data);
-            $zerophp->response->setOutputType('json');
-            return false;*/
         }
 
         // Redirect after submit finalize

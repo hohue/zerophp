@@ -31,6 +31,7 @@ class UserController {
         $form['#actions']['submit']['#value'] = zerophp_lang('Register');
 
         $form['#redirect'] = 'user/register/success';
+        $form['#success_message'] = '';
 
         $zerophp->response->addContent(Form::build($form));
     }

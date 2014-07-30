@@ -316,7 +316,7 @@ class Entity {
         return true;
     }
 
-    function crudCreateFormSubmit($form_id, $form, &$form_values, $message = '') {
+    function crudCreateFormSubmit($form_id, $form, &$form_values) {
         $entity = new \stdClass();
 
         // Fetch via structure to skip unexpected fields (alter form another modules)
@@ -398,8 +398,17 @@ class Entity {
 
         $form_values[$this->structure['#id']] = $this->saveEntity($entity);
 
-        $message = $message ? $message : zerophp_lang('Your data was updated successfully.');
-        zerophp_get_instance()->response->addMessage($message, 'success');
+        if (isset($form['#success_message'])) {
+            $message = $form['#success_message'];
+        }
+        else {
+            $message = zerophp_lang('Your data was updated successfully.');
+        }
+
+        // if isset($form['#success_message']) && empty($form['#success_message']) then not addMessage
+        if ($message) {
+            zerophp_get_instance()->response->addMessage($message, 'success');
+        }
     }
 
 
