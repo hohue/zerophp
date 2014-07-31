@@ -360,3 +360,18 @@ if (!function_exists('template_tree_build_option')) {
         return $result;
     }
 }
+
+function zerophp_mail($email, $subject, $body, $template = 'email') {
+    $email = explode('|', $email);
+    $email[1] = isset($email[1]) ? $email[1] : '';
+
+    zerophp_static('zerophp_mail', array(
+        'email' => $email,
+        'subject' => $subject,
+    ));
+
+    \Mail::send($template, array('body' => $body), function($message) {
+        $attributes = zerophp_static('zerophp_mail');
+        $message->to($attributes['email'][0], $attributes['email'][1])->subject($attributes['subject']);
+    });
+}

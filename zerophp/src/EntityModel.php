@@ -80,20 +80,22 @@ class EntityModel {
 
         if (!isset($attributes['load_all']) || !$attributes['load_all']) {
             if ($entity_id) {
-                $db->where($structure['#id'], $entity_id);
+                $db->where($structure['#id'], '=', $entity_id);
             }
         }
 
         if (isset($attributes['where']) && count($attributes['where'])) {
             foreach ($attributes['where'] as $key => $value) {
-                $db->where($key, $value);
+                $key = explode(' ', $key);
+                $key[1] = isset($key[1]) ? $key[1] : '=';
+                $db->where($key[0], $key[0], $value);
             }
         }
 
         if ((!isset($attributes['where']) || !isset($attributes['where']['active']))
             && (!isset($attributes['check_active']) || $attributes['check_active'])
             && isset($structure['#fields']['active'])) {
-            $db->where('active', 1);
+            $db->where('active', '=', 1);
         }
     }
 
