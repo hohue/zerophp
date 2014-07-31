@@ -93,9 +93,7 @@ class UserController {
         return zerophp_redirect();
     }
 
-    function userChangePasswordForm($zerophp) {
-        
-    }
+    function userChangePasswordForm($zerophp) {}
 
 
 
