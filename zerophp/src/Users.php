@@ -6,7 +6,7 @@ use ZeroPHP\ZeroPHP\Entity;
 class Users extends Entity {
     function __construct() {
         $this->setStructure(array(
-            '#id' => 'user_id',
+            '#id' => 'id',
             '#name' => 'users',
             '#class' => 'ZeroPHP\ZeroPHP\Users',
             '#title' => zerophp_lang('Users'),
@@ -14,8 +14,8 @@ class Users extends Entity {
                 //'list' => 'user/users',
             ),
             '#fields' => array(
-                'user_id' => array(
-                    '#name' => 'user_id',
+                'id' => array(
+                    '#name' => 'id',
                     '#title' => zerophp_lang('ID'),
                     '#type' => 'hidden',
                 ),
@@ -127,76 +127,46 @@ class Users extends Entity {
             $entity->password = \Hash::make($entity->password);
         }
 
-        if (!empty($entity->user_id)) {
-            $old = $this->loadEntityByEmail($entity->email);
-            if (isset($old->email)) {
-                \Log::error(zerophp_lang('Can not create this user because this email was exists: %email. Log in %function', array('%email' => $entity->email, '%function' => 'zerophp/zerophp/src/Users::saveEntity')));
-                return false;
-            }
-        }
-
         return parent::saveEntity($entity);
     }
 
     function loadEntityByEmail($email, $attributes = array()) {
         $attributes['load_all'] = false;
         $attributes['where']['email'] = $email;
-        return reset($this->loadEntityExecutive(null, $attributes));
-    }
 
-    function logout() {
-        \Auth::logout();
-        zerophp_get_instance()->response->addMessage(lang('You are successfully logout.'));
-
-        zerophp_redirect();
+        $entity = $this->loadEntityExecutive(null, $attributes);
+        return reset($entity);
     }
 
     function login($form_id, $form, &$form_values) {
-        $structure = $this->getStructure();
+        if (\Auth::attempt(array(
+                'email' => $form_values['email'], 
+                'password' => $form_values['password'],
+                'active' => 1,
+            ), $form_values['remember_me'] == 1 ? true : false)
+        ) {
+            $user = $this->loadEntityByEmail($form_values['email']);
 
-        ##### LOGIN #####
-        $user = new stdClass();
-        if (\Auth::attempt(array('email' => $form_values['email'], 'password' => $form_values['password']), $form_values['remember_me'])) {
+            zerophp_get_instance()->response->addMessage(zerophp_lang('You have been successfully logged in...'));
+
             // Update last_activity field
-            $user_update = new stdClass();
-            $user_update->user_id = $user->user_id;
-            $user_update->last_activity = date('Y-m-d H:i:s');
-            $this->saveEntity($user_update);
+            $user = new \stdClass();
+            $user->id = zerophp_userid();
+            $user->last_activity = date('Y-m-d H:i:s');
+            $this->saveEntity($user);
 
-            if ($user->active == 1) {
-                $user_update->user_id = $user->user_id;
-                $user_update->title = $user->title;
-                $user_update->email = $user->email;
-                $user_update->roles = $user->roles;
-                $user_update->expired = isset($form_values['remember_me']) && $form_values['remember_me'] ? 0 : $this->expired;
-
-                $data = array(
-                    'users-user' => $user_update,
-                );
-                $this->CI->session->set_userdata($data);
-                $this->setUser();
-
-                zerophp_get_instance()->response->addMessage(lang('You have been successfully logged in...'));
+            // Hack for Responsive File Manager
+            //@todo 9 Chuyen den hook_init
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
             }
-            elseif ($user->active == 2) {
-                zerophp_get_instance()->response->addMessage(lang('Your account was blocked. Please contact the administrator.'), 'error');
-            }
-            else {
-                zerophp_get_instance()->response->addMessage(lang('Your account is not active yet.'), 'error');
-            }
+            $_SESSION['id'] = zerophp_userid();
 
             return true;
         }
 
-        zerophp_get_instance()->response->addMessage(lang('Your password is incorrect. Please try again.'), 'error');
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Login failed. Your password is incorrect OR Your account is not active yet OR Your account was blocked. Please try again later.'), 'error');
         return false;
-
-        // Hack for Responsive File Manager
-        //@todo 9 Chuyen den hook_init
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-        $_SESSION['user_id'] = zerophp_userid();
     }
 
 
@@ -363,7 +333,7 @@ class Users extends Entity {
         $user = $this->loadEntityByEmail($form_values['email']);
 
         $entity = Entity::loadEntityObject('activation');
-        $hash = $this->CI->activation->hash_set($user->user_id, 'users_reset_pass');
+        $hash = $this->CI->activation->hash_set($user->id, 'users_reset_pass');
 
         // Send Email
         $content = array(
@@ -373,7 +343,7 @@ class Users extends Entity {
         $entity = Entity::loadEntityObject('mail');
         $this->CI->mail->send($form_values['email'], fw_variable_get('Activation email template users reset password subject', 'Reset your password'), $content, 'mail_template_activation_users_reset_pass|activation');
 
-        zerophp_get_instance()->response->addMessage(lang('We sent reset password email to your email. Please check your email now.'), 'success');
+        zerophp_get_instance()->response->addMessage(zerophp_lang('We sent reset password email to your email. Please check your email now.'), 'success');
     }
 
     function change_pass_form() {
@@ -471,7 +441,7 @@ class Users extends Entity {
         }
 
         if (!$this->login_check($this->user->email, $form_values['password_old'])) {
-            zerophp_get_instance()->response->addMessage(lang('Your old password is not match.'), 'error');
+            zerophp_get_instance()->response->addMessage(zerophp_lang('Your old password is not match.'), 'error');
             return false;
         }
 
@@ -481,11 +451,11 @@ class Users extends Entity {
     }
 
     function change_pass_form_submit($form_id, $form, &$form_values) {
-        $user = new stdClass();
-        $user->user_id = $this->user->user_id;
+        $user = new \stdClass();
+        $user->id = $this->user->id;
         $user->password = $form_values['password'];
         $this->saveEntity($user);
 
-        zerophp_get_instance()->response->addMessage(lang('Your new password was updated successfully.'), 'success');
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Your new password was updated successfully.'), 'success');
     }
 }

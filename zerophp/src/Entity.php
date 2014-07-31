@@ -69,7 +69,7 @@ class Entity {
         $entities = array();
 
         if ($entity_id === 0 && empty($attributes['load_all'])) {
-            $entities[0] = new stdClass();
+            $entities[0] = new \stdClass();
             $entities[0]->{$this->structure['#id']} = 0;
         }
         else {
@@ -687,7 +687,7 @@ class Entity {
         }
 
         if ($entity == null) {
-            $entity = new stdClass();
+            $entity = new \stdClass();
         }
 
         if (isset($entity->{$this->structure['#id']})) {
@@ -895,7 +895,7 @@ class Entity {
     function crud_list_form_submit($form_id, $form, &$form_values) {
         $entities = array();
         foreach ($form_values['#update'] as $entity_id => $update) {
-            $entities[$entity_id] = new stdClass();
+            $entities[$entity_id] = new \stdClass();
             $entities[$entity_id]->{$this->structure['#id']} = $entity_id;
 
             foreach ($update as $key => $value) {
@@ -904,7 +904,7 @@ class Entity {
         }
 
         $this->entity_update_all($entities);
-        zerophp_get_instance()->response->addMessage(lang('Your data was updated successfully.'), 'success');
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Your data was updated successfully.'), 'success');
     }
 
     function entity_delete($entity_ids) {
@@ -1099,7 +1099,7 @@ class Entity {
             return $this->access($type, $entity_name);
         }
 
-        zerophp_get_instance()->response->addMessage(lang('Forbidden: You do not have permission to access.') . current_url());
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Forbidden: You do not have permission to access.') . current_url());
         return \Redirect::to();
     }
 

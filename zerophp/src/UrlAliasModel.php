@@ -28,6 +28,6 @@ class UrlAliasModel {
             return $row;
         }
 
-        return new stdClass();
+        return new \stdClass();
     }
 }

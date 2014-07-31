@@ -190,7 +190,7 @@ class ShopTopic extends Entity {
                 'size' => 15,
                 '#options' => $this->category_option_get_all(1),
                 'ajax' => array(
-                    'path' => 'shop_topic/start_get_level2',
+                    'path' => 'shop/topic/create/start_get_level2',
                     'wrapper' => 'fii_category_level2',
                     'method' => 'html',
                 ),
@@ -205,7 +205,7 @@ class ShopTopic extends Entity {
                 '#type' => 'select_build',
                 'size' => 15,
                 'ajax' => array(
-                    'path' => 'shop_topic/start_get_level3',
+                    'path' => 'shop/topic/create/start_get_level3',
                     'wrapper' => 'fii_category_level3',
                     'method' => 'html',
                 ),
@@ -282,15 +282,15 @@ class ShopTopic extends Entity {
         return $form_id;
     }
 
-    function category_get_posted($user_id) {
-        $cach_name = "shop_topic-get_category_posted-$user_id";
+    function category_get_posted($id) {
+        $cach_name = "shop_topic-get_category_posted-$id";
         if ($cache = \Cache::get($cach_name)) {
             return $cache;
         }
 
         $posted = array();
         $this->CI->load->model('shop_topic_model', '', false, 'shop_topic');
-        $categories = $this->CI->shop_topic_model->get_category_posted($user_id);
+        $categories = $this->CI->shop_topic_model->get_category_posted($id);
         if (count($categories)) {
             $entity = Entity::loadEntityObject('category');
             foreach ($categories as $value) {
@@ -342,7 +342,7 @@ class ShopTopic extends Entity {
         $form_value['category_id'] = $this->CI->session->userdata('shop_topic_create_category_id');
         if (!$form_value['category_id']) {
             zerophp_get_instance()->response->addMessage('Bạn phải chọn một danh mục trước.', 'error');
-            return \Redirect::to('shop_topic/start');
+            return \Redirect::to('shop/topic/create/start');
         }
         //$this->CI->session->unset_userdata('shop_topic_create_category_id');
     }
