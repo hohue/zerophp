@@ -24,11 +24,6 @@ class ArticleController {
     }
 
     function show($zerophp, $article_id){
-        $article_id = zerophp_get_instance()->request->segment(1);
-        
-
-      //zerophp_devel_print($article_id);
-
         $entity = Entity::loadEntityObject('ZeroPHP\Article\Article');
         $article = $entity->loadEntity($article_id);
 
@@ -44,7 +39,6 @@ class ArticleController {
         $form = $entity->crudCreateForm();
         $this->_unsetFormItem($form);
 
-        $article_id = intval(zerophp_get_instance()->request->segment(1));
         $article = $entity->loadEntity($article_id);
 
         $form['article_id']['#value'] = $article_id;

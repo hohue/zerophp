@@ -93,7 +93,49 @@ class UserController {
         return zerophp_redirect();
     }
 
-    function userChangePasswordForm($zerophp) {}
+    function userChangePasswordForm($zerophp) {
+        $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $structure = $user->getStructure();
+
+        $form = array();
+        $form['password_old'] = $structure['#fields']['password'];
+        $form['password_old']['#name'] = 'password_old';
+        $form['password_old']['#title'] = zerophp_lang('Old password');
+
+        $form['password'] = $structure['#fields']['password'];
+        $form['password']['#name'] = 'password';
+        $form['password']['#title'] = zerophp_lang('New password');
+
+        $form['password_confirm'] = $structure['#fields']['password'];
+        $form['password_confirm']['#name'] = 'password_confirm';
+        $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
+        $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Change Password'),
+        );
+
+        $form['#validate'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'changepassValidate',
+            ),
+        );
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'changepassSubmit',
+            ),
+        );
+
+
+        //zerophp_devel_print($form);
+
+        $zerophp->response->addContent(Form::build($form));
+    }
 
     function userForgotPasswordForm($zerophp) {}
 
