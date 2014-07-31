@@ -24,12 +24,18 @@ class ArticleController {
     }
 
     function show($zerophp, $article_id){
-        $article_id = intval(zerophp_get_instance()->request->segment(1));
+        $article_id = zerophp_get_instance()->request->segment(1);
+        
+      //$article_id = zerophp_get_instance()->request->segment(1);
+
+      //zerophp_devel_print($article_id);
 
         $entity = Entity::loadEntityObject('ZeroPHP\Article\Article');
         $article = $entity->loadEntity($article_id);
 
-        //zerophp_devel_print($article, $article_id);
+        if(!isset($article->article_id)) {
+            \App::abort(404);
+        }
 
         $zerophp->response->addContent(zerophp_view('article_read', zerophp_object_to_array($article)));
     }
