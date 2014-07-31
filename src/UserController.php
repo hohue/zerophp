@@ -108,6 +108,7 @@ class UserController {
 
         $form['password_confirm'] = $structure['#fields']['password'];
         $form['password_confirm']['#name'] = 'password_confirm';
+        $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
         $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
         $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
 
@@ -137,15 +138,13 @@ class UserController {
         $zerophp->response->addContent(Form::build($form));
     }
 
-//email
     function userForgotPasswordForm($zerophp) {
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
         $structure = $user->getStructure();
         $form = array();
 
         $form['email'] = $structure['#fields']['email'];
-        //$form['email']['#name'] = 'email';
-        //$form['email']['#title'] = zerophp_lang('Email');
+        $form['email']['#validate'] .= '|exists:users,email';
         
 
         $form['#actions']['submit'] = array(
@@ -154,15 +153,25 @@ class UserController {
             '#value' => zerophp_lang('Forgot Password'),
         );
 
+        $form['#validate'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'forgotpassValidate',
+            ),
+        );
 
-       //zerophp_devel_print($form);
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'changepassSubmit',
+            ),
+        );
 
         $zerophp->response->addContent(Form::build($form));
 
     }
 
-//pass pass_cfm
-    function userResetPasswordForm($zerophp) {
+    function userResetPasswordForm($zerophp, $hash) {
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
         $structure = $user->getStructure();
         $form = array();
@@ -170,9 +179,11 @@ class UserController {
         $form['password'] = $structure['#fields']['password'];
 
         $form['password_confirm'] = $structure['#fields']['password'];
-        $form['password']['#name'] = 'password';
-        $form['password']['#title'] = zerophp_lang('password');
-        //$form['password_confirm']['#error_messages'] = zerophp_lang('Send a confirmation email to register for an account at ChoVip.vn');
+        $form['password_confirm']['#name'] = 'password_confirm';
+        $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
+        $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
+        $form['password_confirm']['#error_messages'] = zerophp_lang('Password confirmation is not match with password');
+        $form['password_confirm']['#description'] = zerophp_lang('Send a confirmation email to register for an account at ChoVip.vn');
 
         $form['#actions']['submit'] = array(
             '#name' => 'submit',
@@ -184,18 +195,32 @@ class UserController {
         $zerophp->response->addContent(Form::build($form));
     }
 
-//email
     function userActivationResendForm($zerophp) {
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
         $structure = $user->getStructure();
         $form = array();
 
         $form['email'] = $structure['#fields']['email'];
+        $form['email']['#validate'] .= '|exists:users,email';
 
         $form['#actions']['submit'] = array(
             '#name' => 'submit',
             '#type' => 'submit',
             '#value' => zerophp_lang('User Activation'),
+        );
+
+        $form['#validate'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'activationresendValidate',
+            ),
+        );
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'activationresendSubmit',
+            ),
         );
 
         //zerophp_devel_print($form);
