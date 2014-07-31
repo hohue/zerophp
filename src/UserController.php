@@ -13,6 +13,8 @@ class UserController {
     }
 
     function showRegisterForm($zerophp) {
+        //zerophp_mail('alka.webdev@gmail.com|Al-Ka', 'Activation your account', 'Hello World');
+
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
         $form = $user->crudCreateForm();
         $this->_unsetFormItem($form);
@@ -29,6 +31,16 @@ class UserController {
         $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
 
         $form['#actions']['submit']['#value'] = zerophp_lang('Register');
+
+        $form['#validate'][] = array(
+            'class' => 'ZeroPHP\ZeroPHP\Users',
+            'method' => 'registerFormValidate',
+        );
+
+        $form['#submit'][] = array(
+            'class' => 'ZeroPHP\ZeroPHP\Users',
+            'method' => 'registerFormSubmit',
+        );
 
         $form['#redirect'] = 'user/register/success';
         $form['#success_message'] = '';

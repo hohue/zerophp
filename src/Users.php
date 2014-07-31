@@ -169,6 +169,35 @@ class Users extends Entity {
         return false;
     }
 
+    function registerFormValidate($form_id, $form, &$form_values) {
+        $active = zerophp_variable_get('users register email validation', 1);
+        if ($active) {
+            $form_values['active'] = 0;
+        }
+        else {
+            $form_values['active'] = 1;
+        }
+
+        return true;
+    }
+
+    function registerFormSubmit($form_id, $form, &$form_values) {
+        if ($form_values['active'] == 0) {
+            $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+            $hash = $activation->setHash($form_values['id'], 'user_register');
+
+            $vars = array(
+                'email' => $form_values['email'],
+                'active_link' => url("user/activation/$hash"),
+            );
+
+            zerophp_mail($form_values['email'], 
+                zerophp_lang(zerophp_variable_get('user activation email subject', 'Activation your account')),
+                zerophp_view('email_user_activation', $vars)
+            );
+        }
+    }
+
     function changepassValidate($form_id, $form, &$form_values) {
         $passwd = \Auth::user()->__get('password');
 
@@ -235,247 +264,5 @@ class Users extends Entity {
         }
 
         return $result;
-    }
-
-    function users_create_form_alter($form_id, &$form) {
-
-        array_unshift($form['#validate'], array(
-            'class' => 'users',
-            'method' => 'users_create_form_validate'
-        ));
-
-        $form['password_confirm'] = $form['password'];
-        $form['password_confirm']['#label'] = zerophp_lang('Password confirmation');
-        $form['password_confirm']['#name'] = 'password_confirm';
-        $form['password_confirm']['#id'] = 'fii_password_confirm';
-        $form['password_confirm']['#item']['#name'] = 'password_confirm';
-        $form['password_confirm']['#item']['id'] = 'fii_password_confirm_field';
-        $form['password_confirm']['#item']['data-validate'] = 'password_confirm';
-        $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
-
-        //@todo 9 Move me to chovip module
-        $form['accept'] = array(
-            '#name' => 'accept',
-            '#type' => 'checkbox',
-            '#item' => array(
-                '#name' => 'accept',
-                '#type' => 'checkbox',
-                'value' => 1,
-                'data-required' => 'true',
-            ),
-            '#error_messages' => zerophp_lang('You must accept to register your account.'),
-            '#description' => zerophp_lang('Accept websites\'s  policy', array(
-                '%link1' => \URL::to('e/read/article/3'),
-                '%link2' => \URL::to('e/read/article/4'),
-            )),
-        );
-        $form['submit']['#item']['value'] = zerophp_lang('Register');
-        $form['#redirect'] = \URL::to('user/register_success');
-
-        unset($form['active']);
-        unset($form['roles']);
-    }
-
-    function users_update_form_alter($form_id, &$form) {
-        $this->users_create_form_alter($form_id, $form);
-
-        $form['email']['#disabled'] = 'disabled';
-        $form['email']['#item']['disabled'] = 'disabled';
-
-        $form['email_disabled'] = array(
-            '#name' => 'email_disabled',
-            '#type' => 'hidden',
-            '#item' => array(
-                'email' => '',
-            ),
-        );
-    }
-
-    function users_update_form_value_alter($form_id, $form, &$form_values) {
-        if (isset($form_values['email'])) {
-            $form_values['email_disabled'] = array(
-                'email' => $form_values->email,
-            );
-        }
-    }
-
-    function forgot_pass_form() {
-        $form['email'] = array(
-            '#name' => 'email',
-            '#type' => 'text',
-            '#label' => zerophp_lang('Email'),
-            '#item' => array(
-                '#name' => 'email',
-                '#type' => 'text',
-                'label' => zerophp_lang('Email'),
-                'data-validate' => 'email',
-                'placeholder' => zerophp_lang('paolo.maldini@gmail.com'),
-            ),
-            '#description' => zerophp_lang('Please enter your email exactly as you entered it when registering with our system.'),
-            '#error_messages' => zerophp_lang('Invalid email'),
-        );
-
-        $form['submit'] = array(
-            '#name' => 'submit',
-            '#type' => 'submit',
-            '#item' => array(
-                '#name' => 'submit',
-                'value' => zerophp_lang('Send me a new password'),
-            ),
-        );
-
-        $form['#validate'][] = array(
-            'class' => 'users',
-            'method' => 'forgot_pass_form_validate',
-        );
-
-        $form['#submit'][] = array(
-            'class' => 'users',
-            'method' => 'forgot_pass_form_submit',
-        );
-
-        $form_id = 'users-forgot_pass_form';
-        $this->CI->form->form_build($form_id, $form);
-        return $form_id;
-    }
-
-    function forgot_pass_form_validate($form_id, $form, &$form_values) {
-        $entity = Entity::loadEntityObject('form_validation');
-        $this->CI->form_validation->set_rules('email', $form['email']['#label'], 'trim|required|email|is_exists[users.email]');
-        if ($this->CI->form_validation->run() == FALSE) {
-            return false;
-        }
-
-        return true;
-    }
-
-    function forgot_pass_form_submit($form_id, $form, &$form_values) {
-        $user = $this->loadEntityByEmail($form_values['email']);
-
-        $entity = Entity::loadEntityObject('activation');
-        $hash = $this->CI->activation->hash_set($user->id, 'users_reset_pass');
-
-        // Send Email
-        $content = array(
-            '#title' => $user->title,
-            'link' => \URL::to("activation/users_reset_pass/$hash"),
-        );
-        $entity = Entity::loadEntityObject('mail');
-        $this->CI->mail->send($form_values['email'], fw_variable_get('Activation email template users reset password subject', 'Reset your password'), $content, 'mail_template_activation_users_reset_pass|activation');
-
-        zerophp_get_instance()->response->addMessage(zerophp_lang('We sent reset password email to your email. Please check your email now.'), 'success');
-    }
-
-    function change_pass_form() {
-        $form['password_old'] = array(
-            '#name' => 'password_old',
-            '#type' => 'password',
-            '#label' => zerophp_lang('Old password'),
-            '#item' => array(
-                '#name' => 'password_old',
-                '#type' => 'password',
-                'label' => zerophp_lang('Old password'),
-                'data-validate' => 'password',
-                'placeholder' => zerophp_lang('Enter your current password'),
-            ),
-            '#description' => zerophp_lang('Must contain at least <font>8 characters</font>'),
-            '#error_messages' => zerophp_lang('Invalid old password'),
-            '#required' => true,
-        );
-
-        $form['password'] = array(
-            '#name' => 'password',
-            '#type' => 'password',
-            '#label' => zerophp_lang('New password'),
-            '#item' => array(
-                '#name' => 'password',
-                '#type' => 'password',
-                'label' => zerophp_lang('New password'),
-                'data-validate' => 'password',
-                'placeholder' => zerophp_lang('Enter your new password'),
-            ),
-            '#description' => zerophp_lang('Must contain at least <font>8 characters</font>'),
-            '#error_messages' => zerophp_lang('Invalid new password'),
-            '#required' => true,
-        );
-
-        $form['password_confirm'] = array(
-            '#name' => 'password_confirm',
-            '#type' => 'password',
-            '#label' => zerophp_lang('New password confirmation'),
-            '#item' => array(
-                '#name' => 'password_confirm',
-                '#type' => 'password',
-                'label' => zerophp_lang('New password confirm'),
-                'data-validate' => 'password_confirm',
-                'placeholder' => zerophp_lang('Enter your new confirmation password'),
-            ),
-            '#description' => zerophp_lang('Must contain at least <font>8 characters</font>'),
-            '#error_messages' => zerophp_lang('New password confirmation is not match with new password'),
-            '#required' => true,
-        );
-
-        $form['submit'] = array(
-            '#name' => 'submit',
-            '#type' => 'submit',
-            '#item' => array(
-                '#name' => 'submit',
-                'value' => zerophp_lang('Save'),
-            ),
-        );
-
-        $form['reset'] = array(
-            '#name' => 'reset',
-            '#type' => 'reset',
-            '#item' => array(
-                '#name' => 'reset',
-                '#type' => "reset",
-                'value' => zerophp_lang('Reset'),
-            ),
-        );
-
-        $form['#validate'][] = array(
-            'class' => 'users',
-            'method' => 'change_pass_form_validate',
-        );
-
-        $form['#submit'][] = array(
-            'class' => 'users',
-            'method' => 'change_pass_form_submit',
-        );
-
-        $form['#redirect'] = \URL::to('user/logout');
-
-        $form_id = 'users-change_pass_form';
-        $this->CI->form->form_build($form_id, $form);
-        return $form_id;
-    }
-
-    function change_pass_form_validate($form_id, $form, &$form_values) {
-        $entity = Entity::loadEntityObject('form_validation');
-        $this->CI->form_validation->set_rules('password_old', zerophp_lang('Old password'), 'require|min:8|max:12');
-        $this->CI->form_validation->set_rules('password_confirm', zerophp_lang('New password confirmation'), 'require');
-        $this->CI->form_validation->set_rules('password', zerophp_lang('New password'), 'required|min:8|max:12|matches[password_confirm]');
-        if ($this->CI->form_validation->run() == FALSE) {
-            return false;
-        }
-
-        if (!$this->login_check($this->user->email, $form_values['password_old'])) {
-            zerophp_get_instance()->response->addMessage(zerophp_lang('Your old password is not match.'), 'error');
-            return false;
-        }
-
-        $form_values['password'] = $this->CI->users->password_hash($form_values['password']);
-
-        return true;
-    }
-
-    function change_pass_form_submit($form_id, $form, &$form_values) {
-        $user = new \stdClass();
-        $user->id = $this->user->id;
-        $user->password = $form_values['password'];
-        $this->saveEntity($user);
-
-        zerophp_get_instance()->response->addMessage(zerophp_lang('Your new password was updated successfully.'), 'success');
     }
 }

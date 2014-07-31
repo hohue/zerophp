@@ -58,6 +58,18 @@ class SystemInstall {
                 'variable_key' => 'theme admin',
                 'variable_value' => 'bootstrap',
             ),
+            array(
+                'variable_key' => 'users register email validation',
+                'variable_value' => 1,
+            ),
+            array(
+                'variable_key' => 'activation expired',
+                'variable_value' => 172800,
+            ),
+            array(
+                'variable_key' => 'user activation email subject',
+                'variable_value' => 'Activation your account',
+            ),
         ));
     }
 
@@ -71,6 +83,9 @@ class SystemInstall {
 
         \DB::table('variable')->whereIn('variable_key', array(
                 'theme admin',
+                'users register email validation',
+                'activation expired',
+                'user activation email subject',
             ))->delete();
     }
 
