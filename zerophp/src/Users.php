@@ -218,6 +218,19 @@ class Users extends Entity {
         zerophp_get_instance()->response->addMessage(zerophp_lang('Your password was reset successfully.'));
     }
 
+    function forgotpassValidate($form_id, $form, &$form_values) {
+        //@todo 4 get userid from hash
+        \Auth::loginUsingId(2);
+
+        return true;
+    }
+
+    function activationresendValidate($form_id, $form, &$form_values) {
+        //@todo 4 get userid from hash
+        \Auth::loginUsingId(2);
+
+        return true;
+    }
 
 
 
