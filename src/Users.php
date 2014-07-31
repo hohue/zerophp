@@ -169,6 +169,26 @@ class Users extends Entity {
         return false;
     }
 
+    function changepassValidate($form_id, $form, &$form_values) {
+        $passwd = \Auth::user()->__get('password');
+
+        if (\Hash::check($form_values['password_old'], $passwd)) {
+            return true;
+        }
+
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Your old password does not match.'), 'error');
+
+        return false;
+    }
+
+    function changepassSubmit($form_id, $form, &$form_values){
+        $user = $this->loadEntity(zerophp_userid());
+        $user->password = $form_values['password'];
+        $this->saveEntity($user);
+
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Your password was reset successfully.'));
+    }
+
 
 
 
