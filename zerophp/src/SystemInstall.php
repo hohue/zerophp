@@ -16,14 +16,18 @@ class SystemInstall {
 
     private static function up_0_01001() {
         // Insert User 1
-        if (!\DB::table('users')->where('user_id', 1)->first()) {
+        if (!\DB::table('users')->where('id', 1)->first()) {
+            $now = date('Y-m-d H:i:s');
             \DB::table('users')->insert(array(
                 array(
-                    'user_id' => 1,
+                    'id' => 1,
                     'title' => 'Administrator',
                     'email' => 'admin@localhost.com',
                     'password' => \Hash::make('12345678'),
                     'active' => 1,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                    'last_activity' => $now,
                 ),
             ));
         }
@@ -128,13 +132,13 @@ class SystemInstall {
 
         if (! \Schema::hasTable('users')) {
             \Schema::create('users', function($table) {
-                $table->increments('user_id');
+                $table->increments('id');
                 $table->string('title', 128)->nullable();
                 $table->string('email', 128);
                 $table->string('password', 128);
                 $table->boolean('active')->default(0);
                 $table->rememberToken();
-                $table->timestamp('last_activity');
+                $table->timestamp('last_activity')->nullable();
                 $table->timestamps();
                 $table->softDeletes();
 
@@ -193,10 +197,10 @@ class SystemInstall {
         if (! \Schema::hasTable('users_role')) {
             \Schema::create('users_role', function($table) {
                 $table->string('field', 32);
-                $table->integer('user_id')->unsigned();
+                $table->integer('id')->unsigned();
                 $table->integer('role_id')->unsigned();
 
-                $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+                $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
                 $table->foreign('role_id')->references('role_id')->on('role')->onDelete('cascade');
             });
         }

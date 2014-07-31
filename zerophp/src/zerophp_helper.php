@@ -256,11 +256,15 @@ function zerophp_form_render_all(&$form) {
 }
 
 function zerophp_redirect($url = '/') {
+    return \Redirect::to(zerophp_redirect_get_path($url));
+}
+
+function zerophp_redirect_get_path($url = '/') {
     if ($redirect = zerophp_get_instance()->request->query('destination')) {
         $url = $redirect;
     }
 
-    return \Redirect::to($url);
+    return $url;
 }
 
 if (!function_exists('template_item_list')) {

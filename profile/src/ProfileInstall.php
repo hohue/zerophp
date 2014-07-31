@@ -19,16 +19,16 @@ class ProfileInstall {
     private static function up_0_01() {
         if (! \Schema::hasTable('profile')) {
             \Schema::create('profile', function($table) {
-                $table->integer('user_id')->unsigned();
+                $table->integer('id')->unsigned();
                 $table->string('address', 256);
                 $table->integer('local_id')->unsigned()->default(0);
                 $table->integer('district_id')->unsigned()->default(0);
                 $table->string('mobile', 32)->nullable();
                 $table->timestamp('birthday');
 
-                $table->primary('user_id');
+                $table->primary('id');
 
-                $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+                $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
             });
         }
 

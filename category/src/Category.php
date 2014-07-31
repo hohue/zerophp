@@ -95,7 +95,7 @@ class Category extends Entity {
 
         $group = !empty($arguments['group']) && is_numeric($arguments['group']) ? $arguments['group'] : 0;
 
-        $empty = new stdClass();
+        $empty = new \stdClass();
         $empty->title = '---';
         $empty->category_id = 0;
         $result[0] = $empty;

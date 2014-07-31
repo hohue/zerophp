@@ -112,14 +112,14 @@ class Role extends Entity {
         $this->CI->load->model('roles_model');
         $this->CI->roles_model->access_set_list($data);
         $this->CI->cachef->del_system('users-access_get_list');
-        zerophp_get_instance()->response->addMessage(lang('Your data was updated successfully.'));
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Your data was updated successfully.'));
     }
 
-    function access_check($path = null, $user_id = null, $access_key = array()) {
-        $user_id = $user_id ? $user_id : zerophp_userid();$user = $this->CI->users->loadEntity($user_id);
+    function access_check($path = null, $id = null, $access_key = array()) {
+        $id = $id ? $id : zerophp_userid();$user = $this->CI->users->loadEntity($id);
 
         // true for user 1 (super admin)
-        if ($user_id == 1) {
+        if ($id == 1) {
             return true;
         }
 
@@ -155,7 +155,7 @@ class Role extends Entity {
             return true;
         }
 
-        $user = $this->CI->users->loadEntity($user_id);
+        $user = $this->CI->users->loadEntity($id);
         $roles = array_keys($user->roles);
 
         $result = true;

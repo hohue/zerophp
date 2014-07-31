@@ -16,7 +16,7 @@ class UserController {
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
         $form = $user->crudCreateForm();
         $this->_unsetFormItem($form);
-        unset($form['user_id'], $form['roles']);
+        unset($form['id'], $form['roles']);
 
         // Validate email unique
         $form['email']['#validate'] .= '|unique:users,email';
@@ -72,16 +72,29 @@ class UserController {
             '#value' => zerophp_lang('Login'),
         );
 
-        $form['#submit'] = array(
+        $form['#validate'] = array(
             array(
                 'class' => 'ZeroPHP\ZeroPHP\Users',
                 'method' => 'login',
             ),
         );
 
+        $form['#redirect'] = zerophp_redirect_get_path();
+
         $form['#theme'] = 'users_login';
 
         $zerophp->response->addContent(Form::build($form));
+    }
+
+    function userLogout($zerophp) {
+        \Auth::logout();
+        zerophp_get_instance()->response->addMessage(zerophp_lang('You are successfully logout.'));
+
+        return zerophp_redirect();
+    }
+
+    function userChangePasswordForm($zerophp) {
+        
     }
 
 

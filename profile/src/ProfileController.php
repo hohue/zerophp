@@ -15,8 +15,8 @@ class ProfileController {
             $structure['#fields']['district_id']['reference_option']['arguments']['group'] = $data['local_id'];
         }
 
-        if (!empty($data['user_id'])) {
-            $users_profile = $this->users_profile->loadEntity(intval($data['user_id']));
+        if (!empty($data['id'])) {
+            $users_profile = $this->users_profile->loadEntity(intval($data['id']));
 
             if (!empty($users_profile->district_id)) {
                 $structure['#fields']['district_id']['value'] = reset(array_keys($users_profile->district_id));

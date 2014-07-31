@@ -6,13 +6,13 @@ use ZeroPHP\ZeroPHP\Entity;
 class Profile extends Entity {
     function __construct() {
         $this->setStructure(array(
-            '#id' => 'user_id',
+            '#id' => 'id',
             '#name' => 'profile', //ten bang
             '#class' => 'ZeroPHP\Profile\Profile',
             '#title' => zerophp_lang('Users profile'),
             '#fields' => array(
-                'user_id' => array(
-                    '#name' => 'user_id',
+                'id' => array(
+                    '#name' => 'id',
                     '#title' => zerophp_lang('ID'),
                     '#type' => 'hidden'
                 ),
@@ -137,7 +137,7 @@ class Profile extends Entity {
 
     function users_profile_update_form_value_alter($form_id, $form, &$form_values) {
         $form_values['fullname'] = $this->CI->users->user_get()->title;
-        $form_values['user_id'] = zerophp_userid();
+        $form_values['id'] = zerophp_userid();
     }
 
     function entity_exists($entity_id, $active = true, $cache = true) {
@@ -147,15 +147,15 @@ class Profile extends Entity {
 
         $entity = $this->loadEntity($entity_id, array('cache' => $cache));
 
-        if (!empty($entity->user_id)) {
+        if (!empty($entity->id)) {
             return $entity;
         }
         else {
             // Create a new profile for user if not exists
             $user = $this->CI->users->loadEntity($entity_id);
-            if (!empty($user->user_id)) {
-                $entity = new stdClass();
-                $entity->user_id = $user->user_id;
+            if (!empty($user->id)) {
+                $entity = new \stdClass();
+                $entity->id = $user->id;
                 $entity_id = $this->saveEntity($entity);
 
                 return $this->loadEntity($entity_id);
@@ -175,7 +175,7 @@ class Profile extends Entity {
 
         $group = !empty($arguments['group']) && is_numeric($arguments['group']) ? $arguments['group'] : 0;
 
-        $empty = new stdClass();
+        $empty = new \stdClass();
         $empty->title = '---';
         $empty->category_id = 0;
         $result[0] = $empty;

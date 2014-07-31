@@ -38,7 +38,7 @@ class ShopInstall {
 
                 $table->index('path');
 
-                $table->foreign('created_by')->references('user_id')->on('users')->onDelete('cascade');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 
@@ -55,7 +55,7 @@ class ShopInstall {
                 $table->index('session_id');
                 $table->index('shop_id');
 
-                $table->foreign('created_by')->references('user_id')->on('users')->onDelete('cascade');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
                 $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
             });
         }
@@ -82,7 +82,7 @@ class ShopInstall {
                 $table->index('price');
 
                 $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
-                $table->foreign('created_by')->references('user_id')->on('users')->onDelete('cascade');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 
@@ -120,7 +120,7 @@ class ShopInstall {
                 $table->index('created_by');
 
                 $table->foreign('shop_cart_id')->references('shop_cart_id')->on('shop_cart')->onDelete('cascade');
-                $table->foreign('created_by')->references('user_id')->on('users')->onDelete('cascade');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 
@@ -150,7 +150,7 @@ class ShopInstall {
                 $table->index('price');
 
                 $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
-                $table->foreign('created_by')->references('user_id')->on('users')->onDelete('cascade');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 

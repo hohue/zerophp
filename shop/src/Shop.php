@@ -169,18 +169,21 @@ class Shop extends Entity {
         ));
     }
 
-
-    
-
-    function loadEntity_by_user($user_id, $attributes = array()) {
-        $attributes['where']['created_by'] = $user_id;
+    function loadEntityByUser($id, $attributes = array()) {
+        $attributes['where']['created_by'] = $id;
 
         if (!isset($attributes['check_active'])) {
             $attributes['check_active'] = false;
         }
 
-        return reset($this->loadEntityExecutive(null, $attributes));
+        $entity = $this->loadEntityExecutive(null, $attributes);
+        return reset($entity);
     }
+
+
+
+
+
 
     function loadEntity_by_url_alias($path, $attributes = array()) {
         $attributes['where']['url_alias'] = $path;
@@ -195,7 +198,7 @@ class Shop extends Entity {
     function shop_create_form_alter($form_id, &$form) {
         if ($form_id == 'entity_crud_create_shop') {
             // Check shop registered
-            $shop = $this->loadEntity_by_user(zerophp_userid());
+            $shop = $this->loadEntityByUser(zerophp_userid());
             if (!empty($shop->shop_id)) {
                 zerophp_get_instance()->response->addMessage('Bạn chỉ có thể mở một shop.', 'error');
                 return \Redirect::to();
@@ -266,7 +269,7 @@ class Shop extends Entity {
         $shop_obj_create_form_alter($form_id, $form);
 
         // Check shop updated
-        $shop = $this->loadEntity_by_user(zerophp_userid());
+        $shop = $this->loadEntityByUser(zerophp_userid());
         if (empty($shop->shop_id) || $shop->shop_id != $form['shop_id']['#item']['shop_id']) {
             zerophp_get_instance()->response->addMessage('Bạn không có quyền truy cập vào trang này', 'error');
             return \Redirect::to();
@@ -281,7 +284,7 @@ class Shop extends Entity {
         if (isset($attributes['entity_id']) && $attributes['entity_id'] == 'me') {
             $attributes['entity_id'] = 0;
 
-            $shop = $this->loadEntity_by_user(zerophp_userid());
+            $shop = $this->loadEntityByUser(zerophp_userid());
             if (!empty($shop->shop_id)) {
                 $attributes['entity_id'] = $shop->shop_id;
             }
@@ -338,7 +341,7 @@ class Shop extends Entity {
         ) {
             $entity = Entity::loadEntityObject('shop_topic');
             $topic = $this->CI->shop_topic->loadEntity($uri[3]);
-            $shop = $this->loadEntity_by_user($topic->created_by);
+            $shop = $this->loadEntityByUser($topic->created_by);
 
             $block->shop_id = $shop->shop_id;
             return true;

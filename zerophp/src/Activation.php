@@ -49,7 +49,7 @@ class Activation extends Entity {
 
     function users_create_form_submit($form_id, $form, &$form_values) {
         if (empty($form_values['active'])) {
-            $hash = $this->hash_set($form_values['user_id']);
+            $hash = $this->hash_set($form_values['id']);
 
             $content = array(
                 'email' => $form_values['email'],
@@ -69,7 +69,7 @@ class Activation extends Entity {
         ));
 
         if (!isset($activation->hash)) {
-            $activation = new stdClass();
+            $activation = new \stdClass();
             $activation->destination_id = $destination_id;
             $activation->expired = time() + $this->expired;
             $activation->hash = md5($activation->destination_id . $activation->expired . mt_rand());
@@ -106,8 +106,8 @@ class Activation extends Entity {
         if (!empty($activation->destination_id) && ($activation->expired >= time())) {
             $user = $this->CI->users->loadEntity($activation->destination_id, array('check_active' => false));
 
-            $user_update = new stdClass();
-            $user_update->user_id = $user->user_id;
+            $user_update = new \stdClass();
+            $user_update->id = $user->id;
             $user_update->active = 1;
             $this->CI->users->saveEntity($user_update);
 
@@ -173,16 +173,16 @@ class Activation extends Entity {
             ),
         ));
         if (!isset($user->email)) {
-            zerophp_get_instance()->response->addMessage(lang('Your account was activated. Please login.'), 'error');
+            zerophp_get_instance()->response->addMessage(zerophp_lang('Your account was activated. Please login.'), 'error');
             return false;
         }
-        $form_values['user_id'] = $user->user_id;
+        $form_values['id'] = $user->id;
 
         return true;
     }
 
     function resend_users_form_submit($form_id, $form, &$form_values) {
-        $hash = $this->hash_set($form_values['user_id']);
+        $hash = $this->hash_set($form_values['id']);
 
         // Send Email
         $content = array(
@@ -192,14 +192,14 @@ class Activation extends Entity {
         $entity = Entity::loadEntityObject('mail');
         $this->CI->mail->send($form_values['email'], fw_variable_get('Activation email template users resend subject', 'Resend activation code'), $content, 'mail_template_activation_users_resend|activation');
 
-        zerophp_get_instance()->response->addMessage(lang('We sent activation email to your email. Please check your email now.'), 'success');
+        zerophp_get_instance()->response->addMessage(zerophp_lang('We sent activation email to your email. Please check your email now.'), 'success');
     }
 
     function users_reset_pass_form($hash) {
         $activation = $this->loadEntity_from_hash($hash);
 
         if (!$activation->destination_id) {
-            zerophp_get_instance()->response->addMessage(lang('Your reset password link is not match or has expired.'), 'error');
+            zerophp_get_instance()->response->addMessage(zerophp_lang('Your reset password link is not match or has expired.'), 'error');
             return \Redirect::to(\URL::to());
         }
 
@@ -236,13 +236,13 @@ class Activation extends Entity {
             ),
         );
 
-        $form['user_id'] = array(
-            '#name' => 'user_id',
+        $form['id'] = array(
+            '#name' => 'id',
             '#type' => 'hidden',
             '#disabled' => 'disabled',
             '#value' => $activation->destination_id,
             '#item' => array(
-                'user_id' => $activation->destination_id,
+                'id' => $activation->destination_id,
             ),
         );
 
@@ -277,12 +277,12 @@ class Activation extends Entity {
     }
 
     function users_reset_pass_form_submit($form_id, $form, &$form_values) {
-        $user_update = new stdClass();
-        $user_update->user_id = $form_values['user_id'];
+        $user_update = new \stdClass();
+        $user_update->id = $form_values['id'];
         $user_update->password = $form_values['password'];
 
         $this->CI->users->saveEntity($user_update);
 
-        zerophp_get_instance()->response->addMessage(lang('Your new password was saved successfully.'), 'success');
+        zerophp_get_instance()->response->addMessage(zerophp_lang('Your new password was saved successfully.'), 'success');
     }
 }
