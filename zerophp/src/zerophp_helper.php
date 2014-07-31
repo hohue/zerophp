@@ -164,13 +164,11 @@ function &zerophp_get_instance() {
 }
 
 function zerophp_flush_cache_view() {
-    $cachedViewsDirectory= app('path.storage').'/views/';
+    $cachedViewsDirectory = app('path.storage').'/views/';
     $files = glob($cachedViewsDirectory.'*');
         
-        foreach($files as $file)
-        {
-            if(is_file($file))
-            {
+        foreach($files as $file) {
+            if(is_file($file)) {
                 @unlink($file);
             }
         }  
@@ -255,6 +253,14 @@ function zerophp_form_render_all(&$form) {
     }
 
     return $result;
+}
+
+function zerophp_redirect($url = '/') {
+    if ($redirect = zerophp_get_instance()->request->query('destination')) {
+        $url = $redirect;
+    }
+
+    return \Redirect::to($url);
 }
 
 if (!function_exists('template_item_list')) {

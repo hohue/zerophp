@@ -15,15 +15,18 @@ class SystemInstall {
     }
 
     private static function up_0_01001() {
-        /*$user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
-        $admin = new \stdClass();
-        $admin->user_id = 1;
-        $admin->title = 'AdministratorUser';
-        $admin->email = 'admin@localhost.com';
-        $admin->password = '12345678';
-        $admin->active = 1;
-        $admin->roles = array(3);
-        $user->saveEntity($admin);*/
+        // Insert User 1
+        if (!\DB::table('users')->where('user_id', 1)->first()) {
+            \DB::table('users')->insert(array(
+                array(
+                    'user_id' => 1,
+                    'title' => 'Administrator',
+                    'email' => 'admin@localhost.com',
+                    'password' => \Hash::make('12345678'),
+                    'active' => 1,
+                ),
+            ));
+        }
 
         \DB::table('menu')->insert(array(
             array(
@@ -45,6 +48,13 @@ class SystemInstall {
                 'method' => 'clearOPCache',
             ),
         ));
+
+        \DB::table('variable')->insert(array(
+            array(
+                'variable_key' => 'theme admin',
+                'variable_value' => 'bootstrap',
+            ),
+        ));
     }
 
     private static function down_0_01001() {
@@ -53,6 +63,10 @@ class SystemInstall {
                 'user/register/success',
                 'performance/clear/cache',
                 'performance/clear/opcache',
+            ))->delete();
+
+        \DB::table('variable')->whereIn('variable_key', array(
+                'theme admin',
             ))->delete();
     }
 
