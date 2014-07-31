@@ -92,10 +92,6 @@ function zerophp_view($template, $data = array()) {
     return \View::make($template, $data)->render();
 }
 
-function zerophp_form($template, $data = array()) {
-    return \View::make($template, $data)->render();
-}
-
 function zerophp_userid() {
     if ($id = zerophp_static(__FUNCTION__)) {
         return $id;
@@ -222,6 +218,7 @@ function zerophp_get_calling_function() {
 }
 
 function zerophp_form_render($key, &$form) {
+    //zerophp_devel_print($key, $form);
     if (substr($key, 0, 1) != '#') {
         if (isset($form[$key])) {
             $item = $form[$key];
@@ -233,13 +230,14 @@ function zerophp_form_render($key, &$form) {
         }
 
         if (isset($item)) {
-            if (isset($item['theme'])) {
-                $template = $item['theme'];
-                unset($item['theme']);
+            if (isset($item['#theme'])) {
+                $template = $item['#theme'];
+                unset($item['#theme']);
             }
             else {
                 $template = 'form_item';
             }
+            //$template = 'form_item';
 
             return zerophp_view($template, array('element' => $item));
         }

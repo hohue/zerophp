@@ -19,7 +19,7 @@ class Profile extends Entity {
                 'address' => array(
                     '#name' => 'address',
                     '#title' => zerophp_lang('address'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => '123 Phường Chánh Nghĩa',
                     ),
@@ -81,7 +81,7 @@ class Profile extends Entity {
                 'mobile' => array(
                     '#name' => 'mobile',
                     '#title' => zerophp_lang('mobile'),
-                    '#type' => 'input',
+                    '#type' => 'text',
                 ),
             ),
         ));
@@ -99,9 +99,9 @@ class Profile extends Entity {
             '#required' => true,
             '#item' => array(
                 '#name' => 'fullname',
-                '#validate' => '#required',
+                '#validate' => 'required',
                 '#required' => 1,
-                '#type' => 'input',
+                '#type' => 'text',
                 'placeholder' => 'Nguyễn Văn Anh',
             ),
             '#error_messages' => zerophp_lang('Required field'),

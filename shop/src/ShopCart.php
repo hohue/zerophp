@@ -31,14 +31,14 @@ class ShopCart extends Entity {
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => 'created_at',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at	',
                     '#title' => 'updated_at',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),

@@ -25,7 +25,7 @@ class ShopOrder extends Entity {
                 'pay_name' => array(
                     '#name' => 'pay_name	',
                     '#title' => 'Họ & Tên',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Họ & Tên',
                     ),
@@ -33,7 +33,7 @@ class ShopOrder extends Entity {
                 'pay_email' => array(
                     '#name' => 'pay_email	',
                     '#title' => 'Email',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Email',
                     ),
@@ -41,7 +41,7 @@ class ShopOrder extends Entity {
                 'pay_phone' => array(
                     '#name' => 'pay_phone	',
                     '#title' => 'Điện Thoại',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Điện Thoại',
                     ),
@@ -49,7 +49,7 @@ class ShopOrder extends Entity {
                 'pay_address' => array(
                     '#name' => 'pay_address	',
                     '#title' => 'Địa Chỉ',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Địa Chỉ',
                     ),
@@ -63,7 +63,7 @@ class ShopOrder extends Entity {
                 'ship_name' => array(
                     '#name' => 'pay_name	',
                     '#title' => 'Họ & Tên',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Họ & Tên',
                     ),
@@ -71,7 +71,7 @@ class ShopOrder extends Entity {
                 'ship_email' => array(
                     '#name' => 'pay_email	',
                     '#title' => 'Email',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Email',
                     ),
@@ -79,7 +79,7 @@ class ShopOrder extends Entity {
                 'ship_phone' => array(
                     '#name' => 'pay_phone	',
                     '#title' => 'Điện Thoại',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Điện Thoại',
                     ),
@@ -87,7 +87,7 @@ class ShopOrder extends Entity {
                 'ship_address' => array(
                     '#name' => 'pay_address	',
                     '#title' => 'Địa Chỉ',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'Địa Chỉ',
                     ),
@@ -95,7 +95,7 @@ class ShopOrder extends Entity {
                 'note' => array(
                     '#name' => 'note	',
                     '#title' => 'GHI CHÚ THÊM',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => 'GHI CHÚ THÊM',
                     ),

@@ -19,13 +19,13 @@ class ShopTopic extends Entity {
                 'title' => array(
                     '#name' => 'title',
                     '#title' => 'Tiêu đề',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required'
                 ),
                 'short_description' => array(
                     '#name' => 'short_description',
                     '#title' => 'Mô tả ngắn',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required'
                 ),
                 'content' => array(
@@ -37,7 +37,7 @@ class ShopTopic extends Entity {
                 'price' => array(
                     '#name' => 'price',
                     '#title' => 'Giá sản phẩm',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required|numeric'
                 ),
                 'shipping' => array(
@@ -89,7 +89,7 @@ class ShopTopic extends Entity {
                 'created_by' => array(
                     '#name' => 'created_by',
                     '#title' => 'Tạo bởi',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#validate' => 'required',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1
@@ -105,14 +105,14 @@ class ShopTopic extends Entity {
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => 'created_at',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at	',
                     '#title' => 'updated_at',
-                    '#type' => 'input',
+                    '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1
                 ),

@@ -19,8 +19,8 @@ class CategoryGroup extends Entity {
                 'title' => array(
                     '#name' => 'title',
                     '#title' => zerophp_lang('Title'),
-                    '#type' => 'input',
-                    '#validate' => '#required',
+                    '#type' => 'text',
+                    '#validate' => 'required',
                     '#required' => true,
                 ),
                 'weight' => array(
