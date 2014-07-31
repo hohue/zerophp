@@ -95,28 +95,11 @@ class UserController {
 
     function userChangePasswordForm($zerophp) {}
 
+    function userForgotPasswordForm($zerophp) {}
 
+    function userActivationResendForm($zerophp) {}
 
+    function userResetPasswordForm($zerophp) {}
 
-
-
-
-    function logout() {
-        $this->users->logout();
-        return \Redirect::to(!empty($zerophp->request->query('destination')) ? trim($zerophp->request->query('destination')) : '');
-    }
-
-    function forgot_pass() {
-        $vars = array(
-            'form_id' => $this->users->forgot_pass_form(),
-        );
-        $zerophp->response->addContent(zerophp_view('users_forgot_pass', $vars));
-    }
-
-    function changepass() {
-        $vars = array(
-            'form_id' => $this->users->change_pass_form(),
-        );
-        $zerophp->response->addContent(zerophp_view('users_change_pass', $vars));
-    }
+    function userActivation($zerophp) {}
 }
