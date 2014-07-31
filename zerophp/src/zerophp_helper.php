@@ -132,7 +132,7 @@ function zerophp_anchor_shop($url, $title, $attributes = array()) {
     return zerophp_anchor_popup("ajax/user/login?destination=$url", $title, $attributes);
 }
 
-function zerophp_anchor_popup($url, $title, $attributes) {
+function zerophp_anchor_popup($url, $title, $attributes = array()) {
     $class= 'cboxInline cboxInlineAjax cboxElement';
     $attributes['class'] = isset($attributes['class']) ? $attributes['class'] . ' ' . $class : $class;
 
@@ -168,13 +168,11 @@ function &zerophp_get_instance() {
 }
 
 function zerophp_flush_cache_view() {
-    $cachedViewsDirectory= app('path.storage').'/views/';
+    $cachedViewsDirectory = app('path.storage').'/views/';
     $files = glob($cachedViewsDirectory.'*');
         
-        foreach($files as $file)
-        {
-            if(is_file($file))
-            {
+        foreach($files as $file) {
+            if(is_file($file)) {
                 @unlink($file);
             }
         }  
