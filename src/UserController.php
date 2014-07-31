@@ -137,11 +137,76 @@ class UserController {
         $zerophp->response->addContent(Form::build($form));
     }
 
-    function userForgotPasswordForm($zerophp) {}
+//email
+    function userForgotPasswordForm($zerophp) {
+        $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $structure = $user->getStructure();
+        $form = array();
 
-    function userActivationResendForm($zerophp) {}
+        $form['email'] = $structure['#fields']['email'];
+        //$form['email']['#name'] = 'email';
+        //$form['email']['#title'] = zerophp_lang('Email');
+        
 
-    function userResetPasswordForm($zerophp) {}
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Forgot Password'),
+        );
+
+
+       //zerophp_devel_print($form);
+
+        $zerophp->response->addContent(Form::build($form));
+
+    }
+
+//pass pass_cfm
+    function userResetPasswordForm($zerophp) {
+        $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $structure = $user->getStructure();
+        $form = array();
+
+        $form['password'] = $structure['#fields']['password'];
+
+        $form['password_confirm'] = $structure['#fields']['password'];
+        $form['password']['#name'] = 'password';
+        $form['password']['#title'] = zerophp_lang('password');
+        //$form['password_confirm']['#error_messages'] = zerophp_lang('Send a confirmation email to register for an account at ChoVip.vn');
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Reset Password'),
+        );
+        //zerophp_devel_print($form);
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+//email
+    function userActivationResendForm($zerophp) {
+        $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $structure = $user->getStructure();
+        $form = array();
+
+        $form['email'] = $structure['#fields']['email'];
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('User Activation'),
+        );
+
+        //zerophp_devel_print($form);
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+    
+
+   
+
+
 
     function userActivation($zerophp) {}
 }
