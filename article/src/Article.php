@@ -57,7 +57,7 @@ class Article extends Entity {
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),
                     ),
-                    '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
+                    '#validate' => 'required|numeric',
                     '#default' => 1,
                 ),
             ),
