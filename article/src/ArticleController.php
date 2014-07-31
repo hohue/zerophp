@@ -26,7 +26,6 @@ class ArticleController {
     function show($zerophp, $article_id){
         $article_id = zerophp_get_instance()->request->segment(1);
         
-      //$article_id = zerophp_get_instance()->request->segment(1);
 
       //zerophp_devel_print($article_id);
 
