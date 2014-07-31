@@ -189,8 +189,7 @@ class Users extends Entity {
         zerophp_get_instance()->response->addMessage(zerophp_lang('Your password was reset successfully.'));
     }
 
-
-
+    
 
 
 
