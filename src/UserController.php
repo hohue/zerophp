@@ -168,7 +168,7 @@ class UserController {
         $form['#actions']['submit'] = array(
             '#name' => 'submit',
             '#type' => 'submit',
-            '#value' => zerophp_lang('Forgot Password'),
+            '#value' => zerophp_lang('Forgot password'),
         );
 
         $form['#submit'] = array(
@@ -177,11 +177,35 @@ class UserController {
                 'method' => 'forgotpassFormSubmit',
             ),
         );
+        
+        $form['#redirect'] = 'user/forgotpass/success';
+        $form['#success_message'] = 'you have successfully activated';
 
         $zerophp->response->addContent(Form::build($form));
     }
 
-    function userForgotPasswordSuccess($zerophp) {}
+    function userForgotPasswordSuccess($zerophp) {
+        $email = \Session::get('user forgotpass email');
+        \Session::forget('user forgotpass email');
+
+        if (empty($email)) {
+            \App::abort(404);
+        }
+
+        $items = array(
+            array(
+                '#item' => zerophp_lang('User forgotpass')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
+        $vars = array(
+            'email' => $email,
+        );
+
+        $zerophp->response->addContent(zerophp_view('users_forgotpass_success', $vars));
+
+    }
 
     function userResetPasswordForm($zerophp, $hash) {
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
