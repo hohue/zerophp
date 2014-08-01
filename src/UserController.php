@@ -263,5 +263,22 @@ class UserController {
         $zerophp->response->addContent(Form::build($form));
     }
     
-    function userActivation($zerophp, $hash) {}
+    function userActivation($zerophp, $hash) {
+        $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+        $hash = $activation->loadEntityByHash($hash);
+
+        if (isset($hash->destination_id)) {
+            $user_obj = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+            $user = $user_obj->loadEntity($hash->destination_id);
+            $user->active = 1;
+            $user_obj->saveEntity($user);
+
+            $zerophp->response->addMessage(zerophp_lang('Your account was successfully activated.'));
+        }
+        else {
+            $zerophp->response->addMessage(zerophp_lang('Your activation link has expired. Please use activation resend feature.'));
+        }
+
+        zerophp_redirect();
+    }
 }
