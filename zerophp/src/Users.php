@@ -192,7 +192,7 @@ class Users extends Entity {
 
             $vars = array(
                 'email' => $form_values['email'],
-                'link' => url("user/activation/$hash"),
+                'link' => url("user/activation/" . $hash->hash),
                 'expired' => $hash->expired,
             );
 
@@ -204,6 +204,7 @@ class Users extends Entity {
 
         \Session::put('user registered email', $form_values['email']);
     }
+
 
     function formChangePasswordValidate($form_id, $form, &$form_values) {
         $passwd = \Auth::user()->__get('password');
@@ -246,11 +247,11 @@ class Users extends Entity {
 
             $vars = array(
                 'title' => $user->title,
-                'link' => url("user/resetpass/$hash"),
+                'link' => url("user/resetpass/" . $hash->hash),
             );
 
             zerophp_mail($form_values['email'], 
-                zerophp_lang(zerophp_variable_get('user forgotpass email subject', 'Reset your password')),
+                zerophp_lang(zerophp_variable_get('user forgotpass email sRubject', 'Reset your password')),
                 zerophp_view('email_user_reset_pass', $vars)
             );
 
@@ -284,6 +285,24 @@ class Users extends Entity {
             'class' => 'ZeroPHP\ZeroPHP\Users',
             'method' => 'formRegisterValidate',
         );
+
+        $form['remember_me'] = array(
+            '#name' => 'remember_me',
+            '#type' => 'checkbox',
+            '#value' => 1,
+            '#title' => zerophp_lang('I agree to the :term and :policy', array(
+                    ':term' => zerophp_anchor('article/3', zerophp_lang('Terms of Use'), array('target' => '_blank')),
+                    ':policy' => zerophp_anchor('article/4', zerophp_lang('Privacy Policy'), array('target' => '_blank')),
+                )),
+            '#validate' => 'accepted',
+        );
+
+         $form['#actions']['reset'] = array(
+            '#name' => 'reset',
+            '#type' => 'reset',
+            '#value' => zerophp_lang('Reset'),
+        );
+
 
         $form['#submit'][] = array(
             'class' => 'ZeroPHP\ZeroPHP\Users',
@@ -513,11 +532,45 @@ class Users extends Entity {
             '#value' => zerophp_lang('User Activation'),
         );
 
+        $form['#submit'][] = array(
+            'class' => 'ZeroPHP\ZeroPHP\Users',
+            'method' => 'formActivationResendSubmit',
+        );
+
+        $form['#redirect'] = 'user/activation/resend';
+        $form['#success_message'] = zerophp_lang('confirmation email has been sent successfully');
+
         //zerophp_devel_print($form);
 
         $zerophp->response->addContent(Form::build($form));
     }
-    
+
+      function formActivationResendSubmit($form_id, $form, &$form_values) {
+        //if ($form_values['active'] == 0) {
+        $user = $this->loadEntityByEmail($form_values['email']);
+
+            $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+            $hash = $activation->setHash($user->id, 'user_activation_resend');
+
+            //zerophp_devel_print($hash);
+
+            $vars = array(
+                'email' => $form_values['email'],
+                'link' => url("user/activation/" . $hash->hash),
+                'expired' => $hash->expired,
+            );
+
+            zerophp_mail($form_values['email'], 
+                zerophp_lang(zerophp_variable_get('user activation email subject', 'Activation your account')),
+                zerophp_view('email_user_activation_resend', $vars)
+            );
+        //}
+
+        \Session::put('user activation resend email', $form_values['email']);
+    }
+
+
+
     function showActivation($zerophp, $hash) {
         $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
         $hash = $activation->loadEntityByHash($hash);
@@ -536,6 +589,7 @@ class Users extends Entity {
         zerophp_redirect();
     }
 
+   
 
 
 
