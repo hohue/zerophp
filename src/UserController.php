@@ -171,8 +171,17 @@ class UserController {
             '#value' => zerophp_lang('Forgot Password'),
         );
 
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'forgotpassFormSubmit',
+            ),
+        );
+
         $zerophp->response->addContent(Form::build($form));
     }
+
+    function userForgotPasswordSuccess($zerophp) {}
 
     function userResetPasswordForm($zerophp, $hash) {
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
@@ -192,6 +201,13 @@ class UserController {
             '#name' => 'submit',
             '#type' => 'submit',
             '#value' => zerophp_lang('Reset Password'),
+        );
+
+        $form['hash'] = array(
+            '#name' => 'hash',
+            '#type' => 'hidden',
+            '#value' => $hash,
+            '#disabled' => true,
         );
 
         $form['#validate'] = array(

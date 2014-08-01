@@ -88,7 +88,7 @@ class EntityModel {
             foreach ($attributes['where'] as $key => $value) {
                 $key = explode(' ', $key);
                 $key[1] = isset($key[1]) ? $key[1] : '=';
-                $db->where($key[0], $key[0], $value);
+                $db->where($key[0], $key[1], $value);
             }
         }
 
