@@ -5,13 +5,13 @@ define('VERSION_ZEROPHP_SHOP', 0.01);
 
 class ShopInstall {
     public static function up($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_SHOP && VERSION_ZEROPHP_SHOP <= 0.01) {
+        if ($prev_version < 0.01) {
             self::up_0_01();
         }
     }
 
     public static function down($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_SHOP && VERSION_ZEROPHP_SHOP <= 0.01) {
+        if ($prev_version < 0.01) {
             self::down_0_01();
         }
     }
@@ -198,7 +198,7 @@ class ShopInstall {
             array(
                 'title' => 'Sop cart items',
                 'path' => 'shopcart/items',
-                'class' => 'ZeroPHP\\Shop\\ShopcartController',
+                'class' => 'ZeroPHP\\Shop\\Shopcart',
                 'method' => 'showItems',
             ),
         ));

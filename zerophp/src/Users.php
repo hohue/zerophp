@@ -2,6 +2,7 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\Form;
 
 class Users extends Entity {
     function __construct() {
@@ -138,7 +139,9 @@ class Users extends Entity {
         return reset($entity);
     }
 
-    function login($form_id, $form, &$form_values) {
+    function formLoginValidate($form_id, $form, &$form_values) {
+        $zerophp = zerophp_get_instance();
+
         if (\Auth::attempt(array(
                 'email' => $form_values['email'], 
                 'password' => $form_values['password'],
@@ -147,7 +150,7 @@ class Users extends Entity {
         ) {
             $user = $this->loadEntityByEmail($form_values['email']);
 
-            zerophp_get_instance()->response->addMessage(zerophp_lang('You have been successfully logged in...'));
+            $zerophp->response->addMessage(zerophp_lang('You have been successfully logged in...'));
 
             // Update last_activity field
             $user = new \stdClass();
@@ -166,11 +169,11 @@ class Users extends Entity {
         }
 
         //@todo 1 Them vao form error message
-        zerophp_get_instance()->response->addMessage(zerophp_lang('Login failed. Your password is incorrect OR Your account is not active yet OR Your account was blocked. Please try again later.'), 'error');
+        $zerophp->response->addMessage(zerophp_lang('Login failed. Your password is incorrect OR Your account is not active yet OR Your account was blocked. Please try again later.'), 'error');
         return false;
     }
 
-    function registerFormValidate($form_id, $form, &$form_values) {
+    function formRegisterValidate($form_id, $form, &$form_values) {
         $active = zerophp_variable_get('users register email validation', 1);
         if ($active) {
             $form_values['active'] = 0;
@@ -182,7 +185,7 @@ class Users extends Entity {
         return true;
     }
 
-    function registerFormSubmit($form_id, $form, &$form_values) {
+    function formRegisterSubmit($form_id, $form, &$form_values) {
         if ($form_values['active'] == 0) {
             $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
             $hash = $activation->setHash($form_values['id'], 'user_register');
@@ -202,7 +205,7 @@ class Users extends Entity {
         \Session::put('user registered email', $form_values['email']);
     }
 
-    function changepassValidate($form_id, $form, &$form_values) {
+    function formChangePasswordValidate($form_id, $form, &$form_values) {
         $passwd = \Auth::user()->__get('password');
 
         if (\Hash::check($form_values['password_old'], $passwd)) {
@@ -214,7 +217,7 @@ class Users extends Entity {
         return false;
     }
 
-    function changepassSubmit($form_id, $form, &$form_values){
+    function formChangePasswordSubmit($form_id, $form, &$form_values){
         $user = $this->loadEntity(zerophp_userid());
         $user->password = $form_values['password'];
         $this->saveEntity($user);
@@ -222,7 +225,7 @@ class Users extends Entity {
         zerophp_get_instance()->response->addMessage(zerophp_lang('Your password was reset successfully.'));
     }
 
-    function resetValidate($form_id, $form, &$form_values) {
+    function formResetPasswordValidate($form_id, $form, &$form_values) {
         $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
         $hash = $activation->loadEntityByHash($form_values['hash']);
 
@@ -235,7 +238,7 @@ class Users extends Entity {
         return false;
     }
 
-    function forgotpassFormSubmit($form_id, $form, &$form_values) {
+    function formForgotPasswordSubmit($form_id, $form, &$form_values) {
         $user = $this->loadEntityByEmail($form_values['email']);
 
             $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
@@ -253,6 +256,284 @@ class Users extends Entity {
 
             \Session::put('user forgotpass email', $form_values['email']);
             
+    }
+
+    private function _unsetFormItem(&$form) {
+        unset($form['active'], $form['remember_token'], $form['last_activity'],
+            $form['created_at'], $form['updated_at'], $form['deleted_at']);
+    }
+
+    function showRegisterForm($zerophp) {
+        $form = $this->crudCreateForm();
+        $this->_unsetFormItem($form);
+        unset($form['id'], $form['roles']);
+
+        // Validate email unique
+        $form['email']['#validate'] .= '|unique:users,email';
+
+        // Add password confirmation field
+        $form['password_confirm'] = $form['password'];
+        $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
+        $form['password_confirm']['#name'] = 'password_confirm';
+        $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
+        $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
+
+        $form['#actions']['submit']['#value'] = zerophp_lang('Register');
+
+        $form['#validate'][] = array(
+            'class' => 'ZeroPHP\ZeroPHP\Users',
+            'method' => 'formRegisterValidate',
+        );
+
+        $form['#submit'][] = array(
+            'class' => 'ZeroPHP\ZeroPHP\Users',
+            'method' => 'formRegisterSubmit',
+        );
+
+        $form['#redirect'] = 'user/register/success';
+        $form['#success_message'] = '';
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showRegisterSuccess($zerophp) {
+        $email = \Session::get('user registered email');
+        \Session::forget('user registered email');
+
+        if (empty($email)) {
+            \App::abort(404);
+        }
+
+        $items = array(
+            array(
+                '#item' => zerophp_lang('User register')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
+        $vars = array(
+            'email' => $email,
+        );
+        $zerophp->response->addContent(zerophp_view('users_register_success', $vars));
+    }
+
+    function showLoginForm($zerophp) {
+        $form = array();
+        $structure = $this->getStructure();
+
+        $form['email'] = $structure['#fields']['email'];
+        $form['email']['#validate'] .= '|exists:users,email';
+        unset($form['email']['#description']);
+
+        $form['password'] = $structure['#fields']['password'];
+
+        $form['remember_me'] = array(
+            '#name' => 'remember_me',
+            '#type' => 'checkbox',
+            '#value' => 1,
+            '#title' => zerophp_lang('Remember me'),
+        );
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Login'),
+        );
+
+        $form['#validate'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'formLoginValidate',
+            ),
+        );
+
+        $form['#redirect'] = zerophp_redirect_get_path();
+
+        $form['#theme'] = 'users_login';
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showLogout($zerophp) {
+        \Auth::logout();
+        zerophp_get_instance()->response->addMessage(zerophp_lang('You are successfully logout.'));
+
+        return zerophp_redirect();
+    }
+
+    function showChangePasswordForm($zerophp) {
+        $structure = $this->getStructure();
+
+        $form = array();
+        $form['password_old'] = $structure['#fields']['password'];
+        $form['password_old']['#name'] = 'password_old';
+        $form['password_old']['#title'] = zerophp_lang('Old password');
+
+        $form['password'] = $structure['#fields']['password'];
+        $form['password']['#name'] = 'password';
+        $form['password']['#title'] = zerophp_lang('New password');
+
+        $form['password_confirm'] = $structure['#fields']['password'];
+        $form['password_confirm']['#name'] = 'password_confirm';
+        $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
+        $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
+        $form['password_confirm']['#error_messages'] = zerophp_lang('New password confirmation is not match with new password');
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Change Password'),
+        );
+
+        $form['#validate'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'formChangePasswordValidate',
+            ),
+        );
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'formChangePasswordSubmit',
+            ),
+        );
+
+        //zerophp_devel_print($form);
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showForgotPasswordForm($zerophp) {
+        $structure = $this->getStructure();
+        $form = array();
+
+        $form['email'] = $structure['#fields']['email'];
+        $form['email']['#validate'] .= '|exists:users,email';
+        
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Forgot password'),
+        );
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'formForgotPasswordSubmit',
+            ),
+        );
+        
+        $form['#redirect'] = 'user/forgotpass/success';
+        $form['#success_message'] = zerophp_lang('You have successfully activated');
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showForgotPasswordSuccess($zerophp) {
+        $email = \Session::get('user forgotpass email');
+        \Session::forget('user forgotpass email');
+
+        if (empty($email)) {
+            \App::abort(404);
+        }
+
+        $items = array(
+            array(
+                '#item' => zerophp_lang('User forgotpass')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
+        $vars = array(
+            'email' => $email,
+        );
+
+        $zerophp->response->addContent(zerophp_view('users_forgotpass_success', $vars));
+
+    }
+
+    function showResetPasswordForm($zerophp, $hash) {
+        $structure = $this->getStructure();
+        $form = array();
+
+        $form['password'] = $structure['#fields']['password'];
+
+        $form['password_confirm'] = $structure['#fields']['password'];
+        $form['password_confirm']['#name'] = 'password_confirm';
+        $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
+        $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
+        $form['password_confirm']['#error_messages'] = zerophp_lang('Password confirmation is not match with password');
+        $form['password_confirm']['#description'] = zerophp_lang('Send a confirmation email to register for an account at ChoVip.vn');
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Reset Password'),
+        );
+
+        $form['hash'] = array(
+            '#name' => 'hash',
+            '#type' => 'hidden',
+            '#value' => $hash,
+            '#disabled' => true,
+        );
+
+        $form['#validate'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'formResetPasswordValidate',
+            ),
+        );
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'formChangePasswordSubmit',
+            ),
+        );
+
+
+        //zerophp_devel_print($form);
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showActivationResendForm($zerophp) {
+        $structure = $this->getStructure();
+        $form = array();
+
+        $form['email'] = $structure['#fields']['email'];
+        $form['email']['#validate'] .= '|exists:users,email';
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('User Activation'),
+        );
+
+        //zerophp_devel_print($form);
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+    
+    function showActivation($zerophp, $hash) {
+        $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+        $hash = $activation->loadEntityByHash($hash);
+
+        if (isset($hash->destination_id)) {
+            $user = $this->loadEntity($hash->destination_id);
+            $user->active = 1;
+            $this->saveEntity($user);
+
+            $zerophp->response->addMessage(zerophp_lang('Your account was successfully activated.'));
+        }
+        else {
+            $zerophp->response->addMessage(zerophp_lang('Your activation link has expired. Please use activation resend feature.'));
+        }
+
+        zerophp_redirect();
     }
 
 

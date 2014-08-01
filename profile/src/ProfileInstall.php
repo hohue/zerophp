@@ -5,13 +5,13 @@ define('VERSION_ZEROPHP_PROFILE', 0.01);
 
 class ProfileInstall {
     public static function up($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_PROFILE && VERSION_ZEROPHP_PROFILE <= 0.01) {
+        if ($prev_version < 0.01) {
             self::up_0_01();
         }
     }
 
     public static function down($prev_version) {
-        if ($prev_version < VERSION_ZEROPHP_PROFILE && VERSION_ZEROPHP_PROFILE <= 0.01) {
+        if ($prev_version < 0.01) {
             self::down_0_01();
         }
     }
@@ -38,7 +38,7 @@ class ProfileInstall {
                 'title' => 'User Profile Update',
                 'path' => 'profile/%/update',
                 'class' => 'ZeroPHP\\Profile\\Profile',
-                'method' => 'crudUpdate',
+                'method' => 'updateForm',
                 'arguments' => '1',
             ),
         ));

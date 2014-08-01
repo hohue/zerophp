@@ -1,7 +1,7 @@
 <?php 
 namespace ZeroPHP\Sitemap;
 
-class SitemapController {
+class Sitemap {
 
 
 

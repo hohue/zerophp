@@ -1,7 +1,7 @@
 <?php
 namespace ZeroPHP\Location;
 
-class LocationController {
+class Location {
 
 
     

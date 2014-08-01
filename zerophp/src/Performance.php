@@ -1,7 +1,7 @@
 <?php
 namespace ZeroPHP\ZeroPHP;
 
-class PerformanceController {
+class Performance {
     function clearCache($zerophp) {
         \Cache::flush();
 

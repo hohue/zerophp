@@ -20,7 +20,7 @@ class ContactInstall {
             array(
                 'title' => 'Contact Us',
                 'path' => 'contact',
-                'class' => 'ZeroPHP\\Contact\\ContactController',
+                'class' => 'ZeroPHP\\Contact\\Contact',
                 'method' => 'createForm',
             ),
         ));
