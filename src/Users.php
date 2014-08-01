@@ -196,9 +196,9 @@ class Users extends Entity {
                 zerophp_lang(zerophp_variable_get('user activation email subject', 'Activation your account')),
                 zerophp_view('email_user_activation', $vars)
             );
-
-            \Session::put('user registered email', $form_values['email']);
         }
+
+        \Session::put('user registered email', $form_values['email']);
     }
 
     function changepassValidate($form_id, $form, &$form_values) {
@@ -222,17 +222,33 @@ class Users extends Entity {
     }
 
     function resetValidate($form_id, $form, &$form_values) {
-        //@todo 4 get userid from hash
-        \Auth::loginUsingId(2);
+        $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+        $hash = $activation->loadEntityByHash($form_values['hash']);
 
-        return true;
+        if (isset($hash->destination_id)) {
+            \Auth::loginUsingId($hash->destination_id);
+
+            return true;
+        }
+
+        return false;
     }
 
-    function activationresendValidate($form_id, $form, &$form_values) {
-        //@todo 4 get userid from hash
-        \Auth::loginUsingId(2);
+    function forgotpassFormSubmit($form_id, $form, &$form_values) {
+        $user = $this->loadEntityByEmail($form_values['email']);
 
-        return true;
+            $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+            $hash = $activation->setHash($user->id, 'user_forgotpass');
+
+            $vars = array(
+                'title' => $user->title,
+                'link' => url("user/resetpass/$hash"),
+            );
+
+            zerophp_mail($form_values['email'], 
+                zerophp_lang(zerophp_variable_get('user forgotpass email subject', 'Reset your password')),
+                zerophp_view('email_user_reset_pass', $vars)
+            );
     }
 
 
