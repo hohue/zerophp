@@ -13,8 +13,6 @@ class UserController {
     }
 
     function showRegisterForm($zerophp) {
-        //zerophp_mail('alka.webdev@gmail.com|Al-Ka', 'Activation your account', 'Hello World');
-
         $user = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
         $form = $user->crudCreateForm();
         $this->_unsetFormItem($form);
@@ -49,6 +47,13 @@ class UserController {
     }
 
     function showRegisterSuccess($zerophp) {
+        $email = \Session::get('user registered email');
+        \Session::forget('user registered email');
+
+        if (empty($email)) {
+            \App::abort(404);
+        }
+
         $items = array(
             array(
                 '#item' => zerophp_lang('User register')
@@ -56,7 +61,9 @@ class UserController {
         );
         $zerophp->response->setBreadcrumb($items);
 
-        $vars = array();
+        $vars = array(
+            'email' => $email,
+        );
         $zerophp->response->addContent(zerophp_view('users_register_success', $vars));
     }
 
@@ -180,7 +187,6 @@ class UserController {
         );
 
         $zerophp->response->addContent(Form::build($form));
-
     }
 
     function userResetPasswordForm($zerophp, $hash) {
@@ -240,10 +246,5 @@ class UserController {
         $zerophp->response->addContent(Form::build($form));
     }
     
-
-   
-
-
-
-    function userActivation($zerophp) {}
+    function userActivation($zerophp, $hash) {}
 }
