@@ -249,6 +249,9 @@ class Users extends Entity {
                 zerophp_lang(zerophp_variable_get('user forgotpass email subject', 'Reset your password')),
                 zerophp_view('email_user_reset_pass', $vars)
             );
+
+            \Session::put('user forgotpass email', $form_values['email']);
+            
     }
 
 
