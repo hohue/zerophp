@@ -59,7 +59,7 @@ class Activation extends Entity {
             $this->saveEntity($activation);
         }
 
-        return $activation->hash;
+        return $activation;
     }
 
     function loadEntityByHash($hash, $attributes = array()) {
