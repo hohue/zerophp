@@ -8,26 +8,7 @@ class Entity {
 
     private $structure;
 
-    /**
-     * <pre>
-     * $structure = array(
-     *      'name' => '',                             // Trung voi ten cua class
-     *      'id' => '',                               // ID field
-     *      'title' => '',                            // Ten cua entity
-     *      'ids_can_not_delete' => array(),          // Mang chua cac ID default khong the xoa
-     *      'fields' => array(
-     *          'shop_topic_id' => array(
-     *              ’name’ => ‘shop_topic_id’,        // name trùng với field key
-     *              ‘title’ => ‘ID’,                  // Label của form item
-     *              ’type’ => ‘hidden’,               // form item type: hidden/input/pasword/textarea….,
-     *              ’validate’ => ‘required’,         // Form Validation Rule reference
-     *          ),
-     *      ),
-     * );
-     * </pre>
-     * @param string $structure
-     */
-    public function setStructure($structure = null) {
+    public function setStructure($structure) {
         $this->structure = $structure;
     }
 
@@ -238,6 +219,20 @@ class Entity {
 
     function crudCreateForm() {
         $form = $this->structure['#fields'];
+        $spencial_fields = array('created_at', 'updated_at', 'created_by');
+
+        foreach ($form as $key => $value) {
+            if (in_array($key, $spencial_fields)) {
+                unset($form[$key]);
+            }
+
+            if ($value['#type'] == 'file') {
+                $form['#form'] = array(
+                    'files' => true,
+                );
+                break;
+            }
+        }
 
         $form['entity_name'] = array(
             '#name' => 'entity_name',
@@ -267,17 +262,19 @@ class Entity {
     }
 
     function crudCreateFormValidate($form_id, $form, &$form_values) {
-        // Textarea clean
+        $result = true;
         foreach ($this->structure['#fields'] as $key => $value) {
+            // Textarea clean
             if ($value['#type'] == 'textarea' && !empty($form_values[$key])) {
                 if (!empty($value['#rte_enable'])) {
                     // Make safe and standard html document
                     require_once ROOT . '/libraries/htmlpurifier/library/HTMLPurifier.auto.php';
-                    $config = HTMLPurifier_Config::createDefault();
-                    $purifier = new HTMLPurifier($config);
+                    $config = \HTMLPurifier_Config::createDefault();
+                    $purifier = new \HTMLPurifier($config);
                     $form_values[$key] = $purifier->purify($form_values[$key]);
 
-                    $text = new DOMDocument();
+                    //@todo 9 Hack for SEO ---------------------------
+                    $text = new \DOMDocument();
                     @$text->loadHTML('<?xml encoding="UTF-8"?>' . $form_values[$key]); //LIBXML_HTML_NOIMPLIED
 
                     $images = $text->getElementsByTagName('img');
@@ -306,14 +303,20 @@ class Entity {
 
                     $body = $text->getElementsByTagName('body')->item(0);
                     $form_values[$key] = str_replace("</body>", '', str_replace("<body>", '', $text->saveHTML($body)));
+                    //END Hack for SEO ---------------------------
                 }
                 else {
                     $form_values[$key] = strip_tags($form_values[$key]);
                 }
             }
+            //File upload validate
+            elseif ($value['#type'] == 'file' && \Input::hasFile($value['#name']) && !\Input::file($value['#name'])->isValid()) {
+                //@todo 1 add error message
+                $result = false;
+            }
         }
 
-        return true;
+        return $result;
     }
 
     function crudCreateFormSubmit($form_id, $form, &$form_values) {
@@ -321,12 +324,11 @@ class Entity {
 
         // Fetch via structure to skip unexpected fields (alter form another modules)
         foreach ($this->structure['#fields'] as $key => $value) {
-            if ($value['#type'] == 'file'
-                && file_exists($_FILES[$key]['tmp_name'])
-                && is_uploaded_file($_FILES[$key]['tmp_name'])
-            ) {
-                $this->CI->config->load('upload');
-                $upload_config = config_item('upload');
+            if ($value['#type'] == 'file' && \Input::hasFile($value['#name'])) {
+                $file = \Input::file($value['#name']);
+                zerophp_devel_print($file, 'Entity file - line 329');
+
+                /* $upload_config = config_item('upload');
                 $upload = false;
                 switch ($value['widget']) {
                     case 'image':
@@ -336,11 +338,11 @@ class Entity {
                         break;
 
                     //@todo 9 cho phep upload file
-                    /* case 'file':
+                    case 'file':
                         $upload_config = $upload_config['file'];
                         $upload_config['upload_path'] = 'files/';
                         $upload = true;
-                        break; */
+                        break; 
                 }
 
                 if ($upload) {
@@ -362,7 +364,7 @@ class Entity {
                         $file = $this->CI->upload->data();
                         $form_values[$key] = $upload_config['upload_path'] . $file['file_name'];
                     }
-                }
+                }*/
             }
 
             switch ($key) {
@@ -419,552 +421,9 @@ class Entity {
 
 
 
-    function crud_list($url_prefix = '', $page = 1) {
-        $template = "entity_list_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = zerophp_get_instance()->response->template_check($template, $this->structure['#name']) ? $template : 'entity_list';
+    
 
-        $attributes = array(
-            'page' => $page,
-        );
-
-        if (zerophp_get_instance()->response->admin_get()) {
-            $attributes['check_active'] = false;
-            $attributes['cache'] = false;
-        }
-
-        $pager_sum = 1;
-        $entities = $this->loadEntityAll($attributes, $pager_sum);
-
-        $data = array(
-            'form_id' => $this->crud_list_form($entities, $url_prefix, $page),
-            'entities' => $entities,
-            'structure' => $this->structure,
-            'add_new_link' => fw_anchor($url_prefix . "up/e/create/" . $this->structure['#name'], zerophp_lang('Add new')),
-            'url_prefix' => $url_prefix,
-            'pager_current' => $page,
-            'pager_sum' => $pager_sum,
-            'pager_uri' => $url_prefix . "up/e/index/" . $this->structure['#name'],
-        );
-
-        return array(
-            'page_title' => $this->structure->title,
-            'template' => $template,
-            'data' => $data,
-        );
-    }
-
-    function crud_create($type = 'create', $entity = null, $url_prefix = '', $action = '') {
-        $template = "entity_create_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = zerophp_get_instance()->response->template_check($template, $this->structure['#name']) ? $template : 'entity_create';
-
-        // Update
-        if ($type == 'update' && $entity) {
-            $page_title = zerophp_lang('Editing') . ": ";
-            if (isset($entity->title) && $entity->title) {
-                $page_title .= $entity->title;
-            }
-            else {
-                $page_title .= $this->structure->title . " " . $entity->{$this->structure['#id']};
-            }
-        }
-
-        // Duplicate
-        elseif ($type == 'duplicate' && $entity) {
-            $page_title = zerophp_lang('Clone') . ": ";
-            if (isset($entity->title) && $entity->title) {
-                $page_title .= $entity->title;
-            }
-            else {
-                $page_title .= $this->structure->title . " " . $entity->{$this->structure['#id']};
-            }
-
-            unset($entity->{$this->structure['#id']});
-        }
-
-        // Create
-        else {
-            $page_title = zerophp_lang('Creating') . ': ' . $this->structure->title;
-        }
-
-        $data = array(
-            'form_id' => $this->crud_create_form($type, $entity, $type == 'update' ? true : false, $url_prefix, $action),
-        );
-
-        return array(
-            'page_title' => $page_title,
-            'template' => $template,
-            'data' =>$data,
-        );
-    }
-
-    function crud_read($entity, $url_prefix = '') {
-        $template = "entity_read_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = zerophp_get_instance()->response->template_check($template) ? $template : 'entity_read';
-
-        $data = array(
-            'entity' => $entity,
-            'structure' => $this->structure,
-        );
-
-        $page_title = isset($entity->title) ? $entity->title : $this->structure->title;
-
-
-        zerophp_get_instance()->response->breadcrumbs_add(array(array('item' => $page_title)));
-
-        if (!empty($entity->{$this->structure['#id']})) {
-            zerophp_get_instance()->response->tabs_add($this->link_tab($this->link_action($entity->{$this->structure['#id']}, $url_prefix, 'read')));
-        }
-
-        return array(
-            'page_title' => $page_title,
-            'template' => $template,
-            'data' => $data,
-        );
-    }
-
-    function crud_preview($entity, $url_prefix = '') {
-        return $this->crud_read($entity, $url_prefix);
-    }
-
-    function crud_update($entity, $url_prefix = '') {
-        return $this->crud_create('update', $entity, $url_prefix);
-    }
-
-    function crud_delete($entity, $url_prefix = '') {
-        if (isset($entity->title) && $entity->title) {
-            $entity_title = $entity->title;
-        }
-        else {
-            $entity_title = "#" . $entity->{$this->structure['#id']};
-        }
-
-        $template = "entity_delete_" . $this->structure['#name'] . '|' . $this->structure['#name'];
-        $template = zerophp_get_instance()->response->template_check($template, $this->structure['#name']) ? $template : 'entity_delete';
-
-        $data = array(
-            'form_id' => $this->crud_delete_form($entity->{$this->structure['#id']}, $url_prefix),
-            'entity_name' => $this->structure['#name'],
-            'entity_title' => $entity_title,
-        );
-
-        return array(
-            'page_title' => zerophp_lang('Deleting') . ": " . $entity_title,
-            'template' => $template,
-            'data' => $data,
-        );
-    }
-
-    function crud_duplicate($entity, $url_prefix) {
-        return $this->crud_create('duplicate', $entity, $url_prefix);
-    }
-
-    function crud_views($attributes = array()) {
-        $attributes['entity_name'] = isset($attributes['entity_name']) ? $attributes['entity_name'] : '';
-        $attributes['entity_id'] = isset($attributes['entity_id']) ? $attributes['entity_id'] : '';
-        $attributes['view_type'] = isset($attributes['view_type']) ? $attributes['view_type'] : '';
-        $attributes['admin'] = isset($attributes['admin']) ? $attributes['admin'] : false;
-
-        switch ($attributes['entity_id']) {
-            case 'me':
-                $attributes['entity_id'] = zerophp_userid();
-                break;
-
-            case 'sess':
-                $attributes['entity_id'] = $this->CI->session->userdata('session_id');
-                $attributes['entity_id_type'] = 'session_id';
-                break;
-
-            default:
-                $attributes['entity_id'] = intval($attributes['entity_id']);
-        }
-
-        $url_prefix = $attributes['admin'] ? 'admin/' : '';
-
-        switch ($attributes['view_type']) {
-            case 'crud_list':
-                $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}($url_prefix, isset($attributes['page']) ? $attributes['page'] : 1);
-
-                break;
-
-            case 'crud_create':
-                $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}('create', null, $url_prefix);
-
-                break;
-
-            case 'crud_read':
-                if (! $entity = $this->CI->{$attributes['entity_name']}->entity_exists($attributes['entity_id'])) {
-                    return \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
-                }
-                $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}($entity, $url_prefix);
-
-                break;
-
-            case 'crud_preview':
-            case 'crud_update':
-            case 'crud_delete':
-            case 'crud_duplicate':
-                if (! $entity = $this->CI->{$attributes['entity_name']}->entity_exists($attributes['entity_id'], false, false)) {
-                    return \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
-                }
-                $vars = $this->CI->{$attributes['entity_name']}->{$attributes['view_type']}($entity, $url_prefix);
-
-                break;
-
-            default:
-                return \Redirect::to(fw_variable_get('url page 404', 'dashboard/e404'));
-        }
-
-        $body_class = 'entity';
-        $body_class .= $attributes['entity_name'] ? ' entity_' . $attributes['entity_name'] : '';
-        $body_class .= $attributes['entity_id'] ? ' entity_' . $attributes['entity_name'] . '_' . $attributes['entity_id'] : '';
-        $body_class .= $attributes['view_type'] ? ' entity_' . $attributes['view_type'] : '';
-        $body_class .= $attributes['admin'] ? ' entity_admin' : '';
-
-        $zerophp =& ZeroPHP::getInstance();
-        $zerophp->response->addBodyClass($body_class);
-        $zerophp->response->addContent(zerophp_view($vars['template'], $vars['data']));
-    }
-
-    function crud_create_form($type = 'create', $entity = null, $update = false, $url_prefix = '', $action = '') {
-        $form_id = 'entity_crud_' . ($update ? 'update' : 'create') . '_' . $this->structure['#name'];
-        $cache_name = "Entity-crud_create_form-$form_id";
-        $cache = \Cache::get($cache_name);
-        $form = array();
-
-        if ($cache) {
-            $form = $cache;
-        }
-        else {
-            foreach ($this->structure['#fields'] as $value) {
-                if (isset($value['form_hidden']) && $value['form_hidden']) {
-                    continue;
-                }
-
-                if ($value['#name'] != $this->structure['#id']) {
-                    $form[$value['#name']] = $this->CI->form->form_item_generate($value);
-                }
-            }
-
-            $form['entity_name'] = array(
-                '#name' => 'entity_name',
-                '#type' => 'hidden',
-                '#item' => array(
-                    'entity_name' => $this->structure['#name'],
-                ),
-            );
-
-            $form['submit'] = array(
-                '#name' => 'submit',
-                '#type' => 'submit',
-                '#item' => array(
-                    'name' => 'submit',
-                    'value' => $type == 'update' ? zerophp_lang('Update') : zerophp_lang('Save'),
-                ),
-            );
-
-            $form['#validate'][] = array(
-                'class' => $this->structure['#name'],
-                'method' => 'crud_create_form_validate',
-            );
-
-            $form['#submit'][] = array(
-                'class' => $this->structure['#name'],
-                'method' => 'crud_create_form_submit',
-            );
-
-            if ($action) {
-                $form['#redirect'] = $url_prefix . $action;
-            }
-            else {
-                $url_prefix = $url_prefix ? $url_prefix : (count(array_intersect(array_keys($this->CI->users->user_get()->roles), fw_variable_get('users roles admin', array()))) ? 'admin' : 'up');
-                $action = "$url_prefix/e/index/" . $this->structure['#name'];
-                if ($this->CI->roles->access_check($action)) {
-                    $form['#redirect'] = $action;
-                }
-            }
-
-            \Cache::forever($cache_name, $form);
-        }
-
-        if ($entity == null) {
-            $entity = new \stdClass();
-        }
-
-        if (isset($entity->{$this->structure['#id']})) {
-            $form[$this->structure['#id']] = array(
-                '#name' => $this->structure['#id'],
-                '#type' => 'hidden',
-                '#disabled' => 'disabled',
-                '#value' => $entity->{$this->structure['#id']},
-                '#item' => array(
-                    $this->structure['#id'] => $entity->{$this->structure['#id']},
-                ),
-            );
-        }
-
-        foreach ($this->structure['#fields'] as $value) {
-            if ($value['#type'] == 'textarea' && !empty($value['#rte_enable']) && !empty($entity->{$value['#name']})) {
-                $text = new DOMDocument();
-                @$text->loadHTML('<?xml encoding="UTF-8"?>' . $entity->{$value['#name']});
-
-                $images = $text->getElementsByTagName('img');
-                foreach ($images as $image) {
-                    $lazyload = $text->createAttribute('src');
-                    $lazyload->value = $image->getAttribute('data-original');
-                    $image->appendChild($lazyload);
-                }
-
-                $body = $text->getElementsByTagName('body')->item(0);
-                $entity->{$value['#name']} = str_replace("\n</body>", '', str_replace("<body>\n", '', $text->saveHTML($body)));
-            }
-
-            // Default value
-            if (!isset($entity->{$value['#name']}) && isset($value['#default'])) {
-                if (isset($value['#reference'])) {
-                    $entity = Entity::loadEntityObject($value['#reference']);
-                    $value['#default'] = $this->CI->{$value['#reference']}->loadEntity($value['#default']);
-                }
-
-                $entity->{$value['#name']} = $value['#default'];
-            }
-        }
-
-        $this->CI->form->form_build($form_id, $form, $entity);
-
-        return $form_id;
-    }
-
-    function crud_create_form_submit_hook(&$form_values) {
-        // Hook entity_create_submit
-        $entity = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Hook');
-        $hooks = $this->CI->hook->loadEntityAllByHookType('entity_create_submit');
-        $this->CI->hook->run($hooks, $form_values);
-    }
-
-    function crud_delete_form($entity_ids, $url_prefix = '') {
-        if (!is_array($entity_ids)) {
-            $entity_ids = array(
-                $entity_ids,
-            );
-        }
-
-        $form['delete'] = array(
-            '#name' => 'delete',
-            '#type' => 'hidden',
-            '#disabled' => 'disabled',
-        );
-        $i = 0;
-        foreach ($entity_ids as $value) {
-            $form['delete']['#item']["delete[" . $this->structure['#id'] . "_$i]"] = $value;
-            $form['delete']['#value'][$this->structure['#id'] . "_$i"] = $value;
-            $i++;
-        }
-
-        $form['submit'] = array(
-            '#name' => 'submit',
-            '#type' => 'submit',
-            '#item' => array(
-                'name' => 'submit',
-                'value' => zerophp_lang('Delete'),
-            ),
-        );
-
-        $form['#validate'][] = array(
-            'class' => $this->structure['#name'],
-            'method' => 'crud_delete_form_validate',
-        );
-
-        $form['#submit'][] = array(
-            'class' => $this->structure['#name'],
-            'method' => 'crud_delete_form_submit',
-        );
-
-        $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['#name'];
-
-        $form_id = "Entity-crud_delete-" . $this->structure['#name'];
-        $this->CI->form->form_build($form_id, $form, array(), false);
-        return $form_id;
-    }
-
-    function crud_delete_form_validate($form_id, $form, &$form_values) {
-        $form_values['#delete'] = $form['delete']['#item'];
-        return true;
-    }
-
-    function crud_delete_form_submit($form_id, $form, &$form_values, $message = '') {
-        $this->entity_delete($form_values['#delete']);
-        zerophp_get_instance()->response->addMessage($message ? $message : zerophp_lang('Your data was deleted successfully.'), 'success');
-    }
-
-    function crud_list_form($entities, $url_prefix = '', $page = 1) {
-        $row = array();
-        $form = array();
-        $form_values = array();
-
-        foreach ($entities as $entity) {
-            foreach ($this->structure['#fields'] as $value) {
-                if (isset($value['fast_edit']) && $value['fast_edit']) {
-                    $field_name = $value['#name'] . '_' . $entity->{$this->structure['#id']};
-
-                    $form_item = array(
-                        'type' => $value['#type'],
-                        'name' => $field_name,
-                        'value' => $entity->{$value['#name']},
-                    );
-
-                    if ($value['#name'] == 'weight') {
-                        $form_item['options'] = form_options_make_weight();
-                    }
-
-                    $form[$field_name] = $this->CI->form->form_item_generate($form_item);
-                    $form_values[$field_name] = $form_item['value'];
-                }
-            }
-
-            $row[] = $entity->{$this->structure['#id']};
-        }
-
-        if (count($form)) {
-            $row = implode('|', $row);
-            $form['rows'] = array(
-                '#name' => 'rows',
-                '#type' => 'hidden',
-                '#disabled' => 'disabled',
-                '#value' => $row,
-                '#item' => array(
-                    'rows' => $row,
-                ),
-            );
-
-            $form['submit'] = array(
-                '#name' => 'submit',
-                '#type' => 'submit',
-                '#item' => array(
-                    'name' => 'submit',
-                    'value' => zerophp_lang('Update'),
-                ),
-            );
-
-            $form['#validate'][] = array(
-                'class' => $this->structure['#name'],
-                'method' => 'crud_list_form_validate',
-            );
-
-            $form['#submit'][] = array(
-                'class' => $this->structure['#name'],
-                'method' => 'crud_list_form_submit',
-            );
-
-            $form['#redirect'] = $url_prefix . "up/e/index/" . $this->structure['#name'];
-        }
-
-        $form_id = "Entity-crud_list-" . $this->structure['#name'];
-        $this->CI->form->form_build($form_id, $form, $form_values, false);
-        return $form_id;
-    }
-
-    function crud_list_form_validate($form_id, $form, &$form_values) {
-        $form_values['#update'] = array();
-
-        if (isset($form_values['rows'])) {
-            $entity = Entity::loadEntityObject('form_validation');
-            $rows = explode('|', $form_values['rows']);
-
-            $validate = false;
-            foreach ($rows as $row) {
-                foreach ($this->structure['#fields'] as $value) {
-                    if (isset($value['fast_edit']) && $value['fast_edit'] && isset($form_values[$value['#name'] . '_' . $row])) {
-                        $form_values['#update'][$row][$value['#name']] = $form_values[$value['#name'] . '_' . $row];
-                        if (isset($value['#validate'])) {
-                            $this->CI->form_validation->set_rules($value['#name'] . '_' . $row, $value['title'], $value['#validate']);
-                            $validate = true;
-                        }
-                    }
-                }
-            }
-
-            if ($validator->fails()) {
-                zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    function crud_list_form_submit($form_id, $form, &$form_values) {
-        $entities = array();
-        foreach ($form_values['#update'] as $entity_id => $update) {
-            $entities[$entity_id] = new \stdClass();
-            $entities[$entity_id]->{$this->structure['#id']} = $entity_id;
-
-            foreach ($update as $key => $value) {
-                $entities[$entity_id]->{$key} = $value;
-            }
-        }
-
-        $this->entity_update_all($entities);
-        zerophp_get_instance()->response->addMessage(zerophp_lang('Your data was updated successfully.'), 'success');
-    }
-
-    function entity_delete($entity_ids) {
-        
-        $this->CI->entity_model->delete($entity_ids, $this->structure);
-        $this->CI->cachef->clean();
-    }
-
-    function entity_update_all($entities, $where_key = null) {
-        
-        EntityModel::updateEntity_all($entities, $this->structure, $where_key);
-    }
-
-    function entity_name_exists($entity_name = '') {
-        if (!$entity_name) {
-            return false;
-        }
-
-        $entity = $this->entity_list();
-
-        if (isset($entity[$entity_name])) {
-            return true;
-        }
-
-        return false;
-    }
-
-    function entity_exists($entity_id, $active = true, $cache = true) {
-        if (!$entity_id || !is_numeric($entity_id)) {
-            return false;
-        }
-
-        $entity = $this->loadEntity($entity_id, array('check_active' => $active, 'cache' => $cache));
-
-        if (isset($entity->{$this->structure['#id']}) && $entity->{$this->structure['#id']}) {
-            return $entity;
-        }
-
-        return false;
-    }
-
-    function entity_list() {
-        $cache = \Cache::get('Entity-entity_list');
-        if ($cache) {
-            return $cache;
-        }
-
-        $entity = Entity::loadEntityObject('modules');
-        $entity_list = $this->CI->modules->loadEntityAll();
-
-        $entity = array();
-        foreach ($entity_list as $value) {
-            if ($value->is_entity) {
-                $entity[$value->class] = $value;
-            }
-        }
-
-        \Cache::forever('Entity-entity_list', $entity);
-        return $entity;
-    }
+    
 
     //@todo 9 Hard-core, tao chuc nang add icon cho tabs & link action
     function link_action($entity_id, $url_prefix = '', $type = 'list') {
@@ -993,124 +452,5 @@ class Entity {
         }
 
         return $item;
-    }
-
-    function link_tab($tabs) {
-        $items = array();
-        foreach ($tabs as $tab) {
-            $items[] = array(
-                'item' => $tab,
-            );
-        }
-
-        return $items;
-    }
-
-    function access($type, $entity_name = '') {
-        $entity_name = strtolower($entity_name);
-
-        $permissions = $this->CI->config->item('permissions');
-        if (!isset($permissions["Entity_$entity_name"])) {
-            $entity_name = 'entity';
-        }
-
-        $access = array();
-        switch ($type) {
-            case 'crud_list':
-                if ($entity_name != 'entity' && !in_array("view_" . $entity_name . "_list", $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "view_" . $entity_name . "_list";
-                break;
-
-            case 'crud_create':
-                if ($entity_name != 'entity' && !in_array("create_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "create_" . $entity_name;
-                break;
-
-            case 'crud_read':
-                if ($entity_name != 'entity' && !in_array("read_any_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "read_any_" . $entity_name;
-
-                if ($entity_name != 'entity' && !in_array("read_own_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "read_own_" . $entity_name;
-                break;
-
-            case 'crud_preview':
-                if ($entity_name != 'entity' && !in_array("preview_any_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "preview_any_" . $entity_name;
-
-                if ($entity_name != 'entity' && !in_array("preview_own_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "preview_own_" . $entity_name;
-                break;
-
-            case 'crud_update':
-                if ($entity_name != 'entity' && !in_array("update_any_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "update_any_" . $entity_name;
-
-                if ($entity_name != 'entity' && !in_array("update_own_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "update_own_" . $entity_name;
-                break;
-
-            case 'crud_delete':
-                if ($entity_name != 'entity' && !in_array("delete_any_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "delete_any_" . $entity_name;
-
-                if ($entity_name != 'entity' && !in_array("delete_own_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "delete_own_" . $entity_name;
-                break;
-
-            case 'crud_duplicate':
-                if ($entity_name != 'entity' && !in_array("duplicate_any_", $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "duplicate_any_" . $entity_name;
-
-                if ($entity_name != 'entity' && !in_array("duplicate_own_" . $entity_name, $permissions["Entity_$entity_name"])) {
-                    $entity_name = 'entity';
-                }
-                $access[] = "duplicate_own_" . $entity_name;
-                break;
-        }
-
-        return $access;
-    }
-
-    function access_admin($type, $entity_name = '') {
-        if ($this->CI->users->access_check('admin')) {
-            return $this->access($type, $entity_name);
-        }
-
-        zerophp_get_instance()->response->addMessage(zerophp_lang('Forbidden: You do not have permission to access.') . current_url());
-        return \Redirect::to();
-    }
-
-    function access_own_entity($path) {
-        $entity = Entity::loadEntityObject($path[2]);
-        $entity = $this->CI->{$path[2]}->loadEntity($path[3]);
-
-        if (isset($entity->created_by) && $entity->created_by == user_current()) {
-            return true;
-        }
-
-        return false;
     }
 }
