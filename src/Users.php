@@ -189,7 +189,8 @@ class Users extends Entity {
 
             $vars = array(
                 'email' => $form_values['email'],
-                'active_link' => url("user/activation/$hash"),
+                'link' => url("user/activation/$hash"),
+                'expired' => $hash->expired,
             );
 
             zerophp_mail($form_values['email'], 
