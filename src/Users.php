@@ -165,6 +165,7 @@ class Users extends Entity {
             return true;
         }
 
+        //@todo 1 Them vao form error message
         zerophp_get_instance()->response->addMessage(zerophp_lang('Login failed. Your password is incorrect OR Your account is not active yet OR Your account was blocked. Please try again later.'), 'error');
         return false;
     }
@@ -195,6 +196,8 @@ class Users extends Entity {
                 zerophp_lang(zerophp_variable_get('user activation email subject', 'Activation your account')),
                 zerophp_view('email_user_activation', $vars)
             );
+
+            \Session::put('user registered email', $form_values['email']);
         }
     }
 
