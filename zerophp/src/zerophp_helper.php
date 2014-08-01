@@ -117,7 +117,7 @@ function zerophp_user() {
 }
 
 function zerophp_anchor($url, $title, $attributes = array()) {
-    return '<a href="'.\URL::to($url).'">'.$title.'</a>';
+    return '<a href="'.\URL::to($url).'" ' . \HTML::attributes($attributes) . '>'.$title.'</a>';
 }
 
 function zerophp_anchor_shop($url, $title, $attributes = array()) {
