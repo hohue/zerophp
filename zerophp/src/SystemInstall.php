@@ -51,6 +51,12 @@ class SystemInstall {
                 'class' => 'ZeroPHP\\ZeroPHP\\PerformanceController',
                 'method' => 'clearOPCache',
             ),
+            array(
+                'title' => 'Forgot Password success',
+                'path' => 'user/forgotpass/success',
+                'class' => 'ZeroPHP\\ZeroPHP\\UserController',
+                'method' => 'userForgotPasswordSuccess',
+            ),
         ));
 
         \DB::table('variable')->insert(array(
