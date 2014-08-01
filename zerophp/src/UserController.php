@@ -151,7 +151,6 @@ class UserController {
             ),
         );
 
-
         //zerophp_devel_print($form);
 
         $zerophp->response->addContent(Form::build($form));
@@ -170,20 +169,6 @@ class UserController {
             '#name' => 'submit',
             '#type' => 'submit',
             '#value' => zerophp_lang('Forgot Password'),
-        );
-
-        $form['#validate'] = array(
-            array(
-                'class' => 'ZeroPHP\ZeroPHP\Users',
-                'method' => 'forgotpassValidate',
-            ),
-        );
-
-        $form['#submit'] = array(
-            array(
-                'class' => 'ZeroPHP\ZeroPHP\Users',
-                'method' => 'changepassSubmit',
-            ),
         );
 
         $zerophp->response->addContent(Form::build($form));
@@ -208,6 +193,22 @@ class UserController {
             '#type' => 'submit',
             '#value' => zerophp_lang('Reset Password'),
         );
+
+        $form['#validate'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'resetValidate',
+            ),
+        );
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\ZeroPHP\Users',
+                'method' => 'changepassSubmit',
+            ),
+        );
+
+
         //zerophp_devel_print($form);
 
         $zerophp->response->addContent(Form::build($form));
