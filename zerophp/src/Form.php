@@ -293,6 +293,10 @@ class Form {
                 }
             }
 
+            if (!empty($form['#success_message'])) {
+                $zerophp->response->addMessage($form['#success_message']);
+            }
+
             if (!empty($zerophp->request->query('destination'))) {
                 $redirect = $zerophp->request->query('destination');
             }
