@@ -52,7 +52,7 @@ class SystemInstall {
                 'method' => 'clearOPCache',
             ),
             array(
-                'title' => 'Forgot Password success',
+                'title' => 'Forgot password success',
                 'path' => 'user/forgotpass/success',
                 'class' => 'ZeroPHP\\ZeroPHP\\UserController',
                 'method' => 'userForgotPasswordSuccess',
@@ -305,14 +305,14 @@ class SystemInstall {
                 'method' => 'userChangePasswordForm',
             ),
             array(
-                'title' => 'User Activation',
+                'title' => 'User Forgot Password',
                 'path' => 'user/forgotpass',
                 'arguments' => '',
                 'class' => 'ZeroPHP\\ZeroPHP\\UserController',
                 'method' => 'userForgotPasswordForm',
             ),
             array(
-                'title' => 'User Activation',
+                'title' => 'User Reset Password',
                 'path' => 'user/resetpass/%',
                 'arguments' => '2',
                 'class' => 'ZeroPHP\\ZeroPHP\\UserController',
