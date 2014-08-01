@@ -51,7 +51,7 @@ class Activation extends Entity {
         if (!isset($activation->hash)) {
             $activation = new \stdClass();
             $activation->destination_id = $destination_id;
-            $activation->expired = date('Y-m-d H:i:s', date('Y-m-d H:i:s') + zerophp_variable_get('activation expired', 172800)); // 2 days
+            $activation->expired = date('Y-m-d H:i:s', time() + zerophp_variable_get('activation expired', 172800)); // 2 days
             $activation->hash = md5($activation->destination_id . $activation->expired . mt_rand());
             $activation->type = $type;
 
@@ -74,6 +74,8 @@ class Activation extends Entity {
     function loadEntityByDestination($destination_id, $attributes = array()) {
         $attributes['load_all'] = false;
         $attributes['where']['destination_id'] = $destination_id;
+        $attributes['where']['expired >='] = date('Y-m-d H:i:s');
+        
         $entity = $this->loadEntityExecutive(null, $attributes);
         return reset($entity);
     }
