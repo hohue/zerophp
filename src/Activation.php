@@ -75,8 +75,10 @@ class Activation extends Entity {
         $attributes['load_all'] = false;
         $attributes['where']['destination_id'] = $destination_id;
         $attributes['where']['expired >='] = date('Y-m-d H:i:s');
-        
+
         $entity = $this->loadEntityExecutive(null, $attributes);
         return reset($entity);
     }
 }
+
+//Checked
