@@ -3,11 +3,11 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class Perms extends Entity {
-
-    function __construct() {
-        $this->setStructure(array(
+class Perms extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#id' => 'perm_id',
             '#name' => 'perms',
             '#class' => 'ZeroPHP\ZeroPHP\Perms',
@@ -46,11 +46,11 @@ class Perms extends Entity {
                     '#title' => zerophp_lang('Weight'),
                     '#type' => 'select_build',
                     '#options' => form_#options_make_weight(),
-                    '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    '#validate' => 'required|numeric|between:-999,999',
                     '#fast_edit' => 1,
                 ),
             ),
-        ));
+        );
     }
 
     function loadEntity_from_path($path, $attributes = array()) {

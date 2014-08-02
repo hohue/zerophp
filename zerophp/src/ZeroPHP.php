@@ -25,6 +25,7 @@ class ZeroPHP {
         if ($this->language != 'en') {
             $translate = new \ZeroPHP\ZeroPHP\LanguageTranslate;
             $this->translate = $translate->loadEntityAllByLanguage($this->language);
+            //zerophp_devel_print($translate, $this->translate);
         }
         
         $this->request = new Request();

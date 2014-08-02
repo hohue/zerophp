@@ -2,15 +2,15 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class Block extends Entity {
-
-    function __construct() {
+class Block extends Entity implements  EntityInterface {
+    public function __config() {
         // Get Regions of Theme_default and Theme_admin
         $regions = \Config::get('theme.regions', array());
         asort($regions);
 
-        $this->setStructure(array(
+        return array(
             '#id' => 'block_id',
             '#name' => 'block',
             '#class' => 'ZeroPHP\ZeroPHP\Block',
@@ -73,7 +73,7 @@ class Block extends Entity {
                     '#title' => zerophp_lang('Weight'),
                     '#type' => 'select_build',
                     '#options' => form_options_make_weight(),
-                    '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    '#validate' => 'required|numeric|between:-999,999',
                     '#fast_edit' => 1,
                 ),
                 'active' => array(
@@ -87,7 +87,7 @@ class Block extends Entity {
                     '#validate' => 'required|numeric|greater_than[-1]|less_than[2]'
                 ),
             ),
-        ));
+        );
     }
 
     function loadEntityAll($attributes = array()) {

@@ -2,11 +2,11 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class Role extends Entity {
-
-    function __construct() {
-        $this->setStructure(array(
+class Role extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#name' => 'role',
             '#class' => 'ZeroPHP\ZeroPHP\Role',
             '#title' => zerophp_lang('Roles'),
@@ -40,12 +40,12 @@ class Role extends Entity {
                     '#type' => 'select_build',
                     '#options' => form_options_make_weight(),
                     '#default' => 0,
-                    '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    '#validate' => 'required|numeric|between:-999,999',
                     '#fast_edit' => 1,
                 ),
             ),
             '#can_not_delete' => array(1, 2, 3, 4),
-        ));
+        );
     }
 
     function permissions_form($roles, $permissions, $access) {

@@ -2,11 +2,11 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class ImageStyle extends Entity {
-
-    function __construct() {
-        $this->setStructure(array(
+class ImageStyle extends Entity implements  EntityInterface {
+    function __config() {
+        return array(
             '#id' => 'style',
             '#name' => 'image_style',
             '#class' => 'ZeroPHP\ZeroPHP\ImageStyle',
@@ -44,7 +44,7 @@ class ImageStyle extends Entity {
                 ),
             ),
             '#can_not_delete' => array(1, 2),
-        ));
+        );
     }
 
     function image_show($path, $style = 'normal') {

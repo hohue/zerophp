@@ -2,11 +2,11 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class PermsFunc extends Entity {
-
-    function __construct() {
-        $this->setStructure(array(
+class PermsFunc extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#id' => 'perms_func_id',
             '#name' => 'perms_func',
             '#class' => 'ZeroPHP\ZeroPHP\PermsFunc',
@@ -46,7 +46,7 @@ class PermsFunc extends Entity {
                     '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
                 ),
             ),
-        ));
+        );
     }
 
     function loadEntity_from_access_key($access_key, $attributes = array()) {

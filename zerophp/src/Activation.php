@@ -2,10 +2,11 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class Activation extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Activation extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#id' => 'activation_id',
             '#name' => 'activation',
             '#class' => 'ZeroPHP\ZeroPHP\Activation',
@@ -37,7 +38,7 @@ class Activation extends Entity {
                     '#type' => 'text',
                 ),
             ),
-        ));
+        );
     }
 
     function setHash($destination_id, $type) {

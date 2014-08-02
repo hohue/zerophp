@@ -2,10 +2,11 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class Hook extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Hook extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#id' => 'hook_id',
             '#name' => 'hook',
             '#class' => 'ZeroPHP\ZeroPHP\Hook',
@@ -50,7 +51,7 @@ class Hook extends Entity {
                     '#title' => zerophp_lang('Weight'),
                     '#type' => 'select_build',
                     '#options' => form_options_make_weight(),
-                    '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    '#validate' => 'required|numeric|between:-999,999',
                     '#fast_edit' => 1,
                 ),
                 'active' => array(
@@ -64,7 +65,7 @@ class Hook extends Entity {
                     '#validate' => 'required|numeric|greater_than[-1]|less_than[2]'
                 ),
             ),
-        ));
+        );
     }
 
     function loadEntityAll($attributes = array()) {
