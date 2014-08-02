@@ -238,7 +238,7 @@ class Shop extends Entity {
             //@todo 9 Hack for value changed
             $_POST = $form_value;
 
-            $entity = Entity::loadEntityObject('form_validation');
+            
 
             $this->CI->form_validation->set_rules('mobile', $form['mobile']['#label'], 'is_unique[shop.mobile]');
             $this->CI->form_validation->set_rules('url_alias', $form['url_alias']['#label'], 'is_unique[shop.url_alias]');
@@ -261,7 +261,7 @@ class Shop extends Entity {
             $this->CI->users->saveEntity($user);
         }
 
-        $entity = Entity::loadEntityObject('url_alias');
+        $entity = new \ZeroPHP\ZeroPHP\UrlAlias;
         $this->url_alias->url_alias_create('e/read/shop/' . $form_value['shop_id'], $form_value['url_alias']);
     }
 
@@ -301,7 +301,7 @@ class Shop extends Entity {
 
         $shop_id = $block->shop_id;
 
-        $entity = Entity::loadEntityObject('shop');
+        $entity = new \ZeroPHP\Shop\Shop;
         $shop = $this->CI->shop->loadEntity($shop_id);
         $saleman = $this->CI->users->loadEntity($shop->created_by);
 
@@ -339,7 +339,7 @@ class Shop extends Entity {
             && isset($uri[2]) && $uri[2] == 'shop_topic'
             && isset($uri[3]) && is_numeric($uri[3])
         ) {
-            $entity = Entity::loadEntityObject('shop_topic');
+            $entity = new \ZeroPHP\Shop\ShopTopic;
             $topic = $this->CI->shop_topic->loadEntity($uri[3]);
             $shop = $this->loadEntityByUser($topic->created_by);
 

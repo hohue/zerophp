@@ -181,7 +181,7 @@ class Profile extends Entity {
         $result[0] = $empty;
 
         if ($group) {
-            $entity = Entity::loadEntityObject('category');
+            $entity = new \ZeroPHP\Category\Category;
             $attributes = array(
                 'order' => array(
                     'weight' => 'ASC',

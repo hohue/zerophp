@@ -137,7 +137,7 @@ class Hook extends Entity {
 
     function run($hooks, $arguments) {
         foreach ($hooks as $hook) {
-            $entity = Entity::loadEntityObject($hook['library']);
+            $entity = new $hook['class'];;
             $this->CI->{$hook['library']}->{$hook['function']}($arguments);
         }
     }

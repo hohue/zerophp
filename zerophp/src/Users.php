@@ -158,13 +158,6 @@ class Users extends Entity {
             $user->last_activity = date('Y-m-d H:i:s');
             $this->saveEntity($user);
 
-            // Hack for Responsive File Manager
-            //@todo 9 Chuyen den hook_init
-            if (session_status() == PHP_SESSION_NONE) {
-                session_start();
-            }
-            $_SESSION['userid'] = zerophp_userid();
-
             return true;
         }
 
@@ -187,7 +180,7 @@ class Users extends Entity {
 
     function formRegisterSubmit($form_id, $form, &$form_values) {
         if ($form_values['active'] == 0) {
-            $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+            $activation = new \ZeroPHP\ZeroPHP\Activation;;
             $hash = $activation->setHash($form_values['id'], 'user_register');
 
             $vars = array(
@@ -227,7 +220,7 @@ class Users extends Entity {
     }
 
     function formResetPasswordValidate($form_id, $form, &$form_values) {
-        $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+        $activation = new \ZeroPHP\ZeroPHP\Activation;;
         $hash = $activation->loadEntityByHash($form_values['hash']);
 
         if (isset($hash->destination_id)) {
@@ -242,7 +235,7 @@ class Users extends Entity {
     function formForgotPasswordSubmit($form_id, $form, &$form_values) {
         $user = $this->loadEntityByEmail($form_values['email']);
 
-            $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+            $activation = new \ZeroPHP\ZeroPHP\Activation;;
             $hash = $activation->setHash($user->id, 'user_forgotpass');
 
             $vars = array(
@@ -264,7 +257,16 @@ class Users extends Entity {
             $form['created_at'], $form['updated_at'], $form['deleted_at']);
     }
 
-    function showRegisterForm($zerophp) {
+    function showRegister($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'showRegisterForm',
+        );
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showRegisterForm() {
         $form = $this->crudCreateForm();
         $this->_unsetFormItem($form);
         unset($form['id'], $form['roles']);
@@ -312,7 +314,7 @@ class Users extends Entity {
         $form['#redirect'] = 'user/register/success';
         $form['#success_message'] = '';
 
-        $zerophp->response->addContent(Form::build($form));
+        return $form;
     }
 
     function showRegisterSuccess($zerophp) {
@@ -336,7 +338,16 @@ class Users extends Entity {
         $zerophp->response->addContent(zerophp_view('users_register_success', $vars));
     }
 
-    function showLoginForm($zerophp) {
+    function showLogin($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'showLoginForm',
+        );
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showLoginForm() {
         $form = array();
         $structure = $this->getStructure();
 
@@ -370,7 +381,7 @@ class Users extends Entity {
 
         $form['#theme'] = 'users_login';
 
-        $zerophp->response->addContent(Form::build($form));
+        return $form;
     }
 
     function showLogout($zerophp) {
@@ -380,7 +391,16 @@ class Users extends Entity {
         return zerophp_redirect();
     }
 
-    function showChangePasswordForm($zerophp) {
+    function showChangePassword($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'showChangePasswordForm',
+        );
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showChangePasswordForm() {
         $structure = $this->getStructure();
 
         $form = array();
@@ -418,12 +438,19 @@ class Users extends Entity {
             ),
         );
 
-        //zerophp_devel_print($form);
+        return $form;
+    }
+
+    function showForgotPassword($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'showForgotPasswordForm',
+        );
 
         $zerophp->response->addContent(Form::build($form));
     }
 
-    function showForgotPasswordForm($zerophp) {
+    function showForgotPasswordForm() {
         $structure = $this->getStructure();
         $form = array();
 
@@ -447,7 +474,7 @@ class Users extends Entity {
         $form['#redirect'] = 'user/forgotpass/success';
         $form['#success_message'] = zerophp_lang('You have successfully activated');
 
-        $zerophp->response->addContent(Form::build($form));
+        return $form;
     }
 
     function showForgotPasswordSuccess($zerophp) {
@@ -473,7 +500,17 @@ class Users extends Entity {
 
     }
 
-    function showResetPasswordForm($zerophp, $hash) {
+    function showResetPassword($zerophp, $hash) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'showResetPasswordForm',
+            'arguments' => $hash,
+        );
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function showResetPasswordForm($hash) {
         $structure = $this->getStructure();
         $form = array();
 
@@ -513,8 +550,14 @@ class Users extends Entity {
             ),
         );
 
+        return $form;
+    }
 
-        //zerophp_devel_print($form);
+    function showActivationResend($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'showActivationResendForm',
+        );
 
         $zerophp->response->addContent(Form::build($form));
     }
@@ -540,16 +583,13 @@ class Users extends Entity {
         $form['#redirect'] = 'user/activation/resend';
         $form['#success_message'] = zerophp_lang('confirmation email has been sent successfully');
 
-        //zerophp_devel_print($form);
-
-        $zerophp->response->addContent(Form::build($form));
+        return $form;
     }
 
-      function formActivationResendSubmit($form_id, $form, &$form_values) {
-        //if ($form_values['active'] == 0) {
-        $user = $this->loadEntityByEmail($form_values['email']);
+    function formActivationResendSubmit($form_id, $form, &$form_values) {
+            $user = $this->loadEntityByEmail($form_values['email']);
 
-            $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+            $activation = new \ZeroPHP\ZeroPHP\Activation;;
             $hash = $activation->setHash($user->id, 'user_activation_resend');
 
             //zerophp_devel_print($hash);
@@ -564,15 +604,12 @@ class Users extends Entity {
                 zerophp_lang(zerophp_variable_get('user activation email subject', 'Activation your account')),
                 zerophp_view('email_user_activation_resend', $vars)
             );
-        //}
 
-        \Session::put('user activation resend email', $form_values['email']);
+            \Session::put('user activation resend email', $form_values['email']);
     }
 
-
-
     function showActivation($zerophp, $hash) {
-        $activation = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Activation');
+        $activation = new \ZeroPHP\ZeroPHP\Activation;;
         $hash = $activation->loadEntityByHash($hash);
 
         if (isset($hash->destination_id)) {

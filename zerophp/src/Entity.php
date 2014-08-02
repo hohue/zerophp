@@ -147,14 +147,22 @@ class Entity {
         return $result;
     }
 
-    function loadEntity($entity_id, $attributes = array()) {
+    function loadEntity($entity_id, $attributes = array(), $check_active = false) {
         // entity load default
         $cached = false;
         if (is_numeric($entity_id) && !count($attributes)) {
             $cached = true;
             $cache_name = __CLASS__ . "-Entity-$entity_id-" . $this->structure['#name'];
             if ($cache = \Cache::get($cache_name)) {
-                return $cache;
+                if(!$check_active) {
+                    return $cache;
+                }
+                elseif (!empty($cache->active)) {
+                    return $cache;
+                }
+                else {
+                    return array();
+                }
             }
         }
 
@@ -219,18 +227,29 @@ class Entity {
 
     function crudCreateForm() {
         $form = $this->structure['#fields'];
-        $spencial_fields = array('created_at', 'updated_at', 'created_by');
+        $form['#form'] = array();
 
         foreach ($form as $key => $value) {
-            if (in_array($key, $spencial_fields)) {
+            if (!empty($value['#form_hidden'])) {
                 unset($form[$key]);
             }
+            elseif(!empty($value['#default'])) {
+                $form[$key]['#value'] = $value['#default'];
+            }
 
-            if ($value['#type'] == 'file') {
-                $form['#form'] = array(
-                    'files' => true,
-                );
-                break;
+            if (isset($value['#type']) && $value['#type'] == 'file') {
+                $form['#form']['files'] = true;
+
+                if ($value['#widget'] == 'image'){
+                    $rule = \Config::get('file.rule_image');
+
+                    if (!isset($value['#validate'])) {
+                        $form[$key]['#validate'] = $rule;
+                    }
+                    elseif(!strpos('mimes:', $value['#validate'])) {
+                        $form[$key]['#validate'] .= "|$rule";
+                    }
+                }
             }
         }
 
@@ -326,45 +345,35 @@ class Entity {
         foreach ($this->structure['#fields'] as $key => $value) {
             if ($value['#type'] == 'file' && \Input::hasFile($value['#name'])) {
                 $file = \Input::file($value['#name']);
-                zerophp_devel_print($file, 'Entity file - line 329');
 
-                /* $upload_config = config_item('upload');
+                $upload_path = MAIN . \Config::get('file.path');
                 $upload = false;
-                switch ($value['widget']) {
+                switch ($value['#widget']) {
                     case 'image':
-                        $upload_config = $upload_config['image'];
-                        $upload_config['upload_path'] = 'files/images/';
+                        $upload_path .= '/images/';
                         $upload = true;
                         break;
 
                     //@todo 9 cho phep upload file
-                    case 'file':
+                    /*case 'file':
                         $upload_config = $upload_config['file'];
                         $upload_config['upload_path'] = 'files/';
                         $upload = true;
-                        break; 
+                        break;*/
                 }
 
                 if ($upload) {
-                    $upload_config['upload_path'] .= zerophp_userid() . '/';
+                    $upload_path .= zerophp_userid();
+                    $file_name = zerophp_file_get_filename($file, $upload_path);
 
-                    if (!is_dir($upload_config['upload_path'])) {
-                        mkdir($upload_config['upload_path'], 0777, true);
-                    }
-
-                    $entity = Entity::loadEntityObject('upload', $upload_config);
-                    $this->CI->upload->initialize($upload_config);
-                    $result = $this->CI->upload->do_upload($key);
-
-                    if ($result === false) {
-                        zerophp_get_instance()->response->addMessage($this->CI->upload->display_errors(), 'error');
-                        unset($form_values[$key]);
+                    if ($file->move($upload_path, $file_name)) {
+                        $form_values[$key] = str_replace(MAIN, '', $upload_path) ."/$file_name";
                     }
                     else {
-                        $file = $this->CI->upload->data();
-                        $form_values[$key] = $upload_config['upload_path'] . $file['file_name'];
+                        zerophp_get_instance()->response->addMessage(zerophp_lang('An error has occurred. Can not upload file.'), 'error');
+                        unset($form_values[$key]);
                     }
-                }*/
+                }
             }
 
             switch ($key) {

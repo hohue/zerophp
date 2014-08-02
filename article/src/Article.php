@@ -43,6 +43,12 @@ class Article extends Entity {
                     '#type' => 'text',
                     '#form_hidden' => true,
                 ),
+                'updated_by' => array(
+                    '#name' => 'updated_by',
+                    '#title' => zerophp_lang('Updated by'),
+                    '#type' => 'text',
+                    '#form_hidden' => true,
+                ),
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
@@ -72,22 +78,16 @@ class Article extends Entity {
         ));
     }
 
-    private function _unsetFormItem(&$form) {
-        unset($form['active']);
-    }
-
-    function createForm($zerophp) {
-        $form = $this->crudCreateForm();
-        $this->_unsetFormItem($form);
-
-        unset($form['article_id']);
-
+    function create($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\Article\Article',
+            'method' => 'crudCreateForm',
+        );
         $zerophp->response->addContent(Form::build($form));
     }
 
-    function show($zerophp, $article_id){
-        $entity = Entity::loadEntityObject('ZeroPHP\Article\Article');
-        $article = $entity->loadEntity($article_id);
+    function read($zerophp, $article_id){
+        $article = $this->loadEntity($article_id, array(), true);
 
         if(!isset($article->article_id)) {
             \App::abort(404);
@@ -96,23 +96,17 @@ class Article extends Entity {
         $zerophp->response->addContent(zerophp_view('article_read', zerophp_object_to_array($article)));
     }
 
-    function updateForm($zerophp, $article_id) {
-        $entity = Entity::loadEntityObject('ZeroPHP\Article\Article');
-        $form = $entity->crudCreateForm();
-        $this->_unsetFormItem($form);
+    function update($zerophp, $article_id) {
+        $article = $this->loadEntity($article_id);
 
-        $article = $entity->loadEntity($article_id);
+        if(!isset($article->article_id)) {
+            \App::abort(404);
+        }
 
-        $form['article_id']['#value'] = $article_id;
-        $form['title']['#value'] = $article->title;
-        $form['content']['#value'] = $article->content;
-
-        //zerophp_devel_print($form, $article);
-
-        $zerophp->response->addContent(Form::build($form));
+        $form = array(
+            'class' => '\ZeroPHP\Article\Article',
+            'method' => 'crudCreateForm',
+        );
+        $zerophp->response->addContent(Form::build($form, $article));
     }
-
-    function showList($zerophp){}
-
-    function deleteForm($zerophp, $article_id) {}
 }

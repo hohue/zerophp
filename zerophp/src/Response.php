@@ -82,7 +82,7 @@ class Response {
         $regions = \Config::get('theme.regions', array());
 
         if (count($regions)) {
-            $block = Entity::loadEntityObject('\ZeroPHP\ZeroPHP\Block');
+            $block = new \ZeroPHP\ZeroPHP\Block;
             $blocks = $block->loadEntityAll();
             foreach ($regions as $region_key => $region_name) {
                 if (isset($blocks[$region_key]) && count($blocks[$region_key])) {
@@ -284,7 +284,7 @@ class Response {
         $this->data['breadcrumb'] = $items;
 
         array_unshift($this->data['breadcrumb'], array(
-            '#item' => zerophp_anchor(\URL::to('/'), zerophp_lang('Home')),
+            '#item' => zerophp_anchor(zerophp_url('/'), zerophp_lang('Home')),
         ));
     }
 

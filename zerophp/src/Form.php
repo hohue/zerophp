@@ -19,6 +19,9 @@ class Form {
                 $form = $cache_value;
             }
             else {
+                $form['arguments'] = isset($form['arguments']) ? (array) $form['arguments'] : array();
+                $form = call_user_func_array(array(new $form['class'], $form['method']), $form['arguments']);
+
                 $form['#id'] = $form_id;
                 $form['_form_id'] = array(
                     '#name' => '_form_id',
@@ -37,13 +40,13 @@ class Form {
             self::_alter($form_id, $form, $form_values, 'form_value_alter');
 
             // Set default value for form
-            $form = self::_setValues($form_id, $form, $form_values);
+            self::_setValues($form_id, $form, $form_values);
         }
 
         // Create cache to use when form submitted
         \Cache::put($cache_name_error_form, $form, \Config::get('session.lifetime', 120));
 
-        $form = self::_build($form_id, $form);
+        self::_build($form_id, $form);
 
         //zerophp_devel_print(zerophp_view($form['#theme'], array('form' => $form)));
 
@@ -51,11 +54,11 @@ class Form {
     }
 
     private static function _alter($form_id, &$form, &$form_values = array(), $type = 'form_alter') {
-        $form_alter_list = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Hook');
+        $form_alter_list = new \ZeroPHP\ZeroPHP\Hook;
         $form_alter_list = array_merge($form_alter_list->loadEntityAllByHookType($type), $form_alter_list->loadEntityAllByHookType($type, $form_id));
 
         foreach ($form_alter_list as $alter) {
-            $hook = Entity::loadEntityObject($alter->class);
+            $hook = new $alter->class;
             if ($type == 'form_value_alter') {
                 $hook->{$alter->method}($form_id, $form, $form_values);
             }
@@ -65,7 +68,7 @@ class Form {
         }
     }
 
-    private static function _build($form_id, $form) {
+    private static function _build($form_id, &$form) {
         // Set form attributes default
         $form['#form'] = isset($form['#form']) ? $form['#form'] : array();
         $form['#theme'] = isset($form['#theme']) ? $form['#theme'] : 'form';
@@ -129,8 +132,6 @@ class Form {
                 }
             }
         }
-
-        return $form;
     }
 
     private static function __buildItem($item) {
@@ -168,9 +169,11 @@ class Form {
         return $item;
     }
 
-    private static function _setValues($form_id, $form, $form_values = array()) {
-        if (is_object($form_values)) {
-            $form_values = fw_object_to_array($form_values);
+    private static function _setValues($form_id, &$form, $form_values = array()) {
+        foreach ($form_values as $key => $value) {
+            if (isset($form[$key])) {
+                $form[$key] = $value;
+            }
         }
 
         //@todo 9 Form: _form_set_values
@@ -259,8 +262,6 @@ class Form {
                 }
             }
         }*/
-
-        return $form;
     }
 
     public static function submit() {
@@ -476,15 +477,15 @@ class Form {
 
     private function _form_item_generate_reference(&$field) {
         if (isset($field['reference']) && $field['reference']) {
-            $entity = Entity::loadEntityObject($field['reference']);
+            $entity = new $field['reference'];
             $ref_structure = $field['#reference']['class']::getStructure();
 
             if (empty($field['reference_option'])) {
                 $reference = $this->CI->{$field['reference']}->loadEntityAll();
             }
             else {
-                $entity = Entity::loadEntityObject($field['reference_option']['library']);
-                $reference = $this->CI->{$field['reference_option']['library']}->{$field['reference_option']['function']}($field['reference_option']['arguments']);
+                $entity = new $field['reference_option']['class'];
+                $reference = $this->CI->{$field['reference_option']['class']}->{$field['reference_option']['method']}($field['reference_option']['arguments']);
             }
 
             foreach ($reference as $ref) {

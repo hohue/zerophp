@@ -27,7 +27,8 @@ class Request {
 
     //@todo 3 Get controller from DB
     public function getController() {
-        $menus = Entity::loadEntityObject('ZeroPHP\ZeroPHP\Menu')->loadEntityAll();
+        $menus = new \ZeroPHP\ZeroPHP\Menu;
+        $menus = $menus->loadEntityAll();
         $ancestors = $this->_getMenuAncestors($this->segment());
         
         foreach ($ancestors as $value) {
@@ -37,6 +38,10 @@ class Request {
         }
 
         \App::abort(404);
+    }
+
+    public function addFilter($key, $value) {
+        return $this->data['filter'][$key] = $value;
     }
 
     public function url() {
@@ -63,7 +68,8 @@ class Request {
         $uri = \Request::path();
 
         // Get URL real from url alias
-        $alias = Entity::loadEntityObject('ZeroPHP\ZeroPHP\UrlAlias')->loadEntityByAlias($uri);
+        $alias = new \ZeroPHP\ZeroPHP\UrlAlias;
+        $alias = $alias->loadEntityByAlias($uri);
         if (isset($alias->url_real)) {
             $this->data['alias'] = $uri;
             $uri = $alias->url_real;

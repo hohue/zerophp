@@ -71,33 +71,20 @@ class Contact extends Entity {
         ));
     }
 
-    function crud_create($type = 'create', $entity = null, $url_prefix = '', $action = '') {
-        $result = parent::crud_create($type, $entity, $url_prefix, $action);
-
-        $result['page_title'] = zerophp_lang('Contact Us');
-
-        return $result;
-    }
-
-    private function _unsetFormItem(&$form) {
-        unset($form['contact_id'], $form['created_at'], $form['updated_at']);
-    }
-
-    function createForm($zerophp) {
-        $entity = Entity::loadEntityObject('ZeroPHP\Contact\Contact');
-        $form = $entity->crudCreateForm();
-        $this->_unsetFormItem($form);
-
-        //unset($form['contact_id']);
-
-        //zerophp_devel_print($form);
+    function create($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\Contact\Contact',
+            'method' => 'createForm',
+        );
 
         $zerophp->response->addContent(Form::build($form));
     }
 
-    function show($zerophp, $id){}
+    function createForm() {
+        $form = $this->crudCreateForm();
 
-    function showList($zerophp){}
+        unset($form['contact_id']);
 
-    function deleteForm($zerophp, $id) {}
+        return $form;
+    }
 }

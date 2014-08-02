@@ -21,22 +21,22 @@ class ArticleInstall {
                 'title' => 'Article create',
                 'path' => 'article/create',
                 'arguments' => '',
-                'class' => 'ZeroPHP\\Article\\Article',
-                'method' => 'createForm',
+                'class' => '\ZeroPHP\Article\Article',
+                'method' => 'create',
             ),
             array(
                 'title' => 'Article read',
                 'path' => 'article/%',
                 'arguments' => '1',
-                'class' => 'ZeroPHP\\Article\\Article',
-                'method' => 'show',
+                'class' => '\ZeroPHP\Article\Article',
+                'method' => 'read',
             ),
             array(
                 'title' => 'Article update',
                 'path' => 'article/%/update',
                 'arguments' => '1',
-                'class' => 'ZeroPHP\\Article\\Article',
-                'method' => 'updateForm',
+                'class' => '\ZeroPHP\Article\Article',
+                'method' => 'update',
             ),
         ));
     }
@@ -59,6 +59,7 @@ class ArticleInstall {
                 $table->boolean('active')->default(1);
                 $table->timestamps();
                 $table->integer('created_by')->default(0);
+                $table->integer('updated_by')->default(0);
             });
         }
     }

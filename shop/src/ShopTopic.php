@@ -153,7 +153,7 @@ class ShopTopic extends Entity {
             return $cache;
         }
 
-        $entity = Entity::loadEntityObject('category');
+        $entity = new \ZeroPHP\Category\Category;
 
         $attributes = array(
             'where' => array(
@@ -275,7 +275,7 @@ class ShopTopic extends Entity {
             'method' => 'create_start_form_submit',
         );
 
-        $form['#redirect'] = \URL::to('e/create/shop_topic');
+        $form['#redirect'] = zerophp_url('e/create/shop_topic');
 
         $form_id = 'shop_topic_create_start_form';
         $this->CI->form->form_build($form_id, $form);
@@ -292,7 +292,7 @@ class ShopTopic extends Entity {
         $this->CI->load->model('shop_topic_model', '', false, 'shop_topic');
         $categories = $this->CI->shop_topic_model->get_category_posted($id);
         if (count($categories)) {
-            $entity = Entity::loadEntityObject('category');
+            $entity = new \ZeroPHP\Category\Category;
             foreach ($categories as $value) {
                 $category = $this->CI->category->loadEntity($value->category_id);
                 if (!empty($category->title)) {
@@ -348,7 +348,7 @@ class ShopTopic extends Entity {
     }
 
     function start() {
-        $shop_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\Shop\ShopTopic');
+        $shop_obj = new \ZeroPHP\Shop\ShopTopic;
 
         $vars = array(
             'form_id' => $shop_obj->create_start_form(),
@@ -363,7 +363,7 @@ class ShopTopic extends Entity {
     }
 
     function start_get_level2() {
-        $shop_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\Shop\ShopTopic');
+        $shop_obj = new \ZeroPHP\Shop\ShopTopic;
         $data = $this->input->get();
 
         $result = '';
@@ -380,7 +380,7 @@ class ShopTopic extends Entity {
     }
 
     function start_get_level3() {
-        $shop_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\Shop\ShopTopic');
+        $shop_obj = new \ZeroPHP\Shop\ShopTopic;
         $data = $this->input->get();
 
         $result = '';

@@ -166,10 +166,10 @@ class Role extends Entity {
                 $access = $this->access_get_list($key);
 
                 if (count(array_intersect($roles, array_keys($access)))) {
-                    $entity = Entity::loadEntityObject('perms_func');
+                    $entity = new \ZeroPHP\ZeroPHP\PermsFunc;
                     $func = $this->CI->perms_func->loadEntity_from_access_key($key);
                     if (!empty($func->library) && !empty($func->function)) {
-                        $entity = Entity::loadEntityObject($func->library);
+                        $entity = new $func->class;
                         $result = $this->CI->{$func->library}->{$func->function}();
                     }
                     else {
@@ -203,7 +203,7 @@ class Role extends Entity {
             return $cache;
         }
 
-        $entity = Entity::loadEntityObject('perms');
+        $entity = new \ZeroPHP\ZeroPHP\Perms;
         $access_key = '';
         while (count($path) && !$access_key) {
             $entity = $this->CI->perms->loadEntity_from_path(implode('/', $path));

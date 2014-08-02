@@ -132,7 +132,7 @@ class EntityModel {
 
             // Update new reference
             if (count($reference[$key])) {
-                $ref_obj = Entity::loadEntityObject($structure['#fields'][$key]['#reference']['class']);
+                $ref_obj = new $structure['#fields'][$key]['#reference']['class'];
                 $ref_structure = $ref_obj->getStructure();
 
                 $data = array();

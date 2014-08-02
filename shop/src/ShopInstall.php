@@ -31,6 +31,7 @@ class ShopInstall {
                 $table->string('image', 256)->nullable();
                 $table->timestamps();
                 $table->integer('created_by')->unsigned();
+                $table->integer('updated_by')->unsigned();
                 $table->boolean('active')->default(0);
                 $table->text('paymenth_method')->nullable();
                 $table->text('shipmenth_method')->nullable();
@@ -39,6 +40,7 @@ class ShopInstall {
                 $table->index('path');
 
                 $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 
@@ -49,6 +51,7 @@ class ShopInstall {
                 $table->integer('shop_id')->unsigned();
                 $table->timestamps();
                 $table->integer('created_by')->unsigned();
+                $table->integer('updated_by')->unsigned();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
 
@@ -56,6 +59,7 @@ class ShopInstall {
                 $table->index('shop_id');
 
                 $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
                 $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
             });
         }
@@ -72,8 +76,9 @@ class ShopInstall {
                 $table->string('promotion_type', 32)->nullable();
                 $table->timestamp('promotion_start');
                 $table->timestamp('promotion_end');
-                $table->integer('created_by')->unsigned();
                 $table->string('image', 256)->nullable();
+                $table->integer('created_by')->unsigned();
+                $table->integer('updated_by')->unsigned();
                 $table->timestamps();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
@@ -83,6 +88,7 @@ class ShopInstall {
 
                 $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
                 $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 
@@ -114,6 +120,7 @@ class ShopInstall {
                 $table->text('note');
                 $table->timestamps();
                 $table->integer('created_by')->unsigned();
+                $table->integer('updated_by')->unsigned();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
 
@@ -121,6 +128,7 @@ class ShopInstall {
 
                 $table->foreign('shop_cart_id')->references('shop_cart_id')->on('shop_cart')->onDelete('cascade');
                 $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 
@@ -140,6 +148,7 @@ class ShopInstall {
                 $table->timestamp('promotion_end');
                 $table->integer('category_id')->unsigned();
                 $table->integer('created_by')->unsigned();
+                $table->integer('updated_by')->unsigned();
                 $table->string('image', 256);
                 $table->timestamps();
                 $table->boolean('active')->default(1);
@@ -151,6 +160,7 @@ class ShopInstall {
 
                 $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
                 $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('cascade');
             });
         }
 
@@ -171,7 +181,7 @@ class ShopInstall {
                 'title' => 'shop_information for topic', 
                 'cache_type' => 'page',
                 'region' => 'right sidebar',
-                'class' => 'ZeroPHP\\Shop\\Shop',
+                'class' => '\ZeroPHP\Shop\Shop',
                 'method' => 'shop_information', 
                 'access' => 'shop_information_access_for_topic',
             ),
@@ -179,7 +189,7 @@ class ShopInstall {
                 'title' => 'shop_information for shop', 
                 'cache_type' => 'page',
                 'region' => 'right sidebar',
-                'class' => 'ZeroPHP\\Shop\\Shop',
+                'class' => '\ZeroPHP\Shop\Shop',
                 'method' => 'shop_information', 
                 'access' => 'shop_information_access_for_shop',
             ),
@@ -187,7 +197,7 @@ class ShopInstall {
                 'title' => 'shop_topic_warning', 
                 'cache_type' => 'full',
                 'region' => 'right sidebar',
-                'class' => 'ZeroPHP\\Shop\\ShopTopic',
+                'class' => '\ZeroPHP\Shop\ShopTopic',
                 'method' => 'shop_topic_warning', 
                 'access' => 'shop_topic_warning_access',
             ),
@@ -198,7 +208,7 @@ class ShopInstall {
             array(
                 'title' => 'Sop cart items',
                 'path' => 'shopcart/items',
-                'class' => 'ZeroPHP\\Shop\\Shopcart',
+                'class' => '\ZeroPHP\Shop\ShopCart',
                 'method' => 'showItems',
             ),
         ));
