@@ -3,14 +3,15 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
 //@todo 9 Add URL alias when use Entity::saveEntity();
 // Write re-build feature for url_alias
 // Add url_alias & url_real folder to .gitignore
 
-class UrlAlias extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class UrlAlias extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#id' => 'urlalias_id',
             '#name' => 'urlalias',
             '#title' => zerophp_lang('URL alias'),
@@ -45,7 +46,7 @@ class UrlAlias extends Entity {
                     '#form_hidden' => 1,
                 ),
             ),
-        ));
+        );
     }
 
     function loadEntityAll($attributes = array()) {

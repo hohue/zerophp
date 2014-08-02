@@ -2,11 +2,11 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class LanguageTranslate extends Entity {
-
-    function __construct() {
-        $this->setStructure(array(
+class LanguageTranslate extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#id' => 'language_translate_id',
             '#name' => 'language_translate',
             '#class' => 'ZeroPHP\ZeroPHP\LanguageTranslate',
@@ -28,7 +28,7 @@ class LanguageTranslate extends Entity {
                     '#type' => 'textarea',
                 ),
             ),
-        ));
+        );
     }
 
     function loadEntityAllByLanguage($language, $attributes = array()) {
@@ -43,7 +43,7 @@ class LanguageTranslate extends Entity {
             )
         );
 
-        $languages = parent::loadEntityAll($attributes);
+        $languages = $this->loadEntityAll($attributes);
 
         $result = array();
         foreach ($languages as $value) {

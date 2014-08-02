@@ -2,11 +2,12 @@
 namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 use ZeroPHP\ZeroPHP\Form;
 
-class Users extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Users extends Entity implements  EntityInterface {
+    public function __config() {
+        return array(
             '#id' => 'id',
             '#name' => 'users',
             '#class' => 'ZeroPHP\ZeroPHP\Users',
@@ -117,7 +118,7 @@ class Users extends Entity {
                 ),
             ),
             '#can_not_delete' => array(1),
-        ));
+        );
     }
 
     function saveEntity($entity) {
@@ -200,7 +201,6 @@ class Users extends Entity {
 
 
     function formChangePasswordValidate($form_id, $form, &$form_values) {
-        //zerophp_devel_print(\Auth::user());
         $passwd = \Auth::user()->__get('password');
 
         if (\Hash::check($form_values['password_old'], $passwd)) {

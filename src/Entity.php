@@ -8,6 +8,10 @@ class Entity {
 
     private $structure;
 
+    public function __construct() {
+        $this->buildStructure();
+    }
+
     public function setStructure($structure) {
         $this->structure = $structure;
     }
@@ -16,17 +20,18 @@ class Entity {
         return $this->structure;
     }
 
-    public static function loadEntityObject($entity) {
-        $zerophp =& zerophp_get_instance();
-
-        $entity_name = zerophp_uri_validate($entity);
-        $entity_name = str_replace('-', '_', $entity_name);
-
-        if (!isset($zerophp->entity[$entity_name])) {
-            $zerophp->entity[$entity_name] = new $entity;
+    public function buildStructure() {
+        $cache_name = __METHOD__ . get_called_class();
+        //echo $cache_name;
+        if ($cache = \Cache::get($cache_name)) {
+            $this->setStructure($cache);
         }
+        else {
+            $structure = $this->__config();
 
-        return $zerophp->entity[$entity_name];
+            \Cache::forever($cache_name, $structure);
+            return $structure;
+        }
     }
 
     function loadEntityAll($attributes = array()) {
