@@ -154,6 +154,15 @@ class Form {
             case 'checkboxes':
                 $item['#options'] = isset($item['#options']) ? $item['#options'] : array();
                 break;
+
+            case 'textarea':
+                if (isset($item['#rte_enable']) && $item['#rte_enable']) {
+                    $item['#attributes']['id'] = zerophp_form_get_rte();
+
+                    //@todo 9 Hack for SEO
+                    $item['#value'] = str_replace('data-original', 'src', $item['#value']);
+                }
+                break;
         }
 
         return $item;
