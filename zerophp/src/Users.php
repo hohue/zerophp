@@ -207,6 +207,7 @@ class Users extends Entity {
 
 
     function formChangePasswordValidate($form_id, $form, &$form_values) {
+        //zerophp_devel_print(\Auth::user());
         $passwd = \Auth::user()->__get('password');
 
         if (\Hash::check($form_values['password_old'], $passwd)) {
