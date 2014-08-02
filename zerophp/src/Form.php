@@ -109,6 +109,7 @@ class Form {
 
             // Don't care with #validate, #submit...
             if (substr($key, 0, 1) != '#') {
+
                 if (isset($form['#error']->$key)) {
                     if (!isset($value['#error_messages'])) {
                         $value['#error_messages'] = '';
@@ -172,7 +173,7 @@ class Form {
     private static function _setValues($form_id, &$form, $form_values = array()) {
         foreach ($form_values as $key => $value) {
             if (isset($form[$key])) {
-                $form[$key] = $value;
+                $form[$key]['#value'] = $value;
             }
         }
 
