@@ -109,7 +109,7 @@ function zerophp_user() {
     $user = new \stdClass();
 
     if ($userid= zerophp_userid()) {
-        $user_obj = \ZeroPHP\ZeroPHP\Entity::loadEntityObject('ZeroPHP\ZeroPHP\Users');
+        $user_obj = new \ZeroPHP\ZeroPHP\Users;
         $user = $user_obj->loadEntity($userid);
     }
 
@@ -117,7 +117,7 @@ function zerophp_user() {
 }
 
 function zerophp_anchor($url, $title, $attributes = array()) {
-    return '<a href="'.\URL::to($url).'" ' . \HTML::attributes($attributes) . '>'.$title.'</a>';
+    return '<a href="'.zerophp_url($url).'" ' . \HTML::attributes($attributes) . '>'.$title.'</a>';
 }
 
 function zerophp_anchor_shop($url, $title, $attributes = array()) {
@@ -132,7 +132,7 @@ function zerophp_anchor_popup($url, $title, $attributes = array()) {
     $class= 'cboxInline cboxInlineAjax cboxElement';
     $attributes['class'] = isset($attributes['class']) ? $attributes['class'] . ' ' . $class : $class;
 
-    return '<a href="#cboxInlineAjax" data-url="'.\URL::to($url).'" class="'.$attributes['class'].'">'.$title.'</a>';
+    return '<a href="#cboxInlineAjax" data-url="'.zerophp_url($url).'" class="'.$attributes['class'].'">'.$title.'</a>';
 }
 
 function zerophp_url_current() {
@@ -253,6 +253,10 @@ function zerophp_form_render_all(&$form) {
     }
 
     return $result;
+}
+
+function zerophp_url($path, $attributes = array(), $secure = false) {
+    return \URL::to($path, $attributes, $secure);
 }
 
 function zerophp_redirect($url = '/') {
@@ -389,4 +393,21 @@ function zerophp_form_get_rte() {
     }
 
     return $rte;
+}
+
+function zerophp_file_get_filename($file, $path) {
+    if (!\File::isDirectory($path)) {
+        \File::makeDirectory($path);
+    }
+
+    // Get file name
+    $file_extension = $file->getClientOriginalExtension();
+    $file_name = $file->getClientOriginalName();
+    $file_name = zerophp_uri_validate(str_replace($file_extension, '', $file_name));
+    $result = "$file_name.$file_extension";
+    while (\File::exists("$path/$result")) {
+        $result = "$file_name-" . strtolower(\Str::random(4)) . ".$file_extension";
+    }
+
+    return $result;
 }

@@ -23,7 +23,7 @@ class ZeroPHP {
 
         //@todo 9 Support Multi-language
         if ($this->language != 'en') {
-            $translate = Entity::loadEntityObject('\ZeroPHP\ZeroPHP\LanguageTranslate');
+            $translate = new \ZeroPHP\ZeroPHP\LanguageTranslate;
             $this->translate = $translate->loadEntityAllByLanguage($this->language);
         }
         
@@ -54,6 +54,15 @@ class ZeroPHP {
                 $arguments[] = is_numeric($value) ? $this->request->segment($value) : $value;
             }
             call_user_func_array(array(new $controller->class, $controller->method), $arguments);
+        }
+
+        // Hack for Responsive File Manager
+        //@todo 9 Chuyen den hook_init
+        if ($userid = zerophp_userid()) {
+            if (session_status() == PHP_SESSION_NONE) {
+                session_start();
+            }
+            $_SESSION['userid'] = $userid;
         }
 
         // Flush cache for Development Environment

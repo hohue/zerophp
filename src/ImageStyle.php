@@ -53,7 +53,7 @@ class ImageStyle extends Entity {
         $this->CI->load->config('image');
         $config = config_item('image');
 
-        $entity = Entity::loadEntityObject('image_lib', $config);
+        $entity = ;
 
         if (!file_exists($path_style)) {
             $style = $this->loadEntity($style);

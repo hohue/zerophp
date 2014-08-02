@@ -209,7 +209,7 @@ class UrlAlias extends Entity {
 
     function url_alias_form_alter_submit($form_id, $form, &$form_values) {
         if(!empty($form_values['url_alias']) && !empty($form_values['entity_name'])) {
-            $entity = Entity::loadEntityObject($form_values['entity_name']);
+            $entity = new $form_values['entity_name'];
             $structure = $this->CI->{$form_values['entity_name']}->getStructure();
 
             $url_real = 'e/read/' . $form_values['entity_name'] . '/' . $form_values[$structure['#id']];
@@ -228,7 +228,7 @@ class UrlAlias extends Entity {
         }
 
         $entity_name = $form['entity_name']['#item']['entity_name'];
-        $entity = Entity::loadEntityObject($entity_name);
+        $entity = new $entity_name;
         $structure = $this->CI->{$entity_name}->getStructure();
 
         if (!empty($form_values[$structure['#id']])) {
