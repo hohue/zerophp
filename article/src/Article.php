@@ -22,33 +22,40 @@ class Article extends Entity {
                     '#title' => zerophp_lang('Title'),
                     '#type' => 'text',
                 ),
-                /*'image' => array(
+                'image' => array(
                     '#name' => 'image',
                     '#title' => zerophp_lang('Image'),
                     '#type' => 'file',
                     '#widget' => 'image',
-                    '#display_hidden' => 1,
-                ),*/
+                    '#display_hidden' => true,
+                    '#validate' => 'image|mimes:jpeg,png,gif',
+                ),
                 'content' => array(
                     '#name' => 'content',
                     '#title' => zerophp_lang('Content'),
                     '#type' => 'textarea',
-                    //'#rte_enable' => 1,
-                    '#display_hidden' => 1,
+                    '#rte_enable' => true,
+                    '#display_hidden' => true,
+                ),
+                'created_by' => array(
+                    '#name' => 'created_by',
+                    '#title' => zerophp_lang('Created by'),
+                    '#type' => 'text',
+                    '#form_hidden' => true,
                 ),
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
-                    '#form_hidden' => 1,
+                    '#form_hidden' => true,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at',
                     '#title' => zerophp_lang('Updated date'),
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
-                    '#form_hidden' => 1,
+                    '#form_hidden' => true,
                 ),
                 'active' => array(
                     '#name' => 'active',
@@ -66,18 +73,14 @@ class Article extends Entity {
     }
 
     private function _unsetFormItem(&$form) {
-        //@todo 4 Viet chuc nang image cho article
-        unset($form['created_at'], $form['updated_at'], $form['active']);
+        unset($form['active']);
     }
 
     function createForm($zerophp) {
-        $entity = Entity::loadEntityObject('ZeroPHP\Article\Article');
-        $form = $entity->crudCreateForm();
+        $form = $this->crudCreateForm();
         $this->_unsetFormItem($form);
 
         unset($form['article_id']);
-
-        //zerophp_devel_print($form);
 
         $zerophp->response->addContent(Form::build($form));
     }

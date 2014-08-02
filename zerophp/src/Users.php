@@ -163,7 +163,7 @@ class Users extends Entity {
             if (session_status() == PHP_SESSION_NONE) {
                 session_start();
             }
-            $_SESSION['id'] = zerophp_userid();
+            $_SESSION['userid'] = zerophp_userid();
 
             return true;
         }

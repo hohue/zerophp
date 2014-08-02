@@ -375,3 +375,18 @@ function zerophp_mail($email, $subject, $body, $template = 'email') {
         $message->to($attributes['email'][0], $attributes['email'][1])->subject($attributes['subject']);
     });
 }
+
+function zerophp_form_get_rte() {
+    global $rte;
+
+    if (empty($rte)) {
+        $rte = 'rte';
+    }
+    else {
+        $next = substr($rte, 3);
+        $next = $next ? intval($next) + 1 : 1;
+        $rte = "rte$next";
+    }
+
+    return $rte;
+}
