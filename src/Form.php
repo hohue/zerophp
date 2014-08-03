@@ -173,7 +173,35 @@ class Form {
     private static function _setValues($form_id, &$form, $form_values = array()) {
         foreach ($form_values as $key => $value) {
             if (isset($form[$key])) {
-                $form[$key]['#value'] = $value;
+                switch ($form[$key]['#type']) {
+                    // Do not tracking password field
+                    case 'password':
+                        break;
+
+                    case 'file':
+                        switch ($form[$key]['#widget']) {
+                            case 'image':
+                                if (empty($form[$key]['#prefix'])) {
+                                    $form[$key]['#prefix'] = '';
+                                }
+                                $form[$key]['#prefix'] .= zerophp_view('form_prefix-image', array('images' => (array) $value));
+
+                                if (empty($form[$key]['#description'])) {
+                                    $form[$key]['#description'] = '';
+                                }
+                                //@todo 7 Viet doan script de xoa file cu neu bi update de
+                                // Them chuc nang cho phep xoa anh da upload
+                                $form[$key]['#description'] .= zerophp_lang('Upload new image to override this image.');
+                                break;
+
+                            case 'file':
+                                break;
+                        }
+                        break;
+
+                    default:
+                        $form[$key]['#value'] = $value;
+                }
             }
         }
 

@@ -30,7 +30,7 @@ class Entity {
             $structure = $this->__config();
 
             \Cache::forever($cache_name, $structure);
-            return $structure;
+            $this->setStructure($structure);
         }
     }
 
@@ -301,17 +301,19 @@ class Entity {
                     $text = new \DOMDocument();
                     @$text->loadHTML('<?xml encoding="UTF-8"?>' . $form_values[$key]); //LIBXML_HTML_NOIMPLIED
 
-                    $images = $text->getElementsByTagName('img');
-                    foreach ($images as $image) {
-                        $lazyload = $text->createAttribute('data-original');
-                        $lazyload->value = $image->getAttribute('src');
-                        $image->appendChild($lazyload);
+                    if (zerophp_variable_get('image lazy load', 1)) {
+                        $images = $text->getElementsByTagName('img');
+                        foreach ($images as $image) {
+                            $lazyload = $text->createAttribute('data-original');
+                            $lazyload->value = $image->getAttribute('src');
+                            $image->appendChild($lazyload);
 
-                        $image->removeAttribute('src');
+                            $image->removeAttribute('src');
 
-                        $class = $text->createAttribute('class');
-                        $class->value .= 'loading lazy';
-                        $image->appendChild($class);
+                            $class = $text->createAttribute('class');
+                            $class->value .= 'loading lazy';
+                            $image->appendChild($class);
+                        }
                     }
 
                     $anchors = $text->getElementsByTagName('a');

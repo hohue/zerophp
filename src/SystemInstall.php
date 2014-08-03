@@ -77,6 +77,25 @@ class SystemInstall {
                 'variable_value' => 'Activation your account',
             ),
         ));
+
+        \Schema::table('image_style', function($table) {
+            $table->tinyInteger('is_upsize')->default(0);
+        });
+
+        \DB::table('image_style')->insert(array(
+            array(
+                'style' => 'normal',
+                'width' => 450,
+                'height' => 300,
+                'type' => 'scale',
+            ),
+            array(
+                'style' => 'thumbnail',
+                'width' => 100,
+                'height' => 100,
+                'type' => 'scale',
+            ),
+        ));
     }
 
     private static function down_0_01001() {
@@ -92,6 +111,11 @@ class SystemInstall {
                 'users register email validation',
                 'activation expired',
                 'user activation email subject',
+            ))->delete();
+
+        \DB::table('image_style')->whereIn('style', array(
+                'normal',
+                'thumbnail',
             ))->delete();
     }
 

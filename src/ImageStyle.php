@@ -3,6 +3,7 @@ namespace ZeroPHP\ZeroPHP;
 
 use ZeroPHP\ZeroPHP\Entity;
 use ZeroPHP\ZeroPHP\EntityInterface;
+use Intervention\Image\ImageManagerStatic as Image;
 
 class ImageStyle extends Entity implements  EntityInterface {
     function __config() {
@@ -17,148 +18,123 @@ class ImageStyle extends Entity implements  EntityInterface {
                     '#title' => zerophp_lang('Style name'),
                     '#type' => 'text',
                     '#required' => true,
-                    '#validate' => 'required|max_length[64]',
+                    '#validate' => 'required|max:64',
                 ),
                 'width' => array(
                     '#name' => 'width',
                     '#title' => zerophp_lang('Width'),
                     '#type' => 'text',
-                    '#validate' => 'numeric|less_than[2000]',
+                    '#validate' => 'numeric|between:0,2000',
                 ),
                 'height' => array(
                     '#name' => 'height',
                     '#title' => zerophp_lang('Height'),
                     '#type' => 'text',
-                    '#validate' => 'numeric|less_than[2000]',
+                    '#validate' => 'numeric|between:0,2000',
                 ),
                 'type' => array(
                     '#name' => 'type',
                     '#title' => zerophp_lang('Type'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => array(
                         'scale and crop' => zerophp_lang('Scale and crop'),
                         'scale' => zerophp_lang('Scale'),
                     ),
                     '#required' => true,
-                    '#validate' => 'required|max:12',
+                    '#validate' => 'required',
                 ),
             ),
             '#can_not_delete' => array(1, 2),
         );
     }
 
-    function image_show($path, $style = 'normal') {
-        $path_style = "files/styles/$style" . str_replace('files/images', '', $path);
+    public function image($file_original, $style = 'normal') {
+        $image_style = new \ZeroPHP\ZeroPHP\ImageStyle;
+        $image_style = $image_style->loadEntity($style);
 
-        $this->CI->load->config('image');
-        $config = config_item('image');
+        if (!isset($image_style->style)) {
+            $img = Image::make(MAIN . $file_original);
 
-        $entity = ;
+            $image = array(
+                'path' => $file_original,
+                'width' => $img->width(),
+                'height' => $img->height(),
+            );
+        }
+        else {
+            $path_file = \Config::get('file.path');
+            $path_style = "$path_file/styles/$style";
+            $file_style = "$path_style/" . str_replace("$path_file/images/", '', $file_original);
 
-        if (!file_exists($path_style)) {
-            $style = $this->loadEntity($style);
-            if (empty($style->style)) {
-                $style = $this->loadEntity('normal');
-            }
+            if (!file_exists(MAIN . $file_style)) {
+                $this->_createDirectory(MAIN . $file_style);
+                $img = Image::make(MAIN . $file_original);
 
-            $this->_create_directory($path_style);
+                switch ($image_style->type) {
+                    case 'scale and crop':
+                        $img->resize($image_style->width, $image_style->height, function ($constraint) {
+                            $constraint->aspectRatio();
+                        });
+                        $img->crop($image_style->width, $image_style->height);
 
-            $config['source_image'] = $path;
-            $config['new_image'] = $path_style;
-            $config['maintain_ratio'] = TRUE;
+                        $img->fill(\Config::get('file.image_background', '#ffffff'), 0, 0);
 
-            if (!empty($style->width)) {
-                $config['width'] = $style->width;
-            }
+                        break;
 
-            if (!empty($style->height)) {
-                $config['height'] = $style->height;
-            }
+                    case 'scale':
+                        $image_style->width = !empty($image_style->width) ? $image_style->width : null;
+                        $image_style->height = !empty($image_style->height) ? $image_style->height : null;
 
-            $error = false;
-            switch ($style->#type) {
-                case 'scale and crop':
-                    $config['width'] = !empty($config['width']) ? $config['width'] : (!empty($config['height']) ? $config['height'] : 100);
-                    $config['height'] = !empty($config['height']) ? $config['height'] : $config['width'];
-
-                    $this->CI->image_lib->initialize($config);
-                    $image = $this->CI->image_lib->get_image_properties('', true);
-                    if (($image['width'] / $config['width']) >= ($image['height'] / $config['height'])) {
-                        $config['master_dim'] = 'height';
-                        $axis = 'x';
-                    }
-                    else {
-                        $config['master_dim'] = 'width';
-                        $axis = 'y';
-                    }
-
-                    // Scale
-                    $this->CI->image_lib->initialize($config);
-                    if (!$this->CI->image_lib->resize() && ENVIRONMENT == 'development') {
-                        $error = true;
-                    }
-                    // Crop
-                    else {
-                        $config['source_image'] = $path_style;
-                        $this->CI->image_lib->initialize($config);
-                        $image = $this->CI->image_lib->get_image_properties('', true);
-
-                        if ($axis == 'x') {
-                            $config['x_axis'] = floor(($image['width'] - $config['width']) / 2);
+                        if (!empty($image_style->upsize)) {
+                            $img->resize($image_style->width, $image_style->height, function ($constraint) {
+                                $constraint->aspectRatio();
+                                $constraint->upsize();
+                            });
                         }
                         else {
-                            $config['y_axis'] = floor(($image['height'] - $config['height']) / 2);
+                            $img->resize($image_style->width, $image_style->height, function ($constraint) {
+                                $constraint->aspectRatio();
+                            });
                         }
 
-                        unset($config['master_dim']);
-                        $config['maintain_ratio'] = FALSE;
-                        $this->CI->image_lib->initialize($config);
-                        if (!$this->CI->image_lib->crop() && ENVIRONMENT == 'development') {
-                            $error = true;
-                        }
-                    }
+                        break;
+                }
 
-                    break;
-
-                case 'scale':
-                    if (empty($config['width']) && empty($config['height'])) {
-                        $config['width'] = 100;
-                    }
-                    $this->CI->image_lib->initialize($config);
-                    if (!$this->CI->image_lib->resize() && ENVIRONMENT == 'development') {
-                        $error = true;
-                    }
-                    break;
+                $img->save(MAIN . $file_style, \Config::get('file.image_quality', 90));
+            }
+            else {
+                $img = Image::make(MAIN . $file_style);
             }
 
-            if ($error) {
-                zerophp_get_instance()->response->addMessage($this->CI->image_lib->display_errors(), 'error');
-            }
+            $image = array(
+                'path' => $file_style,
+                'width' => $img->width(),
+                'height' => $img->height(),
+            );
         }
 
-        $config['source_image'] = $path_style;
-        $this->CI->image_lib->initialize($config);
-        $image = $this->CI->image_lib->get_image_properties('', true);
-
-        return '<img class="lazy loading" data-original="/'.$path_style.'" width="'.$image['width'].'" height="'.$image['height'].'" />';
+        return $image;
     }
 
-    private function _create_directory($path_style) {
-        $path_style = explode('/', $path_style);
-        array_pop($path_style);
-
-        if (is_dir(implode('/', $path_style))) {
+    private function _createDirectory($path_style) {
+        //remove file name
+        $path_style = substr($path_style, 0, strrpos($path_style, '/'));
+        
+        if (\File::isDirectory($path_style)) {
             return;
         }
 
+        $path_style = explode('/', $path_style);
         $path = array_shift($path_style);
         if (count($path_style)) {
             foreach ($path_style as $path_sub) {
                 $path .= "/$path_sub";
-                if (!is_dir($path)) {
-                    mkdir($path, 0777);
+                if (!\File::isDirectory($path)) {
+                    \File::makeDirectory($path);
                 }
             }
         }
     }
 }
+
+//Checked

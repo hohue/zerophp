@@ -235,9 +235,19 @@ function zerophp_form_render($key, &$form) {
                 unset($item['#theme']);
             }
             else {
-                $template = 'form_item';
+                $template_collection = array(
+                    'form_item-' . $item['#type'] . '-' . $item['#name'] . '-' . $form['#id'],
+                    'form_item-' . $item['#type'] . '-' . $item['#name'],
+                    'form_item-' . $item['#type'],
+                    'form_item',
+                );
+
+                $template = array_shift($template_collection);
+                //($template, $template_collection);
+                while (!\View::exists($template) && count($template_collection)) {
+                    $template = array_shift($template_collection);
+                }
             }
-            //$template = 'form_item';
 
             return zerophp_view($template, array('element' => $item));
         }
@@ -410,4 +420,32 @@ function zerophp_file_get_filename($file, $path) {
     }
 
     return $result;
+}
+
+function zerophp_image_style($path, $style = 'normal', $attributes = array()) {
+    $image = new \ZeroPHP\ZeroPHP\ImageStyle;
+    $image = $image->image($path, $style);
+
+    if (!isset($image['path'])) {
+        return '';
+    }
+
+    if (!isset($attributes['class'])) {
+        $attributes['class'] = '';
+    }
+
+    $attributes['width'] = isset($attributes['width']) ? $attributes['width'] : (isset($image['width']) ? $image['width'] : '');
+    $attributes['height'] = isset($attributes['height']) ? $attributes['height'] : (isset($image['height']) ? $image['height'] : '');
+
+    if (zerophp_variable_get('image lazy load', 1)) {
+        $src = 'data-original="' . $image['path'] . '"';
+        $attributes['class'] .= 'lazy loading';
+    }
+    else {
+        $src = 'src="' . $image['path'] . '"';
+    }
+
+    $attr = \HTML::attributes(array_filter($attributes));
+
+    return "<img $src $attr  />";
 }

@@ -29,7 +29,7 @@ class Block extends Entity implements  EntityInterface {
                 'cache_type' => array(
                     '#name' => 'cache_type',
                     '#title' => zerophp_lang('Cache type'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => array(
                         'full' => zerophp_lang('Full cache'),
                         'page' => zerophp_lang('Page cache'),
@@ -39,7 +39,7 @@ class Block extends Entity implements  EntityInterface {
                 'region' => array(
                     '#name' => 'region',
                     '#title' => zerophp_lang('Region'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => $regions,
                     '#validate' => 'required',
                 ),
@@ -71,7 +71,7 @@ class Block extends Entity implements  EntityInterface {
                 'weight' => array(
                     '#name' => 'weight',
                     '#title' => zerophp_lang('Weight'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => form_options_make_weight(),
                     '#validate' => 'required|numeric|between:-999,999',
                     '#fast_edit' => 1,
