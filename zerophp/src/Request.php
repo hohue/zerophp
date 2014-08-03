@@ -1,8 +1,6 @@
 <?php
 namespace ZeroPHP\ZeroPHP;
 
-use ZeroPHP\ZeroPHP\Entity;
-
 class Request {
     private $path_prefix = array(
         'ajax',

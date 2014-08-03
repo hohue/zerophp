@@ -41,7 +41,7 @@ class Shop extends Entity {
                 'local_id' => array(
                     '#name' => 'local_id',
                     '#title' => 'Khu vực',
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#reference' => array(
                         'name' => 'category',
                         'type' => 'internal',
@@ -63,7 +63,7 @@ class Shop extends Entity {
                 'district_id' => array(
                     '#name' => 'district_id',
                     '#title' => 'Quận huyện',
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#reference' => array(
                         'name' => 'category',
                         'type' => 'internal',

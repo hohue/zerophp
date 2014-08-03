@@ -26,7 +26,7 @@ class CategoryGroup extends Entity {
                 'weight' => array(
                     '#name' => 'weight',
                     '#title' => zerophp_lang('Weight'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => form_options_make_weight(),
                     '#default' => 0,
                     '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',

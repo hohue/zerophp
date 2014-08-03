@@ -26,7 +26,7 @@ class Category extends Entity {
                 'category_group_id' => array(
                     '#name' => 'category_group_id',
                     '#title' => zerophp_lang('Category group'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#reference' => array(
                         'name' => 'category_group',
                         'type' => 'internal',
@@ -39,7 +39,7 @@ class Category extends Entity {
                 'parent' => array(
                     '#name' => 'parent',
                     '#title' => zerophp_lang('Parent category'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#reference' => array(
                         'name' => 'category',
                         'type' => 'internal',
@@ -59,7 +59,7 @@ class Category extends Entity {
                 'weight' => array(
                     '#name' => 'weight',
                     '#title' => zerophp_lang('Weight'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => form_options_make_weight(),
                     '#default' => 0,
                     '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',

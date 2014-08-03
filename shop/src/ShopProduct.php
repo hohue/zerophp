@@ -61,7 +61,7 @@ class ShopProduct extends Entity {
                 'promotion_type' => array(
                     '#name' => 'promotion_type',
                     '#title' => 'Kiểu Khuyến Mãi',
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => array(
                         1 => 'Phần trăm',
                         2 => 'Giá trị',

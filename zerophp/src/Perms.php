@@ -44,7 +44,7 @@ class Perms extends Entity implements  EntityInterface {
                 'weight' => array(
                     '#name' => 'weight',
                     '#title' => zerophp_lang('Weight'),
-                    '#type' => 'select_build',
+                    '#type' => 'select',
                     '#options' => form_#options_make_weight(),
                     '#validate' => 'required|numeric|between:-999,999',
                     '#fast_edit' => 1,
