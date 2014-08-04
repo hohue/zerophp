@@ -85,7 +85,7 @@ class ImageStyle extends Entity implements  EntityInterface {
                         $image_style->width = !empty($image_style->width) ? $image_style->width : null;
                         $image_style->height = !empty($image_style->height) ? $image_style->height : null;
 
-                        if (!empty($image_style->upsize)) {
+                        if (!empty($image_style->is_upsize)) {
                             $img->resize($image_style->width, $image_style->height, function ($constraint) {
                                 $constraint->aspectRatio();
                                 $constraint->upsize();
