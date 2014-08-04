@@ -2,10 +2,11 @@
 namespace ZeroPHP\Shop;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class ShopCart extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class ShopCart extends Entity implements EntityInterface {
+    function __config() {
+        return array(
             '#id' => 'shop_cart_id',
             '#name' => 'shop_cart',
             '#class' => 'ZeroPHP\Shop\ShopCart',
@@ -54,7 +55,6 @@ class ShopCart extends Entity {
                     '#default' => 1,
                 ),
             )
-        )
         );
     }
 

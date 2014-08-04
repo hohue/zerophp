@@ -2,10 +2,11 @@
 namespace ZeroPHP\Category;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class CategoryGroup extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class CategoryGroup extends Entity implements EntityInterface {
+    function __config() {
+        return array(
             '#id' => 'category_group_id',
             '#name' => 'category_group',
             '#class' => 'ZeroPHP\Category\CategoryGroup',
@@ -44,7 +45,7 @@ class CategoryGroup extends Entity {
                     '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
                 ),
             ),
-        ));
+        );
     }
 
 

@@ -81,6 +81,8 @@ class Request {
         }
 
         $this->data['segment'] = $uri;
+        $this->data['segment'] = count($this->data['segment']) ? $this->data['segment'] : array('', '');
+
         $this->data['url'] = implode('/', $uri);
         $this->data['url'] = $this->data['url'] ? $this->data['url'] : '/';
 

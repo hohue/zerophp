@@ -49,8 +49,7 @@ class ImageStyle extends Entity implements  EntityInterface {
     }
 
     public function image($file_original, $style = 'normal') {
-        $image_style = new \ZeroPHP\ZeroPHP\ImageStyle;
-        $image_style = $image_style->loadEntity($style);
+        $image_style = $this->loadEntity($style);
 
         if (!isset($image_style->style)) {
             $img = Image::make(MAIN . $file_original);
