@@ -67,10 +67,45 @@ function zerophp_lang($line, $trans = array()) {
         return $line;
 }
 
-
 function form_options_make_weight() {
     $options = array();
     for($i = -99; $i <= 99; $i ++) {
+        $options[$i] = $i;
+    }
+
+    return $options;
+}
+
+function form_options_day() {
+    $options = array(
+        '' => zerophp_lang('Day'),
+    );
+    for($i = 1; $i <= 31; $i ++) {
+        $options[$i] = $i;
+    }
+
+    return $options;
+}
+
+function form_options_month() {
+    $options = array(
+        '' => zerophp_lang('Month'),
+    );
+    for($i = 1; $i <= 12; $i ++) {
+        $options[$i] = $i;
+    }
+
+    return $options;
+}
+
+function form_options_year($min = null, $max = null) {
+    $min = $min ? $min : date('Y') - 100;
+    $max = $max ? $max : date('Y') + 100;
+
+    $options = array(
+        '' => zerophp_lang('Year'),
+    );
+    for($i = $min; $max <= 12; $i ++) {
         $options[$i] = $i;
     }
 
@@ -448,4 +483,83 @@ function zerophp_image_style($path, $style = 'normal', $attributes = array()) {
     $attr = \HTML::attributes(array_filter($attributes));
 
     return "<img $src $attr  />";
+}
+
+function zerophp_form_get_type() {
+    return array(
+        0 => array('radios', 'checkboxes', 'markup', 'date'),
+        1 => array('checkbox', 'radio'), //Form::type($name, $value, $checked, $attributes)
+        2 => array('password', 'file'), //Form::type($name, $attributes)
+        3 => array('select'), // Form::type($name, $options, $value, $attributes)
+        4 => array('submit', 'button', 'reset'), //Form::type($value, $attributes)
+        //default //Form::type($name, $value, $attributes)
+    );
+}
+
+function zerophp_form_content($element) {
+    $type = zerophp_form_get_type();
+
+    switch ($element['#type']) {
+        case 'checkboxes':
+            $checkboxes = '[]';
+        case 'radios':
+            $result = '';
+            foreach ($element['#options'] as $key => $value) {
+                $result .= \Form::checkbox($element['#name'] . (isset($checkboxes) ? $checkboxes : ''), $key, ($key == $element['#value'] ? true : false), $element['#attributes']);
+                $result .= "<sub_label>$value</sub_label>";
+            }
+            return $result;
+
+        case 'markup':
+            return $element['#value'];
+
+        case 'date':
+            $result = '';
+            $value = $element['#value'] ? strtotime($element['#value']) : '';
+            //zerophp_devel_print($value);
+            switch ($element['#config']['form_type']) {
+                case 'select_group':
+                    switch ($element['#config']['group_format']) {
+                        // dmY - day is select, month is select, year is text
+                        default:
+                            $result .= \Form::select(
+                                $element['#name'] . '[day]', 
+                                form_options_day(), 
+                                $value ? date('d', $value) : '', 
+                                isset($element['#attributes']['day']) ? $element['#attributes']['day'] : array());
+                            $result .= \Form::select(
+                                $element['#name'] . '[month]',
+                                form_options_month(), 
+                                $value ? date('m', $value) : '', 
+                                isset($element['#attributes']['month']) ? $element['#attributes']['month'] : array());
+                            $result .= \Form::text(
+                                $element['#name'] . '[year]', 
+                                $value ? date('Y', $value) : '', 
+                                isset($element['#attributes']['year']) ? $element['#attributes']['year'] : array());
+                            break;
+                    }
+                    break;
+                
+                //datepicker
+                default:
+                    # code...
+                    break;
+            }
+            return $result;
+
+        case in_array($element['#type'], $type[1]):
+            return \Form::{$element['#type']}($element['#name'], $element['#value'], $element['#checked'], $element['#attributes']);
+        
+        case in_array($element['#type'], $type[2]):
+            return \Form::{$element['#type']}($element['#name'], $element['#attributes']);
+        
+        case in_array($element['#type'], $type[3]):
+            return \Form::{$element['#type']}($element['#name'], $element['#options'], $element['#value'], $element['#attributes']);
+        
+        case in_array($element['#type'], $type[4]):
+            return \Form::{$element['#type']}($element['#value'], $element['#attributes']);
+
+        default:
+            return \Form::{$element['#type']}($element['#name'], $element['#value'], $element['#attributes']);
+    }
 }
