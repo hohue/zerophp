@@ -38,7 +38,7 @@ class ProfileInstall {
                 'title' => 'User Profile Update',
                 'path' => 'profile/%/update',
                 'class' => '\ZeroPHP\Profile\Profile',
-                'method' => 'updateForm',
+                'method' => 'update',
                 'arguments' => '1',
             ),
         ));
