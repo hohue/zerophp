@@ -579,7 +579,7 @@ class Users extends Entity implements  EntityInterface {
         $zerophp->response->addContent(Form::build($form));
     }
 
-    function showActivationResendForm($zerophp) {
+    function showActivationResendForm() {
         $structure = $this->getStructure();
         $form = array();
 
@@ -645,13 +645,13 @@ class Users extends Entity implements  EntityInterface {
 
     function showResetPasswordSuccess($zerophp) {}
 
-    function lst($zerophp) {$zerophp}
+    function lst($zerophp) {}
 
-    function create($zerophp) {$zerophp}
+    function create($zerophp) {}
 
-    function read($zerophp) {$zerophp}
+    function read($zerophp) {}
 
-    function update($zerophp) {$zerophp}
+    function update($zerophp) {}
 
     function delete($zerophp) {}
 
