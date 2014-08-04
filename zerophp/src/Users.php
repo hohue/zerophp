@@ -674,13 +674,39 @@ class Users extends Entity implements  EntityInterface {
             'method' => 'crudCreateForm',
         );
         $zerophp->response->addContent(Form::build($form));
-    }
+    } 
 
     function read($zerophp) {}
 
-    function update($zerophp) {}
+    function update($zerophp, $userid) {
+        $form_values = $this->loadEntity($userid);
 
-    function delete($zerophp) {}
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'updateForm',
+        );
+        $zerophp->response->addContent(Form::build($form, $form_values));
+    }
+
+    function updateForm() {
+        $form = $this->crudCreateForm();
+
+        $form['email']['#disabled'] = true;
+        $form['email']['#attributes']['disabled'] = 'disabled';
+
+        unset($form['password']['#required']);
+        //zerophp_devel_print($form);
+
+        return $form;
+    }
+
+    function delete($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'crudDeleteForm',
+        );
+        $zerophp->response->addContent(Form::build($form));
+    }
 
    
 

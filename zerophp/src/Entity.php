@@ -426,6 +426,33 @@ class Entity {
         }
     }
 
+    public function crudDeleteForm() {
+       
+        $form = array();
+
+        $form['notice'] = array(
+            '#name' => 'Cancel',
+            '#type' => 'markup',
+            '#value' => 'do you really want to delete',
+        );
+
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('OK'),
+        );
+
+        $form['#actions']['Cancel'] = array(
+            '#name' => 'Cancel',
+            '#type' => 'markup',
+            '#value' => '<a href="javascript:history.back()" class="button_gay bg_button">Cancel</a>',
+        );
+
+
+        return $form;
+    }
+
 
 
 
