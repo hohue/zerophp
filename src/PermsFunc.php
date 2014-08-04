@@ -43,7 +43,7 @@ class PermsFunc extends Entity implements  EntityInterface {
                         0 => zerophp_lang('Disable'),
                     ),
                     '#default' => 1,
-                    '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
+                    '#validate' => 'required|numeric|between:0,1',
                 ),
             ),
         );
