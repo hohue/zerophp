@@ -27,13 +27,13 @@ class Profile extends Entity implements EntityInterface  {
                     ),
                     '#required' => true,
                 ),
-                /*'birthday' => array(
+                'birthday' => array(
                     '#name' => 'birthday',
                     '#title' => zerophp_lang('Birthday'),
                     '#validate' => 'required',
                     '#required' => true,
-                    '#type' => 'date_group',
-                ),*/
+                    '#type' => 'date',
+                ),
                 /*'province_id' => array(
                     '#name' => 'province_id',
                     '#title' => 'Khu vực',
@@ -119,9 +119,8 @@ class Profile extends Entity implements EntityInterface  {
         $form['title'] = $user_structure['#fields']['title'];
 
         $profile_structure  = $this->getStructure();
-        $form['address'] = $profile_structure['#fields']['address'];
-        $form['mobile'] = $profile_structure['#fields']['mobile'];
-
+        unset($profile_structure['#fields']['id']);
+        $form = array_merge($form, $profile_structure['#fields']);
 
         $form['#actions']['submit'] = array(
             '#name' => 'submit',
