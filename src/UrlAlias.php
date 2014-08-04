@@ -6,8 +6,8 @@ use ZeroPHP\ZeroPHP\Entity;
 use ZeroPHP\ZeroPHP\EntityInterface;
 
 //@todo 9 Add URL alias when use Entity::saveEntity();
-// Write re-build feature for url_alias
-// Add url_alias & url_real folder to .gitignore
+// Write re-build feature for alias
+// Add alias & real folder to .gitignore
 
 class UrlAlias extends Entity implements  EntityInterface {
     public function __config() {
@@ -21,13 +21,13 @@ class UrlAlias extends Entity implements  EntityInterface {
                     '#title' => zerophp_lang('ID'),
                     '#type' => 'hidden',
                 ),
-                'url_real' => array(
-                    '#name' => 'url_real',
+                'real' => array(
+                    '#name' => 'real',
                     '#title' => zerophp_lang('URL real'),
                     '#type' => 'text',
                 ),
-                'url_alias' => array(
-                    '#name' => 'url_alias',
+                'alias' => array(
+                    '#name' => 'alias',
                     '#title' => zerophp_lang('URL alias'),
                     '#type' => 'text',
                 ),
@@ -64,13 +64,13 @@ class UrlAlias extends Entity implements  EntityInterface {
     function loadEntityByAlias($path) {
         $attributes = array(
             'where' => array(
-                'url_alias' => $path,
+                'alias' => $path,
             )
         );
-        $url_alias = $this->loadEntityExecutive(null, $attributes);
+        $alias = $this->loadEntityExecutive(null, $attributes);
 
-        if (count($url_alias)) {
-            return reset($url_alias);
+        if (count($alias)) {
+            return reset($alias);
         }
 
         return false;
@@ -79,32 +79,32 @@ class UrlAlias extends Entity implements  EntityInterface {
     function loadEntityByReal($path) {
         $attributes = array(
             'where' => array(
-                'url_real' => $path,
+                'real' => $path,
             )
         );
-        $url_real = $this->loadEntityExecutive(null, $attributes);
+        $real = $this->loadEntityExecutive(null, $attributes);
 
-        if (count($url_real)) {
-            return reset($url_real);
+        if (count($real)) {
+            return reset($real);
         }
 
         return false;
     }
 
-    function verify($url_real, $url_alias, $validate = true) {
+    function verify($real, $alias, $validate = true) {
         // Remove unexpected characters
-        $url_alias = $validate ? zerophp_uri_validate($url_alias) : $url_alias;
+        $alias = $validate ? zerophp_uri_validate($alias) : $alias;
 
         // Check url alias exists
-        $alias = $this->loadEntityByAlias($url_alias);
-        if (!empty($alias->url_alias) && $alias->url_real != $url_real) {
-            $url_alias .= '-' . strtolower(str_random(4));
+        $alias = $this->loadEntityByAlias($alias);
+        if (!empty($alias->alias) && $alias->real != $real) {
+            $alias .= '-' . strtolower(str_random(4));
 
             // Re-check with new url alias
-            $url_alias = $this->verify($url_real, $url_alias, false);
+            $alias = $this->verify($real, $alias, false);
         }
 
-        return $url_alias;
+        return $alias;
     }
 
 
@@ -112,40 +112,40 @@ class UrlAlias extends Entity implements  EntityInterface {
 
 
 
-    function url_alias_create($url_real, $url_alias, $prefix = '') {
+    function alias_create($real, $alias, $prefix = '') {
         $prefix = $prefix ? $prefix : fw_variable_get('url alias all prefix', '');
 
         // Remove prefix
-        $old_prefix = strpos($url_alias, $prefix . '/');
+        $old_prefix = strpos($alias, $prefix . '/');
         if ($old_prefix === 0) {
-            $url_alias = substr($url_alias, $old_prefix + strlen($prefix) + 1);
+            $alias = substr($alias, $old_prefix + strlen($prefix) + 1);
         }
 
-        $url_alias = $prefix . '/' . $url_alias;
-        $url_alias = $this->url_alias_verify_alias($url_real, $url_alias);
+        $alias = $prefix . '/' . $alias;
+        $alias = $this->alias_verify_alias($real, $alias);
 
         // Save to db
-        $this->CI->load->model('url_alias_model');
-        $alias = $this->CI->url_alias_model->get_from_real($url_real);
-        if (!empty($alias->url_alias)) {
+        $this->CI->load->model('alias_model');
+        $alias = $this->CI->alias_model->get_from_real($real);
+        if (!empty($alias->alias)) {
             // Update a new url alias for old url real
-            if ($alias->url_alias != $url_alias) {
-                @$this->CI->cachef->del_url_alias($alias->url_alias);
-                $this->CI->cachef->set_url_alias($url_alias, $url_real);
-                $this->CI->cachef->set_url_real($url_real, $url_alias);
+            if ($alias->alias != $alias) {
+                @$this->CI->cachef->del_alias($alias->alias);
+                $this->CI->cachef->set_alias($alias, $real);
+                $this->CI->cachef->set_real($real, $alias);
 
-                $alias->url_alias = $url_alias;
+                $alias->alias = $alias;
                 $this->saveEntity($alias);
             }
         }
         // Save a new url alias for new url real
         else {
 
-            $this->CI->cachef->set_url_alias($url_alias, $url_real);
-            $this->CI->cachef->set_url_real($url_real, $url_alias);
+            $this->CI->cachef->set_alias($alias, $real);
+            $this->CI->cachef->set_real($real, $alias);
 
-            $alias->url_real = $url_real;
-            $alias->url_alias = $url_alias;
+            $alias->real = $real;
+            $alias->alias = $alias;
             $this->saveEntity($alias);
         }
     }
@@ -153,14 +153,14 @@ class UrlAlias extends Entity implements  EntityInterface {
     function crud_create_form_submit($form_id, $form, &$form_values, $message = '') {
         $new = true;
         // Create url alias cache file
-        if (!empty($form_values['url_alias_id'])) {
-            $url = $this->loadEntity($form_values['url_alias_id'], array('cache' => false));
-            @$this->CI->cachef->del_url_alias($url->url_alias);
-            @$this->CI->cachef->del_url_real($url->url_real);
+        if (!empty($form_values['alias_id'])) {
+            $url = $this->loadEntity($form_values['alias_id'], array('cache' => false));
+            @$this->CI->cachef->del_alias($url->alias);
+            @$this->CI->cachef->del_real($url->real);
             $new = false;
         }
 
-        $this->url_alias_create($form_values['url_real'], $form_values['url_alias']);
+        $this->alias_create($form_values['real'], $form_values['alias']);
 
         $message = $message ? $message : zerophp_lang('Your data was updated successfully.');
         zerophp_get_instance()->response->addMessage($message, 'success');
@@ -172,54 +172,54 @@ class UrlAlias extends Entity implements  EntityInterface {
         // Delete url alias cache file
         foreach ($form_values['#delete'] as $url_id) {
             $url = $this->loadEntity($url_id, array('cache' => false));
-            @$this->CI->cachef->del_url_alias($url->url_alias);
-            @$this->CI->cachef->del_url_real($url->url_real);
+            @$this->CI->cachef->del_alias($url->alias);
+            @$this->CI->cachef->del_real($url->real);
         }
 
         parent::crud_delete_form_submit($form_id, $form, $form_values, $message);
     }
 
-    function url_alias_form_alter($form_id, &$form) {
+    function alias_form_alter($form_id, &$form) {
         if (!in_array($form_id, fw_variable_get('url alias form alter support', array()))) {
             return;
         }
 
         //@todo 9 Chuyen hidden field thanh text field cho phep user tu nhap alias
         // Dieu nay phai phan quyen, boi vi nguoi ban hang co the khong duoc phep nhap url alias
-        $form['url_alias'] = array(
-            '#name' => 'url_alias',
+        $form['alias'] = array(
+            '#name' => 'alias',
             '#type' => 'text',
             '#label' => zerophp_lang('URL alias'),
             '#item' => array(
                 '#type' => 'text',
-                '#name' => 'url_alias',
+                '#name' => 'alias',
             ),
             '#description' => zerophp_lang('Example:') . ' ' . zerophp_lang('female-fashion'),
         );
 
         if (substr($form_id, 0, 19) == 'entity_crud_update_') {
-            $form['url_alias']['#disabled'] = 'disabled';
-            $form['url_alias']['#item']['disabled'] = 'disabled';
+            $form['alias']['#disabled'] = 'disabled';
+            $form['alias']['#item']['disabled'] = 'disabled';
         }
 
         $form['#submit'][] = array(
-            'class' => 'url_alias',
-            'method' => 'url_alias_form_alter_submit',
+            'class' => 'alias',
+            'method' => 'alias_form_alter_submit',
         );
     }
 
-    function url_alias_form_alter_submit($form_id, $form, &$form_values) {
-        if(!empty($form_values['url_alias']) && !empty($form_values['entity_name'])) {
+    function alias_form_alter_submit($form_id, $form, &$form_values) {
+        if(!empty($form_values['alias']) && !empty($form_values['entity_name'])) {
             $entity = new $form_values['entity_name'];
             $structure = $this->CI->{$form_values['entity_name']}->getStructure();
 
-            $url_real = 'e/read/' . $form_values['entity_name'] . '/' . $form_values[$structure['#id']];
+            $real = 'e/read/' . $form_values['entity_name'] . '/' . $form_values[$structure['#id']];
             $prefix = fw_variable_get("url alias entity " . $form_values['entity_name'] . " prefix", '');
-            $this->url_alias_create($url_real, $form_values['url_alias'], $prefix);
+            $this->alias_create($real, $form_values['alias'], $prefix);
         }
     }
 
-    function url_alias_form_value_alter($form_id, $form, &$form_values) {
+    function alias_form_value_alter($form_id, $form, &$form_values) {
         if (!in_array($form_id, fw_variable_get('url alias form alter support', array()))) {
             return;
         }
@@ -233,8 +233,8 @@ class UrlAlias extends Entity implements  EntityInterface {
         $structure = $this->CI->{$entity_name}->getStructure();
 
         if (!empty($form_values[$structure['#id']])) {
-            $url_alias = $this->CI->cachef->get_url_real("e/read/$entity_name/" . $form_values[$structure['#id']]);
-            $form_values['url_alias'] = $url_alias ? $url_alias : ' ';
+            $alias = $this->CI->cachef->get_real("e/read/$entity_name/" . $form_values[$structure['#id']]);
+            $form_values['alias'] = $alias ? $alias : ' ';
         }
     }
 }
