@@ -152,7 +152,7 @@ class Users extends Entity implements  EntityInterface {
             $entity->password = \Hash::make($entity->password);
         }
 
-        if (empty($entity->username)) {
+        if (empty($entity->id) && empty($entity->username)) {
             $entity->username = $entity->email;
         }
 
