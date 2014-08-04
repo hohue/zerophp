@@ -142,11 +142,24 @@ class Profile extends Entity implements EntityInterface  {
             ),
         );
 
+        $form['#success_message'] = zerophp_lang('Your profile was updated successfully.');
+
         return $form;
     }
 
     public function updateFormSubmit($form_id, &$form, &$form_values) {
-        
+        $profile = new \stdClass;
+        $profile->id = zerophp_userid();
+        $profile->address = $form_values['address'];
+        $profile->mobile = $form_values['mobile'];
+        $this->saveEntity($profile);
+
+        $user = new \stdClass;
+        $user->id = zerophp_userid();
+        $user->title = $form_values['title'];
+        $user->updated_at = date('Y-m-d H:i:s');
+        $user_obj = new \ZeroPHP\ZeroPHP\Users;
+        $user_obj->saveEntity($user);
     }
 
     public function read($zerophp) {}
