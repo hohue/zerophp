@@ -49,6 +49,13 @@ class Users extends Entity implements  EntityInterface {
                     '#required' => true,
                     '#error_messages' => zerophp_lang('Required field'),
                 ),
+                'username' => array(
+                    '#name' => 'username',
+                    '#title' => zerophp_lang('Username'),
+                    '#type' => 'text',
+                    '#validate' => 'required',
+                    '#required' => true,
+                ),
                 'email' => array(
                     '#name' => 'email',
                     '#title' => zerophp_lang('Email'),
@@ -122,7 +129,7 @@ class Users extends Entity implements  EntityInterface {
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),
-                'roles' => array(
+                /*'roles' => array(
                     '#name' => 'roles',
                     '#title' => zerophp_lang('Roles'),
                     '#type' => 'checkboxes',
@@ -131,7 +138,7 @@ class Users extends Entity implements  EntityInterface {
                         'class' => 'ZeroPHP\ZeroPHP\Role',
                     ),
                     '#display_hidden' => 1,
-                ),
+                ),*/
             ),
             '#can_not_delete' => array(1),
         );
@@ -143,6 +150,10 @@ class Users extends Entity implements  EntityInterface {
         }
         else {
             $entity->password = \Hash::make($entity->password);
+        }
+
+        if (empty($entity->username)) {
+            $entity->username = $entity->email;
         }
 
         return parent::saveEntity($entity);
@@ -270,7 +281,7 @@ class Users extends Entity implements  EntityInterface {
     }
 
     private function _unsetFormItem(&$form) {
-        unset($form['active'], $form['remember_token'], $form['last_activity'],
+        unset($form['username'], $form['active'], $form['remember_token'], $form['last_activity'],
             $form['created_at'], $form['updated_at'], $form['deleted_at']);
     }
 
@@ -647,7 +658,13 @@ class Users extends Entity implements  EntityInterface {
 
     function lst($zerophp) {}
 
-    function create($zerophp) {}
+    function create($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'crudCreateForm',
+        );
+        $zerophp->response->addContent(Form::build($form));
+    }
 
     function read($zerophp) {}
 
