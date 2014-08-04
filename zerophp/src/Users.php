@@ -197,7 +197,7 @@ class Users extends Entity implements  EntityInterface {
 
     function formRegisterSubmit($form_id, $form, &$form_values) {
         if ($form_values['active'] == 0) {
-            $activation = new \ZeroPHP\ZeroPHP\Activation;;
+            $activation = new \ZeroPHP\ZeroPHP\Activation;
             $hash = $activation->setHash($form_values['id'], 'user_register');
 
             $vars = array(
@@ -606,7 +606,7 @@ class Users extends Entity implements  EntityInterface {
     function formActivationResendSubmit($form_id, $form, &$form_values) {
             $user = $this->loadEntityByEmail($form_values['email']);
 
-            $activation = new \ZeroPHP\ZeroPHP\Activation;;
+            $activation = new \ZeroPHP\ZeroPHP\Activation;
             $hash = $activation->setHash($user->id, 'user_activation_resend');
 
             //zerophp_devel_print($hash);

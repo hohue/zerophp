@@ -2,10 +2,12 @@
 namespace ZeroPHP\Profile;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
+use ZeroPHP\ZeroPHP\Form;
 
-class Profile extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Profile extends Entity implements EntityInterface  {
+    function __config() {
+        return array(
             '#id' => 'id',
             '#name' => 'profile', //ten bang
             '#class' => 'ZeroPHP\Profile\Profile',
@@ -18,20 +20,21 @@ class Profile extends Entity {
                 ),
                 'address' => array(
                     '#name' => 'address',
-                    '#title' => zerophp_lang('address'),
+                    '#title' => zerophp_lang('Address'),
                     '#type' => 'text',
                     '#attributes' => array(
                         'placeholder' => '123 Phường Chánh Nghĩa',
                     ),
+                    '#required' => true,
                 ),
-                'birthday' => array(
+                /*'birthday' => array(
                     '#name' => 'birthday',
                     '#title' => zerophp_lang('Birthday'),
                     '#validate' => 'required',
                     '#required' => true,
                     '#type' => 'date_group',
-                ),
-                'local_id' => array(
+                ),*/
+                /*'local_id' => array(
                     '#name' => 'local_id',
                     '#title' => 'Khu vực',
                     '#type' => 'select',
@@ -77,15 +80,84 @@ class Profile extends Entity {
                         ),
                     ),
                     '#display_hidden' => 1,
-                ),
+                ),*/
                 'mobile' => array(
                     '#name' => 'mobile',
-                    '#title' => zerophp_lang('mobile'),
+                    '#title' => zerophp_lang('Mobile'),
                     '#type' => 'text',
+                    '#required' => true,
                 ),
             ),
-        ));
+        );
     }
+
+    public function update($zerophp) {
+        $from = array(
+            'class' => '\ZeroPHP\Profile\Profile',
+            'method' => 'updateForm',
+        );
+        $zerophp->response->addContent(Form::build($from));
+    }
+
+    public function updateForm() {
+        $form = array();
+
+        $user = zerophp_user();
+        $form['email'] = array(
+            '#name' => 'email',
+            '#type' => 'markup',
+            '#title' => zerophp_lang('Email'),
+            '#value' => '<font>' . $user->email . '</font>',
+        );
+
+        $users = new \ZeroPHP\ZeroPHP\Users;
+        $user_structure = $users->getStructure();
+        $form['title'] = $user_structure['#fields']['title'];
+
+        $profile_structure  = $this->getStructure();
+        $form['address'] = $profile_structure['#fields']['address'];
+        $form['mobile'] = $profile_structure['#fields']['mobile'];
+
+
+        $form['#actions']['submit'] = array(
+            '#name' => 'submit',
+            '#type' => 'submit',
+            '#value' => zerophp_lang('Submit'),
+        );
+
+        $form['#actions']['reset'] = array(
+            '#name' => 'reset',
+            '#type' => 'reset',
+            '#value' => zerophp_lang('Reset'),
+        );
+
+        $form['#submit'] = array(
+            array(
+                'class' => 'ZeroPHP\Profile\Profile',
+                'method' => 'updateFormSubmit',
+            ),
+        );
+
+        return $form;
+    }
+
+    public function updateFormSubmit($form_id, &$form, &$form_values) {
+        $profile_structure  = $this->getStructure();
+        $activation = new \ZeroPHP\ZeroPHP\Activation;
+        
+
+         $vars = array(
+                'address' => $form_values['address'],
+                'mobile' => $form_values['mobile'],
+                
+            );
+
+
+    }
+
+
+
+
 
 
 
@@ -201,7 +273,7 @@ class Profile extends Entity {
         return $result;
     }
 
-    function district_get_from_local() {
+    /*function district_get_from_local() {
         $data = $this->input->get();
 
         $this->load->library('users_profile');
@@ -222,5 +294,5 @@ class Profile extends Entity {
         $form_item = $this->form->form_item_generate($structure['#fields']['district_id']);
 
         $zerophp->content_set(form_render($form_item, null, null, false));
-    }
+    }*/
 }

@@ -113,7 +113,7 @@ class Entity {
 
         $field = $this->structure['#fields'][$field];
 
-        $ref = $this->loadEntityObject($field['#reference']['class']);
+        $ref = new $field['#reference']['class'];
         $ref_structure = $ref->getStructure();
 
         $reference = array();
