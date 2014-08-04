@@ -36,26 +36,72 @@ class SystemInstall {
             array(
                 'title' => 'User register success',
                 'path' => 'user/register/success',
+                'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
                 'method' => 'showRegisterSuccess',
             ),
             array(
                 'title' => 'Forgot password success',
                 'path' => 'user/forgotpass/success',
+                'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
                 'method' => 'userForgotPasswordSuccess',
             ),
             array(
                 'title' => 'Clear Cache',
                 'path' => 'performance/clear/cache',
+                'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Performance',
                 'method' => 'clearCache',
             ),
             array(
                 'title' => 'Clear OPCache',
                 'path' => 'performance/clear/opcache',
+                'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Performance',
                 'method' => 'clearOPCache',
+            ),
+            array(
+                'title' => 'User list',
+                'path' => 'user/list',
+                'arguments' => '',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'lst',
+            ),
+            array(
+                'title' => 'User create',
+                'path' => 'user/create',
+                'arguments' => '',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'create',
+            ),
+            array(
+                'title' => 'User read',
+                'path' => 'user/read',
+                'arguments' => '',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'read',
+            ),
+            array(
+                'title' => 'User update',
+                'path' => 'user/%/update',
+                'arguments' => '1',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'update',
+            ),
+            array(
+                'title' => 'User delete',
+                'path' => 'user/%/delete',
+                'arguments' => '1',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'delete',
+            ),
+            array(
+                'title' => 'Reset Password success',
+                'path' => 'user/resetpass/success',
+                'arguments' => '',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'showResetPasswordSuccess',
             ),
         ));
 
@@ -77,10 +123,6 @@ class SystemInstall {
                 'variable_value' => 'Activation your account',
             ),
         ));
-
-        \Schema::table('image_style', function($table) {
-            $table->tinyInteger('is_upsize')->default(0);
-        });
 
         \DB::table('image_style')->insert(array(
             array(
@@ -104,6 +146,13 @@ class SystemInstall {
                 'user/register/success',
                 'performance/clear/cache',
                 'performance/clear/opcache',
+                'user/forgotpass/success',
+                'user/list',
+                'user/create',
+                'user/%',
+                'user/%/update',
+                'user/%/delete',
+                'user/resetpass/success',
             ))->delete();
 
         \DB::table('variable')->whereIn('variable_key', array(
@@ -225,6 +274,7 @@ class SystemInstall {
                 $table->smallInteger('width');
                 $table->smallInteger('height');
                 $table->string('type', 32);
+                $table->tinyInteger('is_upsize')->default(0);
 
                 $table->primary('style');
             });

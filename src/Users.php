@@ -13,7 +13,23 @@ class Users extends Entity implements  EntityInterface {
             '#class' => 'ZeroPHP\ZeroPHP\Users',
             '#title' => zerophp_lang('Users'),
             '#links' => array(
-                //'list' => 'user/users',
+                'list' => 'user/list',
+                'create' => 'user/create',
+                'read' => 'user/%',
+                'update' => 'user/%/update',
+                'delete' => 'user/%/delete',
+
+                'register' => 'user/register',
+                'register_success' => 'user/register/success',
+                'login' => 'user/login',
+                'logout' => 'user/logout',
+                'activation' => 'user/activation/%',
+                'activation_resend' => 'user/activation/resend',
+                'changepass' => 'user/changepass',
+                'forgotpass' => 'user/forgotpass',
+                'forgotpass_success' => 'user/forgotpass/success',
+                'resetpass' => 'user/resetpass/%',
+                'resetpass_success' => 'user/resetpass/success',
             ),
             '#fields' => array(
                 'id' => array(
@@ -626,6 +642,18 @@ class Users extends Entity implements  EntityInterface {
 
         zerophp_redirect();
     }
+
+    function showResetPasswordSuccess($zerophp) {}
+
+    function lst($zerophp) {$zerophp}
+
+    function create($zerophp) {$zerophp}
+
+    function read($zerophp) {$zerophp}
+
+    function update($zerophp) {$zerophp}
+
+    function delete($zerophp) {}
 
    
 
