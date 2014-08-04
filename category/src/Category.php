@@ -225,8 +225,8 @@ class Category extends Entity implements EntityInterface {
         $this->load->library('users_profile');
         $structure = $this->users_profile->getStructure();
 
-        if (!empty($data['local_id'])) {
-            $structure['#fields']['district_id']['reference_option']['arguments']['group'] = $data['local_id'];
+        if (!empty($data['province_id'])) {
+            $structure['#fields']['district_id']['reference_option']['arguments']['group'] = $data['province_id'];
         }
 
         if (!empty($data['id'])) {

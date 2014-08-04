@@ -33,7 +33,7 @@ class CategoryInstall {
                 $table->increments('category_id');
                 $table->string('category_group_id', 32);
                 $table->string('title', 256);
-                $table->integer('parent')->default(0);
+                $table->integer('parent')->default(0)->unsigned();
                 $table->tinyInteger('weight')->default(0);
                 $table->boolean('active')->default(1);
 
@@ -41,23 +41,10 @@ class CategoryInstall {
                 $table->index('parent');
 
                 $table->foreign('category_group_id')->references('category_group_id')->on('category_group')->onDelete('cascade');
+                $table->foreign('parent')->references('category_id')->on('category')->onDelete('cascade');
             });
         }
-
-        // Insert Default Data
-        /*\DB::table('menu')->insert(array(
-            array(
-                'title' => 'User Profile Update',
-                'path' => 'profile/%/update',
-                'class' => 'ZeroPHP\\Profile\\Profile',
-                'method' => 'crudUpdate',
-                'arguments' => '1',
-            ),
-        ));*/
     }
 
-    private static function down_0_01() {
-        // Drop Tables
-        //\Schema::drop('block');
-    }
+    private static function down_0_01() {}
 }

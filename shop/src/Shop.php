@@ -27,8 +27,8 @@ class Shop extends Entity implements EntityInterface {
                         'placeholder' => 'Hoa mai shop'
                     ),
                 ),
-                'url_alias' => array(
-                    '#name' => 'url_alias',
+                'alias' => array(
+                    '#name' => 'alias',
                     '#title' => 'URL shop',
                     '#type' => 'text',
                     '#required' => true,
@@ -39,8 +39,8 @@ class Shop extends Entity implements EntityInterface {
                     ),
                     '#class' => 'form-prefix',
                 ),
-                'local_id' => array(
-                    '#name' => 'local_id',
+                'province_id' => array(
+                    '#name' => 'province_id',
                     '#title' => 'Khu vực',
                     '#type' => 'select',
                     '#reference' => array(
@@ -186,8 +186,8 @@ class Shop extends Entity implements EntityInterface {
 
 
 
-    function loadEntity_by_url_alias($path, $attributes = array()) {
-        $attributes['where']['url_alias'] = $path;
+    function loadEntity_by_alias($path, $attributes = array()) {
+        $attributes['where']['alias'] = $path;
 
         if (!isset($attributes['check_active'])) {
             $attributes['check_active'] = false;
@@ -233,7 +233,7 @@ class Shop extends Entity implements EntityInterface {
             $form_value['mobile'] = "+84" . $form_value['mobile'];
         }
 
-        $form_value['url_alias'] = uri_validate($form_value['url_alias']);
+        $form_value['alias'] = uri_validate($form_value['alias']);
 
         if ($form_id == 'entity_crud_create_shop') {
             //@todo 9 Hack for value changed
@@ -242,7 +242,7 @@ class Shop extends Entity implements EntityInterface {
             
 
             $this->CI->form_validation->set_rules('mobile', $form['mobile']['#label'], 'is_unique[shop.mobile]');
-            $this->CI->form_validation->set_rules('url_alias', $form['url_alias']['#label'], 'is_unique[shop.url_alias]');
+            $this->CI->form_validation->set_rules('alias', $form['alias']['#label'], 'is_unique[shop.alias]');
 
             if ($this->CI->form_validation->run() == FALSE) {
                 zerophp_get_instance()->response->addMessage($validator->messages(), 'error');
@@ -263,7 +263,7 @@ class Shop extends Entity implements EntityInterface {
         }
 
         $entity = new \ZeroPHP\ZeroPHP\UrlAlias;
-        $this->url_alias->url_alias_create('e/read/shop/' . $form_value['shop_id'], $form_value['url_alias']);
+        $this->alias->alias_create('e/read/shop/' . $form_value['shop_id'], $form_value['alias']);
     }
 
     function shop_update_form_alter($form_id, &$form) {
@@ -276,8 +276,8 @@ class Shop extends Entity implements EntityInterface {
             return \Redirect::to();
         }
 
-        $form['url_alias']['#disabled'] = 'disabled';
-        $form['url_alias']['#item']['disabled'] = 'disabled';
+        $form['alias']['#disabled'] = 'disabled';
+        $form['alias']['#item']['disabled'] = 'disabled';
         unset($form['#redirect']);
     }
 
@@ -316,8 +316,8 @@ class Shop extends Entity implements EntityInterface {
             $shop->address .= ' ' . reset($shop->district_id)->title;
         }
 
-        if (count($shop->local_id)) {
-            $shop->address .= ' ' . reset($shop->local_id)->title;
+        if (count($shop->province_id)) {
+            $shop->address .= ' ' . reset($shop->province_id)->title;
         }
 
         $data = array(

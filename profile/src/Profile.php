@@ -34,8 +34,8 @@ class Profile extends Entity implements EntityInterface  {
                     '#required' => true,
                     '#type' => 'date_group',
                 ),*/
-                /*'local_id' => array(
-                    '#name' => 'local_id',
+                /*'province_id' => array(
+                    '#name' => 'province_id',
                     '#title' => 'Khu vực',
                     '#type' => 'select',
                     '#reference' => array(
@@ -133,7 +133,7 @@ class Profile extends Entity implements EntityInterface  {
 
         $form['#submit'] = array(
             array(
-                'class' => 'ZeroPHP\Profile\Profile',
+                'class' => '\ZeroPHP\Profile\Profile',
                 'method' => 'updateFormSubmit',
             ),
         );
@@ -154,6 +154,8 @@ class Profile extends Entity implements EntityInterface  {
 
 
     }
+
+    public function read($zerophp) {}
 
 
 
@@ -279,8 +281,8 @@ class Profile extends Entity implements EntityInterface  {
         $this->load->library('users_profile');
         $structure = $this->users_profile->getStructure();
 
-        if (!empty($data['local_id'])) {
-            $structure['#fields']['district_id']['reference_option']['arguments']['group'] = $data['local_id'];
+        if (!empty($data['province_id'])) {
+            $structure['#fields']['district_id']['reference_option']['arguments']['group'] = $data['province_id'];
         }
 
         if (!empty($data['id'])) {

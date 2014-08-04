@@ -88,4 +88,6 @@ class Contact extends Entity implements EntityInterface {
 
         return $form;
     }
+
+    function lst($zerophp) {}
 }

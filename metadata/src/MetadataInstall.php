@@ -21,30 +21,16 @@ class MetadataInstall {
             \Schema::create('metadata', function($table) {
                 $table->increments('metadata_id');
                 $table->string('path', 256);
-                $table->string('path_title', 256);
-                $table->text('keywords');
-                $table->text('description');
+                $table->string('path_title', 256)->nullable();
+                $table->text('keywords')->nullable();
+                $table->text('description')->nullable();
                 $table->timestamps();
                 $table->boolean('active')->default(1);
 
                 $table->index('path');
             });
         }
-
-        // Insert Default Data
-        /*\DB::table('menu')->insert(array(
-            array(
-                'title' => 'User Profile Update',
-                'path' => 'profile/%/update',
-                'class' => 'ZeroPHP\\Profile\\Profile',
-                'method' => 'crudUpdate',
-                'arguments' => '1',
-            ),
-        ));*/
     }
 
-    private static function down_0_01() {
-        // Drop Tables
-        //\Schema::drop('block');
-    }
+    private static function down_0_01() {}
 }

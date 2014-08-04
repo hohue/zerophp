@@ -21,10 +21,10 @@ class ProfileInstall {
             \Schema::create('profile', function($table) {
                 $table->integer('id')->unsigned();
                 $table->string('address', 256);
-                $table->integer('local_id')->unsigned()->default(0);
+                $table->integer('province_id')->unsigned()->default(0);
                 $table->integer('district_id')->unsigned()->default(0);
                 $table->string('mobile', 32)->nullable();
-                $table->timestamp('birthday');
+                $table->timestamp('birthday')->nullable();
 
                 $table->primary('id');
 
@@ -41,11 +41,15 @@ class ProfileInstall {
                 'method' => 'update',
                 'arguments' => '1',
             ),
+            array(
+                'title' => 'User Profile',
+                'path' => 'profile/%',
+                'class' => '\ZeroPHP\Profile\Profile',
+                'method' => 'read',
+                'arguments' => '1',
+            ),
         ));
     }
 
-    private static function down_0_01() {
-        // Drop Tables
-        //\Schema::drop('block');
-    }
+    private static function down_0_01() {}
 }

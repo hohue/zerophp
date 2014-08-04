@@ -68,9 +68,9 @@ class Request {
         // Get URL real from url alias
         $alias = new \ZeroPHP\ZeroPHP\UrlAlias;
         $alias = $alias->loadEntityByAlias($uri);
-        if (isset($alias->url_real)) {
+        if (isset($alias->real)) {
             $this->data['alias'] = $uri;
-            $uri = $alias->url_real;
+            $uri = $alias->real;
         }
 
         $uri  = explode('/', strtolower($uri));

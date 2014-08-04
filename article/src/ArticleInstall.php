@@ -1,20 +1,33 @@
 <?php 
 namespace ZeroPHP\Article;
 
-define('VERSION_ZEROPHP_ARTICLE', 0.01001);
+define('VERSION_ZEROPHP_ARTICLE', 0.01);
 
 class ArticleInstall {
     public static function up($prev_version) {
         if ($prev_version < 0.01)    { self::up_0_01(); }
-        if ($prev_version < 0.01001) { self::up_0_01001(); }
     }
 
     public static function down($prev_version) {
         if ($prev_version < 0.01)    { self::down_0_01(); }
-        if ($prev_version < 0.01001) { self::down_0_01001(); }
     }
 
-    private static function up_0_01001() {
+    private static function up_0_01() {
+        if (! \Schema::hasTable('article')) {
+            \Schema::create('article', function($table) {
+                $table->increments('article_id');
+                $table->string('title', 256);
+                $table->integer('category_id')->nullable()->unsigned();
+                $table->string('image', 256)->nullable();
+                $table->text('summary')->nullable();
+                $table->longText('content');
+                $table->boolean('active')->default(1);
+                $table->timestamps();
+                $table->integer('created_by')->default(0)->unsigned();
+                $table->integer('updated_by')->default(0)->unsigned();
+            });
+        }
+
         // Insert Default Data
         \DB::table('menu')->insert(array(
             array(
@@ -55,33 +68,5 @@ class ArticleInstall {
         ));
     }
 
-    private static function down_0_01001() {
-        \DB::table('menu')->whereIn('path', array(
-            'article/list',
-            'article/create',
-            'article/%',
-            'article/%/update',
-            'article/%/delete'
-            ))->delete();
-    }
-
-    private static function up_0_01() {
-        if (! \Schema::hasTable('article')) {
-            \Schema::create('article', function($table) {
-                $table->increments('article_id');
-                $table->string('title', 256);
-                $table->string('image', 256);
-                $table->longText('content');
-                $table->boolean('active')->default(1);
-                $table->timestamps();
-                $table->integer('created_by')->default(0);
-                $table->integer('updated_by')->default(0);
-            });
-        }
-    }
-
-    private static function down_0_01() {
-        // Drop Tables
-        //\Schema::drop('block');
-    }
+    private static function down_0_01() {}
 }
