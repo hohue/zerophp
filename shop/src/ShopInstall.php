@@ -22,46 +22,53 @@ class ShopInstall {
                 $table->increments('shop_id');
                 $table->string('title', 256);
                 $table->string('path', 256);
-                $table->integer('province_id')->unsigned()->default(0);
-                $table->integer('district_id')->unsigned()->default(0);
+                $table->integer('province_id')->unsigned()->nullable();
+                $table->integer('district_id')->unsigned()->nullable();
                 $table->string('address', 256)->nullable();
                 $table->string('homephone', 32)->nullable();
                 $table->string('mobile', 32)->nullable();
                 $table->string('website', 128)->nullable();
                 $table->string('image', 256)->nullable();
                 $table->timestamps();
-                $table->integer('created_by')->unsigned();
-                $table->integer('updated_by')->unsigned();
+                $table->integer('created_by')->unsigned()->nullable();
+                $table->integer('updated_by')->unsigned()->nullable();
                 $table->boolean('active')->default(0);
                 $table->text('paymenth_method')->nullable();
                 $table->text('shipmenth_method')->nullable();
                 $table->softDeletes();
 
                 $table->index('path');
+
+                $table->foreign('province_id')->references('category_id')->on('category')->onDelete('SET NULL');
+                $table->foreign('district_id')->references('category_id')->on('category')->onDelete('SET NULL');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 
         if (! \Schema::hasTable('shop_cart')) {
             \Schema::create('shop_cart', function($table) {
                 $table->increments('shop_cart_id');
-                $table->string('session_id', 256);
-                $table->integer('shop_id')->unsigned();
+                $table->string('session_id', 256)->nullable();
+                $table->integer('shop_id')->unsigned()->nullable();
                 $table->timestamps();
-                $table->integer('created_by')->unsigned();
-                $table->integer('updated_by')->unsigned();
+                $table->integer('created_by')->unsigned()->nullable();
+                $table->integer('updated_by')->unsigned()->nullable();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
 
                 $table->index('shop_id');
 
-                $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
+                $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('SET NULL');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 
         if (! \Schema::hasTable('shop_product')) {
             \Schema::create('shop_product', function($table) {
                 $table->increments('shop_product_id');
-                $table->integer('shop_id')->unsigned();
+                $table->integer('shop_id')->unsigned()->nullable();
                 $table->string('title', 256);
                 $table->longText('content')->nullable();
                 $table->tinyInteger('label')->nullable();
@@ -71,8 +78,8 @@ class ShopInstall {
                 $table->timestamp('promotion_start')->nullable();
                 $table->timestamp('promotion_end')->nullable();
                 $table->string('image', 256)->nullable();
-                $table->integer('created_by')->unsigned()->default(0);
-                $table->integer('updated_by')->unsigned()->default(0);
+                $table->integer('created_by')->unsigned()->nullable();
+                $table->integer('updated_by')->unsigned()->nullable();
                 $table->timestamps();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
@@ -80,7 +87,9 @@ class ShopInstall {
                 $table->index('shop_id');
                 $table->index('price');
 
-                $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
+                $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('SET NULL');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 
@@ -111,8 +120,8 @@ class ShopInstall {
                 $table->string('ship_address', 256)->nullable();
                 $table->text('note')->nullable();
                 $table->timestamps();
-                $table->integer('created_by')->unsigned();
-                $table->integer('updated_by')->unsigned();
+                $table->integer('created_by')->unsigned()->nullable();
+                $table->integer('updated_by')->unsigned()->nullable();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
 
@@ -120,13 +129,15 @@ class ShopInstall {
                 $table->index('created_by');
 
                 $table->foreign('shop_cart_id')->references('shop_cart_id')->on('shop_cart')->onDelete('cascade');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 
         if (! \Schema::hasTable('shop_topic')) {
             \Schema::create('shop_topic', function($table) {
                 $table->increments('shop_topic_id');
-                $table->integer('shop_id')->unsigned();
+                $table->integer('shop_id')->unsigned()->nullable();
                 $table->string('title', 256);
                 $table->string('short_description', 256)->nullable();
                 $table->longText('content')->nullable();
@@ -137,9 +148,9 @@ class ShopInstall {
                 $table->string('promotion_type', 32)->nullable();
                 $table->timestamp('promotion_start')->nullable();
                 $table->timestamp('promotion_end')->nullable();
-                $table->integer('category_id')->unsigned();
-                $table->integer('created_by')->unsigned();
-                $table->integer('updated_by')->unsigned();
+                $table->integer('category_id')->unsigned()->nullable();
+                $table->integer('created_by')->unsigned()->nullable();
+                $table->integer('updated_by')->unsigned()->nullable();
                 $table->string('image', 256)->nullable();
                 $table->timestamps();
                 $table->boolean('active')->default(1);
@@ -150,6 +161,8 @@ class ShopInstall {
                 $table->index('price');
 
                 $table->foreign('shop_id')->references('shop_id')->on('shop')->onDelete('cascade');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 

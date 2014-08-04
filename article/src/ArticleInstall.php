@@ -20,11 +20,15 @@ class ArticleInstall {
                 $table->integer('category_id')->nullable()->unsigned();
                 $table->string('image', 256)->nullable();
                 $table->text('summary')->nullable();
-                $table->longText('content');
+                $table->longText('content')->nullable();
                 $table->boolean('active')->default(1);
                 $table->timestamps();
-                $table->integer('created_by')->default(0)->unsigned();
-                $table->integer('updated_by')->default(0)->unsigned();
+                $table->integer('created_by')->nullable()->unsigned();
+                $table->integer('updated_by')->nullable()->unsigned();
+
+                $table->foreign('category_id')->references('category_id')->on('category')->onDelete('SET NULL');
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
+                $table->foreign('updated_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 

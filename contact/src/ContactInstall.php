@@ -21,7 +21,9 @@ class ContactInstall {
                 $table->string('title', 256)->nullable();
                 $table->text('content');
                 $table->timestamps();
-                $table->integer('created_by')->default(0)->unsigned();
+                $table->integer('created_by')->nullable()->unsigned();
+
+                $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 

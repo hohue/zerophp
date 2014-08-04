@@ -88,8 +88,8 @@ class SystemInstall {
         if (! \Schema::hasTable('activation')) {
             \Schema::create('activation', function($table) {
                 $table->increments('activation_id');
-                $table->integer('destination_id')->unsigned();
                 $table->string('hash', 128);
+                $table->integer('destination_id')->unsigned()->nullable();
                 $table->timestamp('expired')->nullable();
                 $table->string('type', 32)->nullable();
 
@@ -115,9 +115,9 @@ class SystemInstall {
         if (! \Schema::hasTable('image_style')) {
             \Schema::create('image_style', function($table) {
                 $table->string('style', 32);
-                $table->smallInteger('width');
-                $table->smallInteger('height');
-                $table->string('type', 32);
+                $table->smallInteger('width')->nullable();
+                $table->smallInteger('height')->nullable();
+                $table->string('type', 32)->default('scale');
                 $table->boolean('is_upsize')->default(0);
 
                 $table->primary('style');
@@ -248,7 +248,7 @@ class SystemInstall {
                 'path' => 'user/forgotpass/success',
                 'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'userForgotPasswordSuccess',
+                'method' => 'showForgotPasswordSuccess',
             ),
             array(
                 'title' => 'Clear Cache',

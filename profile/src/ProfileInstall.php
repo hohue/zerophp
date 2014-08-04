@@ -20,15 +20,17 @@ class ProfileInstall {
         if (! \Schema::hasTable('profile')) {
             \Schema::create('profile', function($table) {
                 $table->integer('id')->unsigned();
-                $table->string('address', 256);
-                $table->integer('province_id')->unsigned()->default(0);
-                $table->integer('district_id')->unsigned()->default(0);
+                $table->string('address', 256)->nullable();
+                $table->integer('province_id')->unsigned()->nullable();
+                $table->integer('district_id')->unsigned()->nullable();
                 $table->string('mobile', 32)->nullable();
                 $table->timestamp('birthday')->nullable();
 
                 $table->primary('id');
 
                 $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
+                $table->foreign('province_id')->references('category_id')->on('category')->onDelete('SET NULL');
+                $table->foreign('district_id')->references('category_id')->on('category')->onDelete('SET NULL');
             });
         }
 
