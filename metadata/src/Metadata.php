@@ -2,10 +2,11 @@
 namespace ZeroPHP\Metadata;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class Metadata extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Metadata extends Entity implements EntityInterface {
+    function __config() {
+        return array(
             '#id' => 'metadata_id',
             '#name' => 'metadata',
             '#class' => 'ZeroPHP\Metadata\Metadata',
@@ -47,7 +48,7 @@ class Metadata extends Entity {
                 ),
             ),
             '#can_not_delete' => array(1),
-        ));
+        );
     }
 
     

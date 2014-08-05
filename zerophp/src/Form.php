@@ -179,6 +179,7 @@ class Form {
                         break;
 
                     case 'file':
+                        if (empty($value)) continue;
                         switch ($form[$key]['#widget']) {
                             case 'image':
                                 if (empty($form[$key]['#prefix'])) {

@@ -2,10 +2,11 @@
 namespace ZeroPHP\Shop;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 
-class Shop extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Shop extends Entity implements EntityInterface {
+    function __config() {
+        return array(
             '#id' => 'shop_id',
             '#name' => 'shop',
             '#class' => 'ZeroPHP\Shop\Shop',
@@ -166,7 +167,7 @@ class Shop extends Entity {
                     '#display_hidden' => 1,
                 ),
             ),
-        ));
+        );
     }
 
     function loadEntityByUser($id, $attributes = array()) {

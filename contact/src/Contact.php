@@ -2,11 +2,12 @@
 namespace ZeroPHP\Contact;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 use ZeroPHP\ZeroPHP\Form;
 
-class Contact extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Contact extends Entity implements EntityInterface {
+    function __config() {
+        return array(
             '#id' => 'contact_id',
             '#name' => 'contact',
             '#class' => 'ZeroPHP\Contact\Contact',
@@ -68,7 +69,7 @@ class Contact extends Entity {
                     '#form_hidden' => 1,
                 ),
             ),
-        ));
+        );
     }
 
     function create($zerophp) {

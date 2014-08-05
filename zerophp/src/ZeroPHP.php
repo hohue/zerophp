@@ -25,7 +25,6 @@ class ZeroPHP {
         if ($this->language != 'en') {
             $translate = new \ZeroPHP\ZeroPHP\LanguageTranslate;
             $this->translate = $translate->loadEntityAllByLanguage($this->language);
-            //zerophp_devel_print($translate, $this->translate);
         }
         
         $this->request = new Request();
@@ -46,6 +45,7 @@ class ZeroPHP {
         // Run Controller
         if ($continue) {
             $controller = $this->request->getController();
+
             if (isset($controller->title)) {
                 $this->response->addTitle(zerophp_lang($controller->title));
             }

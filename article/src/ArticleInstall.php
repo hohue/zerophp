@@ -18,6 +18,13 @@ class ArticleInstall {
         // Insert Default Data
         \DB::table('menu')->insert(array(
             array(
+                'title' => 'Article list',
+                'path' => 'article/list',
+                'arguments' => '',
+                'class' => '\ZeroPHP\Article\Article',
+                'method' => 'lst',
+            ),
+            array(
                 'title' => 'Article create',
                 'path' => 'article/create',
                 'arguments' => '',
@@ -38,14 +45,23 @@ class ArticleInstall {
                 'class' => '\ZeroPHP\Article\Article',
                 'method' => 'update',
             ),
+            array(
+                'title' => 'Article delete',
+                'path' => 'article/%/delete',
+                'arguments' => '1',
+                'class' => '\ZeroPHP\Article\Article',
+                'method' => 'delete',
+            ),
         ));
     }
 
     private static function down_0_01001() {
         \DB::table('menu')->whereIn('path', array(
+            'article/list',
             'article/create',
             'article/%',
-            'article/%/update'
+            'article/%/update',
+            'article/%/delete'
             ))->delete();
     }
 

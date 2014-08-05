@@ -2,15 +2,23 @@
 namespace ZeroPHP\Article;
 
 use ZeroPHP\ZeroPHP\Entity;
+use ZeroPHP\ZeroPHP\EntityInterface;
 use ZeroPHP\ZeroPHP\Form;
 
-class Article extends Entity {
-    function __construct() {
-        $this->setStructure(array(
+class Article extends Entity implements EntityInterface {
+    function __config() {
+        return array(
             '#id' => 'article_id',
             '#name' => 'article',
             '#class' => 'ZeroPHP\Article\Article',
             '#title' => zerophp_lang('Article'),
+            '#links' => array(
+                'list' => 'article/list',
+                'create' => 'article/create',
+                'read' => 'article/%',
+                'update' => 'article/%/update',
+                'delete' => 'article/%/delete',
+            ),
             '#fields' => array(
                 'article_id' => array(
                     '#name' => 'article_id',
@@ -75,7 +83,7 @@ class Article extends Entity {
                     '#default' => 1,
                 ),
             ),
-        ));
+        );
     }
 
     function create($zerophp) {
@@ -109,4 +117,8 @@ class Article extends Entity {
         );
         $zerophp->response->addContent(Form::build($form, $article));
     }
+
+    function lst($zerophp) {}
+
+    function delete($zerophp) {}
 }
