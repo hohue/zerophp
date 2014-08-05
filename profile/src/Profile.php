@@ -92,6 +92,10 @@ class Profile extends Entity implements EntityInterface  {
     }
 
     public function update($zerophp) {
+        if (!zerophp_userid()) {
+            \App::abort(403);
+        }
+
         $from = array(
             'class' => '\ZeroPHP\Profile\Profile',
             'method' => 'updateForm',
@@ -142,17 +146,7 @@ class Profile extends Entity implements EntityInterface  {
     }
 
     public function updateFormSubmit($form_id, &$form, &$form_values) {
-        $profile_structure  = $this->getStructure();
-        $activation = new \ZeroPHP\ZeroPHP\Activation;
         
-
-         $vars = array(
-                'address' => $form_values['address'],
-                'mobile' => $form_values['mobile'],
-                
-            );
-
-
     }
 
 
