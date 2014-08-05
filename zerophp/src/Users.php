@@ -339,6 +339,8 @@ class Users extends Entity implements  EntityInterface {
             'method' => 'formRegisterSubmit',
         );
 
+        $form['#theme'] = 'form-popup';
+
         $form['#redirect'] = 'user/register/success';
         $form['#success_message'] = '';
 
@@ -466,6 +468,8 @@ class Users extends Entity implements  EntityInterface {
             ),
         );
 
+        $form['#theme'] = 'form-popup';
+
         return $form;
     }
 
@@ -498,6 +502,8 @@ class Users extends Entity implements  EntityInterface {
                 'method' => 'formForgotPasswordSubmit',
             ),
         );
+
+        $form['#theme'] = 'form-popup';
         
         $form['#redirect'] = 'user/forgotpass/success';
         $form['#success_message'] = zerophp_lang('You have successfully activated');
@@ -578,6 +584,8 @@ class Users extends Entity implements  EntityInterface {
             ),
         );
 
+        $form['#theme'] = 'form-popup';
+
         return $form;
     }
 
@@ -610,6 +618,8 @@ class Users extends Entity implements  EntityInterface {
 
         $form['#redirect'] = 'user/activation/resend';
         $form['#success_message'] = zerophp_lang('confirmation email has been sent successfully');
+
+        $form['#theme'] = 'form-popup';
 
         return $form;
     }

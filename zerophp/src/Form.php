@@ -165,6 +165,21 @@ class Form {
                     $item['#value'] = str_replace('data-original', 'src', $item['#value']);
                 }
                 break;
+
+            case 'date':
+                if (empty($item['#config']['form_type'])) {
+                    $item['#config']['form_type'] = 'datepicker';
+                }
+
+                switch ($item['#config']['form_type']) {
+                    case 'select_group':
+                        if (empty($item['#config']['group_format'])) {
+                            $item['#config']['group_format'] = 'dmY';
+                        }
+                        break;
+                }
+
+                break;
         }
 
         return $item;

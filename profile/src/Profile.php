@@ -33,6 +33,14 @@ class Profile extends Entity implements EntityInterface  {
                     '#validate' => 'required',
                     '#required' => true,
                     '#type' => 'date',
+                    '#config' => array(
+                        'form_type' => 'select_group',
+                    ),
+                    '#attributes' => array(
+                        'day' => array('class' => 'date_birth'),
+                        'month' => array('class' => 'date_birth'),
+                        'year' => array('class' => 'birth', 'placeholder' => 1985),
+                    ),
                 ),
                 /*'province_id' => array(
                     '#name' => 'province_id',
@@ -151,6 +159,7 @@ class Profile extends Entity implements EntityInterface  {
         $profile->id = zerophp_userid();
         $profile->address = $form_values['address'];
         $profile->mobile = $form_values['mobile'];
+        $profile->birthday = $form_values['birthday'];
         $this->saveEntity($profile);
 
         $user = new \stdClass;
