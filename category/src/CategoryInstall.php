@@ -33,7 +33,7 @@ class CategoryInstall {
                 $table->increments('category_id');
                 $table->string('category_group_id', 32);
                 $table->string('title', 256);
-                $table->integer('parent')->default(0)->unsigned();
+                $table->integer('parent')->nullable()->unsigned();
                 $table->tinyInteger('weight')->default(0);
                 $table->boolean('active')->default(1);
 

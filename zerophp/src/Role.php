@@ -32,7 +32,7 @@ class Role extends Entity implements  EntityInterface {
                         0 => zerophp_lang('Disable'),
                     ),
                     '#default' => 0,
-                    '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
+                    '#validate' => 'required|numeric|between:0,1',
                 ),
                 'weight' => array(
                     '#name' => 'weight',
@@ -40,7 +40,7 @@ class Role extends Entity implements  EntityInterface {
                     '#type' => 'select',
                     '#options' => form_options_make_weight(),
                     '#default' => 0,
-                    '#validate' => 'required|numeric|between:-999,999',
+                    '#validate' => 'required|numeric|between:-99,99',
                     '#fast_edit' => 1,
                 ),
             ),

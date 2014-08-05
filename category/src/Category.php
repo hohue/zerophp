@@ -63,7 +63,7 @@ class Category extends Entity implements EntityInterface {
                     '#type' => 'select',
                     '#options' => form_options_make_weight(),
                     '#default' => 0,
-                    '#validate' => 'required|numeric|greater_than[-100]|less_than[100]',
+                    '#validate' => 'required|numeric|between:-100,100',
                     '#fast_edit' => 1,
                 ),
                 'active' => array(
@@ -75,7 +75,7 @@ class Category extends Entity implements EntityInterface {
                         0 => zerophp_lang('Disable'),
                     ),
                     '#default' => 1,
-                    '#validate' => 'required|numeric|greater_than[-1]|less_than[2]',
+                    '#validate' => 'required|numeric|between:0,1',
                 ),
             ),
         );
@@ -190,7 +190,7 @@ class Category extends Entity implements EntityInterface {
         return parent::loadEntityAll($attributes, $pager_sum);
     }
 
-    function parent_get_from_group() {
+    /*function parent_get_from_group() {
         $data = $this->input->get();
 
         //fw_devel_print($data);
@@ -217,7 +217,7 @@ class Category extends Entity implements EntityInterface {
         }
 
         $zerophp->content_set(form_render($form_item, null, null, false));
-    }
+    }*/
 
     function children_get_from_parent() {
         $data = $this->input->get();

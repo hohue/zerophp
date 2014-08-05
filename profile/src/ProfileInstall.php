@@ -25,12 +25,16 @@ class ProfileInstall {
                 $table->integer('district_id')->unsigned()->nullable();
                 $table->string('mobile', 32)->nullable();
                 $table->timestamp('birthday')->nullable();
+                $table->integer('created_by')->unsigned()->nullable();
+                $table->integer('updated_by')->unsigned()->nullable();
 
                 $table->primary('id');
 
                 $table->foreign('id')->references('id')->on('users')->onDelete('cascade');
                 $table->foreign('province_id')->references('category_id')->on('category')->onDelete('SET NULL');
                 $table->foreign('district_id')->references('category_id')->on('category')->onDelete('SET NULL');
+                //$table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+                //$table->foreign('updated_by')->references('id')->on('users')->onDelete('SET NULL');
             });
         }
 

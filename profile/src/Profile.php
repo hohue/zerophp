@@ -44,13 +44,13 @@ class Profile extends Entity implements EntityInterface  {
                 ),
                 /*'province_id' => array(
                     '#name' => 'province_id',
-                    '#title' => 'Khu vực',
+                    '#title' => zerophp_lang('Location'),
                     '#type' => 'select',
                     '#reference' => array(
-                        'name' => 'category',
+                        'class' => '\ZeroPHP\Category\Category',
                         'type' => 'internal',
                         'options' => array(
-                            'class' => 'category',
+                            'class' => '\ZeroPHP\Category\Category',
                             'method' => 'parent_get_from_group',
                             'arguments' => array(
                                 'group' => 5,
@@ -63,15 +63,15 @@ class Profile extends Entity implements EntityInterface  {
                                 ),
                             ),
                         ),
-                    ),
-                    '#ajax' => array(
+                    ),*/
+                    /*'#ajax' => array(
                         'path' => 'users_profile/district_get_from_local',
                         'wrapper' => 'fii_district_id',
                         'method' => 'html',
                         'autoload' => 1,
-                    ),
-                ),
-                'district_id' => array(
+                    ),*/
+                //),
+                /*'district_id' => array(
                     '#name' => 'district_id',
                     //'#title' => 'Quận huyện',
                     '#type' => 'select',
@@ -95,46 +95,70 @@ class Profile extends Entity implements EntityInterface  {
                     '#type' => 'text',
                     '#required' => true,
                 ),
+                'created_by' => array(
+                    '#name' => 'created_by',
+                    '#title' => zerophp_lang('Created by'),
+                    '#type' => 'text',
+                    '#form_hidden' => 1,
+                    '#display_hidden' => 1,
+                ),
+                'updated_by' => array(
+                    '#name' => 'updated_by',
+                    '#title' => zerophp_lang('Updated by'),
+                    '#type' => 'text',
+                    '#form_hidden' => 1,
+                    '#display_hidden' => 1,
+                ),
             ),
         );
     }
 
-    public function update($zerophp) {
-        if (!zerophp_userid()) {
+    public function update($zerophp, $userid) {
+        $user = new \ZeroPHP\ZeroPHP\Users;
+        if ($userid == 'me') {
+            $userid = zerophp_userid();
+        }
+        else {
+            $userid = $user->loadEntity($userid);
+            $userid = isset($userid->id) ? $userid->id : 0;
+        }
+
+        if (!$userid) {
             \App::abort(403);
         }
+
+        $profile = $this->loadEntity($userid);
+        $form_values = is_object($profile) ? zerophp_object_to_array($profile) : array();
+
+        $profile = $user->loadEntity($userid);
+        $form_values['email'] = '<font>' . $profile->email . '</font>';
+        $form_values['title'] = $profile->title;
 
         $from = array(
             'class' => '\ZeroPHP\Profile\Profile',
             'method' => 'updateForm',
         );
-        $zerophp->response->addContent(Form::build($from));
+        $zerophp->response->addContent(Form::build($from, $form_values));
     }
 
     public function updateForm() {
         $form = array();
 
+        // From Users vendor
         $user = zerophp_user();
         $form['email'] = array(
             '#name' => 'email',
             '#type' => 'markup',
             '#title' => zerophp_lang('Email'),
-            '#value' => '<font>' . $user->email . '</font>',
         );
 
         $users = new \ZeroPHP\ZeroPHP\Users;
         $user_structure = $users->getStructure();
         $form['title'] = $user_structure['#fields']['title'];
 
-        $profile_structure  = $this->getStructure();
-        unset($profile_structure['#fields']['id']);
-        $form = array_merge($form, $profile_structure['#fields']);
-
-        $form['#actions']['submit'] = array(
-            '#name' => 'submit',
-            '#type' => 'submit',
-            '#value' => zerophp_lang('Submit'),
-        );
+        // From Profile vendors
+        $form = array_merge($form, $this->crudCreateForm());
+        unset($form['id']);
 
         $form['#actions']['reset'] = array(
             '#name' => 'reset',
@@ -142,12 +166,10 @@ class Profile extends Entity implements EntityInterface  {
             '#value' => zerophp_lang('Reset'),
         );
 
-        $form['#submit'] = array(
-            array(
-                'class' => '\ZeroPHP\Profile\Profile',
-                'method' => 'updateFormSubmit',
-            ),
-        );
+        array_unshift($form['#submit'], array(
+            'class' => '\ZeroPHP\Profile\Profile',
+            'method' => 'updateFormSubmit',
+        ));
 
         $form['#success_message'] = zerophp_lang('Your profile was updated successfully.');
 
@@ -155,19 +177,16 @@ class Profile extends Entity implements EntityInterface  {
     }
 
     public function updateFormSubmit($form_id, &$form, &$form_values) {
-        $profile = new \stdClass;
-        $profile->id = zerophp_userid();
-        $profile->address = $form_values['address'];
-        $profile->mobile = $form_values['mobile'];
-        $profile->birthday = $form_values['birthday'];
-        $this->saveEntity($profile);
-
+        // Update to Users vendor
         $user = new \stdClass;
         $user->id = zerophp_userid();
         $user->title = $form_values['title'];
         $user->updated_at = date('Y-m-d H:i:s');
         $user_obj = new \ZeroPHP\ZeroPHP\Users;
         $user_obj->saveEntity($user);
+
+        // Update to Profile Vendor
+        $form_values['id'] = zerophp_userid();
     }
 
     public function read($zerophp) {}

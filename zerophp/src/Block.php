@@ -73,7 +73,7 @@ class Block extends Entity implements  EntityInterface {
                     '#title' => zerophp_lang('Weight'),
                     '#type' => 'select',
                     '#options' => form_options_make_weight(),
-                    '#validate' => 'required|numeric|between:-999,999',
+                    '#validate' => 'required|numeric|between:-99,99',
                     '#fast_edit' => 1,
                 ),
                 'active' => array(
@@ -84,7 +84,7 @@ class Block extends Entity implements  EntityInterface {
                         1 => zerophp_lang('Enable'),
                         0 => zerophp_lang('Disable'),
                     ),
-                    '#validate' => 'required|numeric|greater_than[-1]|less_than[2]'
+                    '#validate' => 'required|numeric|between:0,1'
                 ),
             ),
         );

@@ -86,6 +86,8 @@ class Contact extends Entity implements EntityInterface {
 
         unset($form['contact_id']);
 
+        $form['#theme'] = 'form-popup';
+
         return $form;
     }
 

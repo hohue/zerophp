@@ -127,6 +127,13 @@ class Shop extends Entity implements EntityInterface {
                     '#form_hidden' => 1,
                     '#display_hidden' => 1,
                 ),
+                'updated_by' => array(
+                    '#name' => 'updated_by',
+                    '#title' => zerophp_lang('Updated by'),
+                    '#type' => 'text',
+                    '#form_hidden' => 1,
+                    '#display_hidden' => 1,
+                ),
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
