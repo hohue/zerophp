@@ -695,7 +695,9 @@ class Users extends Entity implements  EntityInterface {
         $form['email']['#attributes']['disabled'] = 'disabled';
 
         unset($form['password']['#required']);
-        //zerophp_devel_print($form);
+        /*unset($form['password']['#required']);
+        unset($form['password']['#required']);*/
+        zerophp_devel_print($form);
 
         return $form;
     }
