@@ -269,16 +269,16 @@ function zerophp_url($path, $attributes = array(), $secure = false) {
     return \URL::to($path, $attributes, $secure);
 }
 
-function zerophp_redirect($url = '/') {
+function zerophp_redirect($url = '') {
     return \Redirect::to(zerophp_redirect_get_path($url));
 }
 
-function zerophp_redirect_get_path($url = '/') {
+function zerophp_redirect_get_path($url = '') {
     if ($redirect = zerophp_get_instance()->request->query('destination')) {
         $url = $redirect;
     }
 
-    return $url;
+    return '/' . $url;
 }
 
 if (!function_exists('template_item_list')) {

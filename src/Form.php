@@ -337,10 +337,7 @@ class Form {
                 $zerophp->response->addMessage($form['#success_message']);
             }
 
-            if (!empty($zerophp->request->query('destination'))) {
-                $redirect = $zerophp->request->query('destination');
-            }
-            elseif(!empty($form['#redirect'])) {
+            if(!empty($form['#redirect'])) {
                 $redirect = $form['#redirect'];
             }
         }
@@ -367,7 +364,7 @@ class Form {
                     return false;
 
                 default:
-                    return \Redirect::to($redirect);
+                    return zerophp_redirect($redirect);
             }
         }
 
