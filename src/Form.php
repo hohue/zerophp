@@ -136,10 +136,6 @@ class Form {
     }
 
     private static function __buildItem($item) {
-        /*if (!isset($item['#name'])) {
-            zerophp_devel_print($item);
-        }*/
-
         $item['#id'] = isset($item['#id']) ? $item['#id'] : 'fii_' . $item['#name']; // fii = form item id
         $item['#class'] = 'form_item form_item_' . $item['#type'] . ' form_item_' . $item['#name'] . (isset($item['#class']) ? ' ' . $item['#class'] : '');
         $item['#value'] = isset($item['#value']) ? $item['#value'] : '';
@@ -393,11 +389,13 @@ class Form {
         foreach ($form as $key => $value) {
             if (substr($key, 0, 1) != '#') {
                 // Build value
-                if (isset($value['#type']) && $value['#type'] == 'date_group') {
+                // @todo 9 Hack for date field
+                if (isset($value['#type']) && $value['#type'] == 'date') {
                     if (!empty($form_values[$key]['year']) && is_numeric($form_values[$key]['year'])
                         && 1000 <= $form_values[$key]['year'] && $form_values[$key]['year'] <= 9999
                         && !empty($form_values[$key]['month']) && is_numeric($form_values[$key]['month'])
                         && !empty($form_values[$key]['day']) && is_numeric($form_values[$key]['day'])
+                        && checkdate($form_values[$key]['month'], $form_values[$key]['day'], $form_values[$key]['year'])
                     ) {
                         $form_values[$key] = $form_values[$key]['year'] . '-' . $form_values[$key]['month'] . '-' . $form_values[$key]['day'];
                     }
@@ -406,7 +404,7 @@ class Form {
                     }
                 }
 
-                // Remove Client edit disabled field
+                // Remove disabled fields were edited by client
                 if (isset($value['#disabled']) && $value['#disabled']) {
                     $form_values[$key] = $value['#value'];
                 }
@@ -421,7 +419,7 @@ class Form {
             }
         }
 
-        // Remove Client add a new field
+        // Remove new fields were added by client
         foreach ($form_values as $key => $value) {
             if (!isset($form[$key])) {
                 unset($form_values[$key]);

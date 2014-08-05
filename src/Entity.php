@@ -279,8 +279,10 @@ class Entity {
             'class' => $this->structure['#class'],
             'method' => 'crudCreateFormSubmit',
         );
-        
-        $form['#redirect'] = !empty($this->structure['#links']['list']) ? $this->structure['#links']['list'] : '/';
+
+        if (!empty($this->structure['#links']['list'])) {
+            $form['#redirect'] = $this->structure['#links']['list'];
+        }
 
         return $form;
     }
@@ -411,6 +413,9 @@ class Entity {
                     elseif (isset($value['#default']) && !isset($form_values[$this->structure['#id']])) {
                         $entity->{$key} = $value['#default'];
                     }
+                    /*elseif (empty($entity->{$this->structure['#id']})) {
+                        $entity->{$key} = null;
+                    }*/
             }
         }
 
