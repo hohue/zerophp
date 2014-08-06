@@ -208,7 +208,7 @@ class ShopInstall {
         // Add some menus
         \DB::table('menu')->insert(array(
             array(
-                'title' => 'Sop cart items',
+                'title' => 'Shop cart items',
                 'path' => 'shopcart/items',
                 'class' => '\ZeroPHP\Shop\ShopCart',
                 'method' => 'showItems',

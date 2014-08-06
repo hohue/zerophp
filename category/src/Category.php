@@ -150,6 +150,11 @@ class Category extends Entity implements EntityInterface {
     }
 
     public function loadOptions($category_group_id, $parent = false, $select_text = '--- Select ---') {
+        $cache_name = __METHOD__ . $category_group_id . $parent . $select_text;
+        if ($cache = \Cache::get($cache_name)) {
+            return $cache;
+        }
+
         $result = array(
             '' => zerophp_lang($select_text),
         );
@@ -159,6 +164,7 @@ class Category extends Entity implements EntityInterface {
             $result[$value->category_id] = $value->title;
         }
 
+        \Cache::forever($cache_name, $result);
         return $result;
     }
 }

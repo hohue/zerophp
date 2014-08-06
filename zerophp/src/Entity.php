@@ -255,11 +255,6 @@ class Entity {
                 if(!empty($value['#default'])) {
                     $form[$key]['#value'] = $value['#default'];
                 }
-
-                if (!empty($value['#reference']['options'])) {
-                    $arguments = isset($value['#reference']['options']['arguments']) ? (array) $value['#reference']['options']['arguments'] : array();
-                    $form[$key]['#options'] = call_user_func_array(array(new $value['#reference']['options']['class'], $value['#reference']['options']['method']), $arguments);
-                }
             }
 
             if (isset($value['#type']) && $value['#type'] == 'file') {

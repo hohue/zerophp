@@ -49,22 +49,22 @@ class Profile extends Entity implements EntityInterface  {
                     '#reference' => array(
                         'name' => 'category',
                         'class' => '\ZeroPHP\Category\Category',
-                        'options' => array(
-                            'class' => '\ZeroPHP\Category\Category',
-                            'method' => 'loadOptions',
-                            'arguments' => array(
-                                'category_group_id' => 'location_province',
-                                'parent' => '',
-                                'select_text' => '--- Province ---',
-                            ),
+                    ),
+                    '#options_callback' => array(
+                        'class' => '\ZeroPHP\Category\Category',
+                        'method' => 'loadOptions',
+                        'arguments' => array(
+                            'category_group_id' => 'location_province',
+                            'parent' => '',
+                            'select_text' => '--- Province ---',
                         ),
                     ),
-                    '#ajax' => array(
+                    /*'#ajax' => array(
                         'path' => 'location/district',
                         'wrapper' => 'fii_district_id',
                         'method' => 'html',
                         'autoload' => 1,
-                    ),
+                    ),*/
                 ),
                 'district_id' => array(
                     '#name' => 'district_id',
@@ -72,16 +72,8 @@ class Profile extends Entity implements EntityInterface  {
                     '#reference' => array(
                         'name' => 'category',
                         'class' => '\ZeroPHP\Category\Category',
-                        'options' => array(
-                            'class' => '\ZeroPHP\Category\Category',
-                            'method' => 'loadOptions',
-                            'arguments' => array(
-                                'category_group_id' => 'location_district',
-                                'parent' => 0,
-                                'select_text' => '--- District ---',
-                            ),
-                        ),
                     ),
+                    '#options' => array('' => zerophp_lang('--- District ---')),
                     '#display_hidden' => 1,
                 ),
                 'mobile' => array(
