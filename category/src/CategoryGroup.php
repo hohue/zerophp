@@ -9,7 +9,7 @@ class CategoryGroup extends Entity implements EntityInterface {
         return array(
             '#id' => 'category_group_id',
             '#name' => 'category_group',
-            '#class' => 'ZeroPHP\Category\CategoryGroup',
+            '#class' => '\ZeroPHP\Category\CategoryGroup',
             '#title' => zerophp_lang('Category group'),
             '#fields' => array(
                 'category_group_id' => array(
@@ -48,19 +48,17 @@ class CategoryGroup extends Entity implements EntityInterface {
         );
     }
 
-
-
-    
-
-    function loadEntityExecutive($entity_id = 0, $attributes = array(), &$pager_sum = 1) {
-        $cache_name = "Category_group-loadEntityExecutive-$entity_id" . serialize($attributes);
+    function loadEntityExecutive($entity_id = 0, $attributes = array()) {
+        $cache_name = __METHOD__ . $entity_id . serialize($attributes);
         if ($cache = \Cache::get($cache_name)) {
             return $cache;
        }
 
-        $result = parent::loadEntityExecutive($entity_id, $attributes, $pager_sum);
+        $result = parent::loadEntityExecutive($entity_id, $attributes);
 
         \Cache::forever($cache_name, $result);
         return $result;
     }
 }
+
+//Checked

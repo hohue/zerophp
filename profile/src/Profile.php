@@ -42,53 +42,39 @@ class Profile extends Entity implements EntityInterface  {
                         'year' => array('class' => 'birth', 'placeholder' => 1985),
                     ),
                 ),
-                /*'province_id' => array(
+                'province_id' => array(
                     '#name' => 'province_id',
                     '#title' => zerophp_lang('Location'),
                     '#type' => 'select',
                     '#reference' => array(
+                        'name' => 'category',
                         'class' => '\ZeroPHP\Category\Category',
-                        'type' => 'internal',
-                        'options' => array(
-                            'class' => '\ZeroPHP\Category\Category',
-                            'method' => 'parent_get_from_group',
-                            'arguments' => array(
-                                'group' => 5,
-                                'load_children' => false,
-                                'attributes' => array(
-                                    'order' => array(
-                                        'weight' => 'ASC',
-                                        'title' => 'ASC',
-                                    ),
-                                ),
-                            ),
+                    ),
+                    '#options_callback' => array(
+                        'class' => '\ZeroPHP\Category\Category',
+                        'method' => 'loadOptions',
+                        'arguments' => array(
+                            'category_group_id' => 'location_province',
+                            'parent' => '',
+                            'select_text' => '--- Province ---',
                         ),
-                    ),*/
-                    /*'#ajax' => array(
-                        'path' => 'users_profile/district_get_from_local',
+                    ),
+                    '#ajax' => array(
+                        'path' => 'location/district',
                         'wrapper' => 'fii_district_id',
-                        'method' => 'html',
                         'autoload' => 1,
-                    ),*/
-                //),
-                /*'district_id' => array(
+                    ),
+                ),
+                'district_id' => array(
                     '#name' => 'district_id',
-                    //'#title' => 'Quận huyện',
                     '#type' => 'select',
                     '#reference' => array(
                         'name' => 'category',
-                        'type' => 'internal',
-                        'options' => array(
-                            'class' => 'users_profile',
-                            'method' => 'district_get_from_local',
-                            'arguments' => array(
-                                'group' => 0,
-                                'load_children' => false,
-                            ),
-                        ),
+                        'class' => '\ZeroPHP\Category\Category',
                     ),
+                    '#options' => array('' => zerophp_lang('--- District ---')),
                     '#display_hidden' => 1,
-                ),*/
+                ),
                 'mobile' => array(
                     '#name' => 'mobile',
                     '#title' => zerophp_lang('Mobile'),
@@ -129,6 +115,7 @@ class Profile extends Entity implements EntityInterface  {
 
         $profile = $this->loadEntity($userid);
         $form_values = is_object($profile) ? zerophp_object_to_array($profile) : array();
+        $form_values['district_id_value'] = isset($form_values['district_id']) ? $form_values['district_id'] : 0;
 
         $profile = $user->loadEntity($userid);
         $form_values['email'] = '<font>' . $profile->email . '</font>';
@@ -159,6 +146,11 @@ class Profile extends Entity implements EntityInterface  {
         // From Profile vendors
         $form = array_merge($form, $this->crudCreateForm());
         unset($form['id']);
+
+        $form['district_id_value'] = array(
+            '#name' => 'district_id_value',
+            '#type' => 'hidden',
+        );
 
         $form['#actions']['reset'] = array(
             '#name' => 'reset',

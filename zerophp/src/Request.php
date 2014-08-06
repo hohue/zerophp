@@ -112,7 +112,10 @@ class Request {
 
     private function _parseQuery($query) {
         foreach ($query as $key => $value) {
-            $query[$key] = zerophp_uri_validate(trim($value, '/'));
+            if (is_string($value)) {
+              $value = zerophp_uri_validate(trim($value, '/'));
+            }
+            $query[$key] = $value;
         }
         return $query;
     }
