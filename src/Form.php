@@ -6,9 +6,10 @@ use ZeroPHP\ZeroPHP\Entity;
 class Form {
     public static function build($form = array(), $form_values = array()) {
         $form_id = zerophp_uri_validate(zerophp_get_calling_function());
+        $form_url = \Input::get('_form_url', md5(time() . csrf_token() . zerophp_get_instance()->request->url()));
 
         // Rebuild from error form
-        $cache_name_error_form = __CLASS__ . "-build-$form_id-" . csrf_token();
+        $cache_name_error_form = __CLASS__ . "-build-$form_id-$form_url";
         if ($cache_value = \Cache::get($cache_name_error_form)) {
             \Cache::forget($cache_name_error_form);
             $form = $cache_value;
@@ -27,6 +28,7 @@ class Form {
                     '#name' => '_form_id',
                     '#type' => 'hidden',
                     '#value' => $form_id,
+                    '#disabled' => true,
                 );
 
                 // Call form_alter functions
@@ -46,9 +48,13 @@ class Form {
         // Create cache to use when form submitted
         \Cache::put($cache_name_error_form, $form, \Config::get('session.lifetime', 120));
 
+        $form['_form_url'] = array(
+            '#name' => '_form_url',
+            '#type' => 'hidden',
+            '#value' => $form_url,
+            '#disabled' => true,
+        );
         self::_build($form_id, $form);
-
-        //zerophp_devel_print(zerophp_view($form['#theme'], array('form' => $form)));
 
         return zerophp_view($form['#theme'], array('form' => $form));
     }
@@ -74,7 +80,7 @@ class Form {
         $form['#theme'] = isset($form['#theme']) ? $form['#theme'] : 'form';
         $form['#actions'] = isset($form['#actions']) ? $form['#actions'] :  array();
         $form['#variable'] = isset($form['#variable']) ? $form['#variable'] :  array();
-        $form['#error'] = isset($form['#error']) ? $form['#error'] :  array();
+        $form['#error'] = isset($form['#error']) ? zerophp_object_to_array($form['#error']) :  array();
         $form['#message'] = isset($form['#message']) ? $form['#message'] :  array();
 
         if (zerophp_get_instance()->response->getOutputType() == 'ajax') {
@@ -110,19 +116,21 @@ class Form {
             // Don't care with #validate, #submit...
             if (substr($key, 0, 1) != '#') {
 
-                if (isset($form['#error']->$key)) {
+                if (isset($form['#error'][$key]) && zerophp_variable_get('form error message show in field', 1)) {
                     if (!isset($value['#error_messages'])) {
                         $value['#error_messages'] = '';
                     }
                     else {
                         $value['#error_messages'] .= '<br />';
                     }
-                    $value['#error_messages'] .= implode('<br />', $form['#error']->$key);
+                    $value['#error_messages'] .= implode('<br />', $form['#error'][$key]);
 
                     if (!isset($value['#class'])) {
                         $value['#class'] = '';
                     }
                     $value['#class'] .= ' error';
+
+                    unset($form['#error'][$key]);
                 }
 
                 $form[$key] = self::buildItem($value);
@@ -235,101 +243,14 @@ class Form {
                 }
             }
         }
-
-        //@todo 9 Form: _form_set_values
-        //        $form_items[$key]['#value'] is using to validate form
-        //        $form_items[$key]['#item']['value'] is using to set default value when form render
-        //        Need to compile them in next version
-        /*foreach ($form_values as $key => $value) {
-            if (isset($form_items[$key])) {
-                switch ($form_items[$key]['#type']) {
-                    // Do not tracking password field
-                    case 'password':
-                        break;
-
-                    case 'hidden':
-                        if (is_array($value)) {
-                            foreach ($value as $k => $v) {
-                                $form_items[$key]['#item'][$k] = $v;
-                                $form_items[$key]['#value'][$k] = $v;
-                            }
-                        }
-                        else {
-                            $form_items[$key]['#item'][$key] = $value;
-                            $form_items[$key]['#value'] = $value;
-                        }
-                        break;
-
-                    case 'checkboxes':
-                        // For Reference Entity Value
-                        $test_value = reset($value);
-                        if (is_array($test_value)) {
-                            $value = array_keys($value);
-                        }
-
-                        foreach ($form_items[$key]['#field'] as $k => $v) {
-                            if (in_array($v['value'], $value)) {
-                                $form_items[$key]['#field'][$k]['checked'] = true;
-                            }
-                            else {
-                                $form_items[$key]['#field'][$k]['checked'] = false;
-                            }
-                            $form_items[$key]['#value'][$k] = $value;
-                        }
-                        break;
-
-                    case 'radios':
-                        foreach ($form_items[$key]['#field'] as $k => $v) {
-                            if ($v['value'] == $value) {
-                                $form_items[$key]['#field'][$k]['checked'] = true;
-                            }
-                            else {
-                                $form_items[$key]['#field'][$k]['checked'] = false;
-                            }
-                            $form_items[$key]['#value'][$k] = $value;
-                        }
-                        break;
-
-                    case 'upload':
-                        switch ($form_items[$key]['#item']['widget']) {
-                            case 'image':
-                                if (empty($form_items[$key]['#prefix'])) {
-                                    $form_items[$key]['#prefix'] = '';
-                                }
-
-                                if (empty($form_items[$key]['#description'])) {
-                                    $form_items[$key]['#description'] = '';
-                                }
-
-                                $form_items[$key]['#prefix'] .= zerophp_view('form_image_field', array('images' => array($value)));
-                                //@todo 7 Viet doan script de xoa file cu neu bi update de
-                                // Them chuc nang cho phep xoa anh da upload
-                                $form_items[$key]['#description'] .= zerophp_lang('Upload new image to override this image.');
-                                break;
-
-                            case 'file':
-                                break;
-                        }
-                        break;
-
-                    default:
-                        if (is_array($value)) {
-                            $value = reset(array_keys($value));
-                        }
-                        $form_items[$key]['#item']['value'] = $value;
-                        $form_items[$key]['#value'] = $value;
-                        break;
-                }
-            }
-        }*/
     }
 
     public static function submit() {
         $form_id = \Input::get('_form_id', false);
-        $form_token = \Input::get('_token', false);
+        $form_url = \Input::get('_form_url', false);
 
         // Restore $form_items from cache
-        $cache_name = __CLASS__ . "-build-$form_id-$form_token";
+        $cache_name = __CLASS__ . "-build-$form_id-$form_url";
         $form = \Cache::get($cache_name);
         \Cache::forget($cache_name);
 
@@ -371,7 +292,7 @@ class Form {
                 $redirect = $form['#redirect'];
             }
         }
-        // Set default value
+        // Set default value for error form
         else {
             foreach ($form_values as $key => $value) {
                 if (isset($form[$key])) {
@@ -407,27 +328,27 @@ class Form {
 
         foreach ($form as $key => $value) {
             if (substr($key, 0, 1) != '#') {
-                // Build value
-                // @todo 9 Hack for date field
-                if (isset($value['#type']) && $value['#type'] == 'date') {
-                    if (!empty($form_values[$key]['year']) && is_numeric($form_values[$key]['year'])
-                        && 1000 <= $form_values[$key]['year'] && $form_values[$key]['year'] <= 9999
-                        && !empty($form_values[$key]['month']) && is_numeric($form_values[$key]['month'])
-                        && !empty($form_values[$key]['day']) && is_numeric($form_values[$key]['day'])
-                        && checkdate($form_values[$key]['month'], $form_values[$key]['day'], $form_values[$key]['year'])
-                    ) {
-                        $form_values[$key] = $form_values[$key]['year'] . '-' . $form_values[$key]['month'] . '-' . $form_values[$key]['day'];
-                    }
-                    else {
-                        $form_values[$key] = '';
-                    }
-                }
-
                 // Remove disabled fields were edited by client
                 if (isset($value['#disabled']) && $value['#disabled']) {
                     $form_values[$key] = $value['#value'];
                 }
                 else {
+                    // Build value
+                    // @todo 9 Hack for date field
+                    if (isset($value['#type']) && $value['#type'] == 'date') {
+                        if (!empty($form_values[$key]['year']) && is_numeric($form_values[$key]['year'])
+                            && 1000 <= $form_values[$key]['year'] && $form_values[$key]['year'] <= 9999
+                            && !empty($form_values[$key]['month']) && is_numeric($form_values[$key]['month'])
+                            && !empty($form_values[$key]['day']) && is_numeric($form_values[$key]['day'])
+                            && checkdate($form_values[$key]['month'], $form_values[$key]['day'], $form_values[$key]['year'])
+                        ) {
+                            $form_values[$key] = $form_values[$key]['year'] . '-' . $form_values[$key]['month'] . '-' . $form_values[$key]['day'];
+                        }
+                        else {
+                            $form_values[$key] = '';
+                        }
+                    }
+
                     $form_values[$key] = isset($form_values[$key]) ? $form_values[$key] : 
                         (isset($value['#default']) ? $value['#default'] : '');
                     if (isset($value['#validate'])) {
@@ -449,108 +370,13 @@ class Form {
             $validator = \Validator::make($rules['value'], $rules['rule']);
 
             if ($validator->fails()) {
-                $form['#error'] = json_decode($validator->messages());
+                $form['#error'] = array_merge($form['#error'], json_decode($validator->messages()));
                 return false;
             }
         }
 
         return true;
     }
-
-
-
-
-
-
-    
-
-    function form_item_generate($field, $item_name = '') {
-        $field['name'] = $item_name ? $item_name : $field['name'];
-
-        $form = array(
-            '#type' => $field['type'],
-            '#name' => $field['name']
-        );
-
-        if (isset($field['title'])) {
-            $form['#label'] = $field['title'];
-            unset($field['title']);
-        }
-
-        if (isset($field['description'])) {
-            $form['#description'] = $field['description'];
-            unset($field['description']);
-        }
-
-        if (isset($field['required'])) {
-            $form['#required'] = $field['required'];
-            unset($field['required']);
-        }
-
-        if (isset($field['error_messages'])) {
-            $form['#error_messages'] = $field['error_messages'];
-            unset($field['error_messages']);
-        }
-
-        if (isset($field['js_validate'])) {
-            foreach ($field['js_validate'] as $key => $value) {
-                $field[$key] = $value;
-            }
-            unset($field['js_validate']);
-        }
-
-        $this->_form_item_generate_reference($field);
-        switch ($field['type']) {
-            case 'checkboxes':
-            case 'radios':
-                foreach ($field['options'] as $option_key => $option_value) {
-                    $form_item_data = array();
-                    $form_item_data['value'] = $option_key;
-                    $form_item_data['name'] = $field['name'];
-                    $form_item_data['id'] = $field['name'] . "_$option_key";
-                    $form_item_data['label'] = $option_value;
-
-                    $form_item[] = $form_item_data;
-                }
-                break;
-
-            // From here $form_item[] = $field;
-            case 'textarea':
-                if (isset($field['rte_enable']) && $field['rte_enable']) {
-                    $field['id'] = form_textarea_get_rte();
-                }
-
-            default:
-                $form_item[] = $field;
-        }
-
-        if (count($form_item) > 1) {
-            $form['#field'] = $form_item;
-        }
-        else {
-            $form['#item'] = reset($form_item);
-        }
-
-        return $form;
-    }
-
-    private function _form_item_generate_reference(&$field) {
-        if (isset($field['reference']) && $field['reference']) {
-            $entity = new $field['reference'];
-            $ref_structure = $field['#reference']['class']::getStructure();
-
-            if (empty($field['reference_option'])) {
-                $reference = $this->CI->{$field['reference']}->loadEntityAll();
-            }
-            else {
-                $entity = new $field['reference_option']['class'];
-                $reference = $this->CI->{$field['reference_option']['class']}->{$field['reference_option']['method']}($field['reference_option']['arguments']);
-            }
-
-            foreach ($reference as $ref) {
-                $ref = fw_object_to_array($ref);
-                $field['options'][$ref[$ref_structure['#id']]] = isset($ref['title']) ? $ref['title'] : $ref[$ref_structure['#id']];
-            }
-        }
-    }
 }
+
+// Checked

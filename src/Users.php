@@ -172,7 +172,7 @@ class Users extends Entity implements  EntityInterface {
         return reset($entity);
     }
 
-    function formLoginValidate($form_id, $form, &$form_values) {
+    function formLoginValidate($form_id, &$form, &$form_values) {
         $zerophp = zerophp_get_instance();
 
         if (\Auth::attempt(array(
@@ -194,8 +194,7 @@ class Users extends Entity implements  EntityInterface {
             return true;
         }
 
-        //@todo 1 Them vao form error message
-        $zerophp->response->addMessage(zerophp_lang('Login failed. Your password is incorrect OR Your account is not active yet OR Your account was blocked. Please try again later.'), 'error');
+        $form['#error']['#form'] = zerophp_lang('Login failed. <br/> - Your password is incorrect <br/> - OR Your account is not active yet <br/> - OR Your account was blocked. Please try again later.');
         return false;
     }
 

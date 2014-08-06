@@ -34,11 +34,17 @@ class ZeroPHP {
         // Process form
         $continue = true;
         if ($request_type == 'post') {
-            $continue = Form::submit();
+            //Check CSRF
+            if (\Session::token() != \Input::get('_token')) {
+                $this->response->addMessage(zerophp_lang('This form has expired. Please copy/refresh and try again.'), 'error');
+            }
+            else {
+                $continue = Form::submit();
 
-            // Form redirect
-            if ($continue !== true && $continue !== false) {
-                return $continue;
+                // Form redirect
+                if ($continue !== true && $continue !== false) {
+                    return $continue;
+                }
             }
         }
 

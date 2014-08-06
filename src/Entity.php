@@ -308,7 +308,7 @@ class Entity {
         return $result;
     }
 
-    public function crudCreateFormSubmit($form_id, $form, &$form_values) {
+    public function crudCreateFormSubmit($form_id, &$form, &$form_values) {
         $entity = new \stdClass();
 
         // Fetch via structure to skip unexpected fields (alter form another modules)
