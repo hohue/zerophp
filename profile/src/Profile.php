@@ -42,53 +42,48 @@ class Profile extends Entity implements EntityInterface  {
                         'year' => array('class' => 'birth', 'placeholder' => 1985),
                     ),
                 ),
-                /*'province_id' => array(
+                'province_id' => array(
                     '#name' => 'province_id',
                     '#title' => zerophp_lang('Location'),
                     '#type' => 'select',
                     '#reference' => array(
+                        'name' => 'category',
                         'class' => '\ZeroPHP\Category\Category',
-                        'type' => 'internal',
                         'options' => array(
                             'class' => '\ZeroPHP\Category\Category',
-                            'method' => 'parent_get_from_group',
+                            'method' => 'loadOptions',
                             'arguments' => array(
-                                'group' => 5,
-                                'load_children' => false,
-                                'attributes' => array(
-                                    'order' => array(
-                                        'weight' => 'ASC',
-                                        'title' => 'ASC',
-                                    ),
-                                ),
+                                'category_group_id' => 'location_province',
+                                'parent' => '',
+                                'select_text' => '--- Province ---',
                             ),
                         ),
-                    ),*/
-                    /*'#ajax' => array(
-                        'path' => 'users_profile/district_get_from_local',
+                    ),
+                    '#ajax' => array(
+                        'path' => 'location/district',
                         'wrapper' => 'fii_district_id',
                         'method' => 'html',
                         'autoload' => 1,
-                    ),*/
-                //),
-                /*'district_id' => array(
+                    ),
+                ),
+                'district_id' => array(
                     '#name' => 'district_id',
-                    //'#title' => 'Quận huyện',
                     '#type' => 'select',
                     '#reference' => array(
                         'name' => 'category',
-                        'type' => 'internal',
+                        'class' => '\ZeroPHP\Category\Category',
                         'options' => array(
-                            'class' => 'users_profile',
-                            'method' => 'district_get_from_local',
+                            'class' => '\ZeroPHP\Category\Category',
+                            'method' => 'loadOptions',
                             'arguments' => array(
-                                'group' => 0,
-                                'load_children' => false,
+                                'category_group_id' => 'location_district',
+                                'parent' => 0,
+                                'select_text' => '--- District ---',
                             ),
                         ),
                     ),
                     '#display_hidden' => 1,
-                ),*/
+                ),
                 'mobile' => array(
                     '#name' => 'mobile',
                     '#title' => zerophp_lang('Mobile'),
