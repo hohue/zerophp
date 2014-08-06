@@ -414,6 +414,43 @@ class Entity {
         return $form;
     }
 
+    function crudListForm() {
+        $entities = $this->loadEntityAll();
+        $form = array();
+
+        //zerophp_devel_print($entities);
+
+        foreach ($entities as $key => $value) {
+            foreach ($this->structure['#fields'] as $k => $v) {
+                if (!isset($v['#display_hidden']) || !$v['#display_hidden']) {
+                    $form['#table'][$key][$k] = array(
+                        '#name' => $k,
+                        '#type' => 'markup',
+                        '#value' => $value->{$k},
+                    );
+                }
+            }
+        }
+        
+        return $form;
+    }
+
+    function crudRead($id){
+        $entity = $this->loadEntity($id);
+
+        $data = array();
+        foreach ($this->structure['#fields'] as $key => $val) {
+            if (!isset($val['#display_hidden']) || !$val['#display_hidden']) {
+                $data['element'][$key] = array(
+                    'title' => $val['#title'],
+                    'value' => $entity->$key,
+                );
+            }
+        }
+
+        return zerophp_view('entity_read', $data);
+    }
+
 
 
 
