@@ -100,6 +100,7 @@ class Users extends Entity implements  EntityInterface {
                     '#title' => zerophp_lang('Remember token'),
                     '#type' => 'text',
                     '#form_hidden' => 1,
+                    '#display_hidden' => 1,
                 ),
                 'last_activity' => array(
                     '#name' => 'last_activity',
@@ -128,8 +129,9 @@ class Users extends Entity implements  EntityInterface {
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
+                    '#display_hidden' => 1,
                 ),
-                'roles' => array(
+                /*'roles' => array(
                     '#name' => 'roles',
                     '#title' => zerophp_lang('Roles'),
                     '#type' => 'checkboxes',
@@ -143,7 +145,7 @@ class Users extends Entity implements  EntityInterface {
                         'method' => 'loadOptionsAll',
                     ),
                     '#display_hidden' => 1,
-                ),
+                ),*/
             ),
             '#can_not_delete' => array(1),
         );
@@ -510,7 +512,6 @@ class Users extends Entity implements  EntityInterface {
         $form['#theme'] = 'form-popup';
         
         $form['#redirect'] = 'user/forgotpass/success';
-        $form['#success_message'] = zerophp_lang('You have successfully activated');
 
         return $form;
     }
@@ -588,6 +589,7 @@ class Users extends Entity implements  EntityInterface {
         );
 
         $form['#theme'] = 'form-popup';
+        $form['#redirect'] = 'user/resetpass/success';
 
         return $form;
     }
@@ -667,11 +669,24 @@ class Users extends Entity implements  EntityInterface {
         zerophp_redirect();
     }
 
-    function showResetPasswordSuccess($zerophp) {}
+    function showResetPasswordSuccess($zerophp) {
 
-    function lst($zerophp) {}
+       $zerophp->response->addContent(zerophp_view('users_resetpass_success'));
+    }
 
-    function read($zerophp) {}
+    function lst($zerophp) {
+        $form = array(
+            'class' => '\ZeroPHP\ZeroPHP\Users',
+            'method' => 'crudListForm',
+        );
+
+        $zerophp->response->addContent(Form::build($form));
+    }
+
+    function read($zerophp, $id) {
+        $data = $this->crudRead($id);
+        $zerophp->response->addContent($data);
+    }
 
     function create($zerophp) {
         $form = array(
@@ -699,8 +714,6 @@ class Users extends Entity implements  EntityInterface {
         //zerophp_devel_print($form);
         return $form;
      }
-
-
 
      function update($zerophp, $userid) {
         $form_values = $this->loadEntity($userid);
