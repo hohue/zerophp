@@ -59,12 +59,11 @@ class Profile extends Entity implements EntityInterface  {
                             'select_text' => '--- Province ---',
                         ),
                     ),
-                    /*'#ajax' => array(
+                    '#ajax' => array(
                         'path' => 'location/district',
                         'wrapper' => 'fii_district_id',
-                        'method' => 'html',
                         'autoload' => 1,
-                    ),*/
+                    ),
                 ),
                 'district_id' => array(
                     '#name' => 'district_id',

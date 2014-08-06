@@ -1,6 +1,8 @@
 <?php
 namespace ZeroPHP\Location;
 
+use ZeroPHP\ZeroPHP\Form;
+
 class Location {
     function change($zerophp, $location_id) {
         if (is_numeric($location_id)) {
@@ -12,33 +14,24 @@ class Location {
 
     public function getDistrict($zerophp) {
         $parent = $zerophp->request->query('province_id');
+        $parent = $parent ? $parent : 0;
 
-        $result = '';
-        if ($parent) {
-            $form = array();
-            $form['district_id'] = array(
-                    '#name' => 'district_id',
-                    '#type' => 'select',
-                    /*'#reference' => array(
-                        'name' => 'category',
-                        'class' => '\ZeroPHP\Category\Category',
-                        'options' => array(
-                            'class' => '\ZeroPHP\Category\Category',
-                            'method' => 'loadOptions',
-                            'arguments' => array(
-                                'category_group_id' => 'location_district',
-                                'parent' => 0,
-                                'select_text' => '--- District ---',
-                            ),
-                        ),
-                    ),
-                    '#display_hidden' => 1,*/
-                );
-            $form['district_id']['#options'] = $options;
-            $form['district_id']['#reference']['options']['arguments']['parent'] = $parent;
-            $result = zerophp_form_render('district_id', $form);
-        }
+        $form = array();
+        $form['district_id'] = array(
+            '#name' => 'district_id',
+            '#type' => 'select',
+            '#options_callback' => array(
+                'class' => '\ZeroPHP\Category\Category',
+                'method' => 'loadOptions',
+                'arguments' => array(
+                    'category_group_id' => 'location_district',
+                    'parent' => $parent,
+                    'select_text' => '--- District ---',
+                ),
+            ),
+        );
+        $form['district_id'] = Form::buildItem($form['district_id']);
 
-        $zerophp->response->addContent($result);
+        $zerophp->response->addContent(zerophp_form_render('district_id', $form));
     }
 }
