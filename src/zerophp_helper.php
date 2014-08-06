@@ -305,7 +305,8 @@ function zerophp_url($path, $attributes = array(), $secure = false) {
 }
 
 function zerophp_redirect($url = '') {
-    return \Redirect::to(zerophp_redirect_get_path($url));
+    $url = trim(zerophp_redirect_get_path($url), '/');
+    return \Redirect::to($url);
 }
 
 function zerophp_redirect_get_path($url = '') {
