@@ -280,8 +280,8 @@ class SystemInstall {
             ),
             array(
                 'title' => 'User read',
-                'path' => 'user/read',
-                'arguments' => '',
+                'path' => 'user/%',
+                'arguments' => '1',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
                 'method' => 'read',
             ),
