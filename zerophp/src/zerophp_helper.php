@@ -502,10 +502,12 @@ function zerophp_form_content($element) {
     switch ($element['#type']) {
         case 'checkboxes':
             $checkboxes = '[]';
+            $form_type = 'checkbox';
         case 'radios':
+            $form_type = isset($form_type) ? $form_type : 'radio';
             $result = '';
             foreach ($element['#options'] as $key => $value) {
-                $result .= \Form::checkbox($element['#name'] . (isset($checkboxes) ? $checkboxes : ''), $key, ($key == $element['#value'] ? true : false), $element['#attributes']);
+                $result .= \Form::$form_type($element['#name'] . (isset($checkboxes) ? $checkboxes : ''), $key, ($key == $element['#value'] ? true : false), $element['#attributes']);
                 $result .= "<sub_label>$value</sub_label>";
             }
             return $result;
