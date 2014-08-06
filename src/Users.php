@@ -137,10 +137,10 @@ class Users extends Entity implements  EntityInterface {
                         'name' => 'role',
                         'class' => '\ZeroPHP\ZeroPHP\Role',
                         'internal' => false,
-                        'options' => array(
-                            'class' => '\ZeroPHP\ZeroPHP\Role',
-                            'method' => 'loadOptionsAll',
-                        ),
+                    ),
+                    '#options_callback' => array(
+                        'class' => '\ZeroPHP\ZeroPHP\Role',
+                        'method' => 'loadOptionsAll',
                     ),
                     '#display_hidden' => 1,
                 ),

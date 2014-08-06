@@ -93,11 +93,6 @@ class Entity {
                 continue;
             }
 
-            if (isset($value['#reference']) && $value['#reference']) {
-                $entity->{$value['#name']} = $this->buildEntityReference($entity, $value['#name'], $attributes);
-                continue;
-            }
-
             if (empty($entity->{$this->structure['#id']})) {
                 if ($value['#name'] == $this->structure['#id']) {
                     $entity->{$value['#name']} = 0;
@@ -109,58 +104,6 @@ class Entity {
         }
 
         return $entity;
-    }
-
-    public function buildEntityReference($entity, $field, $attributes = array()) {
-        $entity_id = $entity->{$this->structure['#id']};
-
-        // Get from cache
-        if (!isset($attributes['cache']) || $attributes['cache'] == true) {
-            $cache_name = __METHOD__ . "$field-$entity_id-" . $this->structure['#name'] . serialize($attributes);
-            if ($cache_content = \Cache::get($cache_name)) {
-                return $cache_content;
-            }
-        }
-
-        $field = $this->structure['#fields'][$field];
-
-        $ref = new $field['#reference']['class'];
-        $ref_structure = $ref->getStructure();
-
-        $reference = array();
-        if (!isset($field['#reference']['type']) || $field['#reference']['type'] != 'internal') {
-            $reference = EntityModel::loadReference($field['#name'], $entity_id, $this->structure, $ref_structure);
-        }
-        else {
-            $reference = array(
-                $entity->{$field['#name']},
-            );
-        }
-
-        $result = array();
-        if (count($reference)) {
-            foreach ($reference as $ref_id) {
-                if ($ref_id) {
-                    $attributes['filter'] = false;
-                    $reference_entity = $ref->loadEntity($ref_id->{$ref_structure['#id']}, $attributes);
-
-                    //if ($field['#name'] == 'district_id') {
-                        //fw_devel_print($field, $ref, $ref_structure);
-                    //}
-
-                    if (!empty($reference_entity->{$ref_structure['#id']})) {
-                        $result[$reference_entity->{$ref_structure['#id']}] = $reference_entity;
-                    }
-                }
-            }
-        }
-
-        // Set to cache
-        if (!isset($attributes['cache']) || $attributes['cache'] == true) {
-            \Cache::put($cache_name, $result, ZEROPHP_CACHE_EXPIRE_TIME);
-        }
-
-        return $result;
     }
 
     public function loadEntity($entity_id, $attributes = array(), $check_active = false) {
@@ -254,11 +197,6 @@ class Entity {
             else {
                 if(!empty($value['#default'])) {
                     $form[$key]['#value'] = $value['#default'];
-                }
-
-                if (!empty($value['#reference']['options'])) {
-                    $arguments = isset($value['#reference']['options']['arguments']) ? (array) $value['#reference']['options']['arguments'] : array();
-                    $form[$key]['#options'] = call_user_func_array(array(new $value['#reference']['options']['class'], $value['#reference']['options']['method']), $arguments);
                 }
             }
 

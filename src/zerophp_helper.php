@@ -270,12 +270,13 @@ function zerophp_form_render($key, &$form) {
                 unset($item['#theme']);
             }
             else {
-                $template_collection = array(
-                    'form_item-' . $item['#type'] . '-' . $item['#name'] . '-' . $form['#id'],
-                    'form_item-' . $item['#type'] . '-' . $item['#name'],
-                    'form_item-' . $item['#type'],
-                    'form_item',
-                );
+                $template_collection = array();
+                if (isset($form['#id'])) {
+                    $template_collection[] = 'form_item-' . $item['#type'] . '-' . $item['#name'] . '-' . $form['#id'];
+                }
+                $template_collection[] = 'form_item-' . $item['#type'] . '-' . $item['#name'];
+                $template_collection[] = 'form_item-' . $item['#type'];
+                $template_collection[] = 'form_item';
 
                 $template = array_shift($template_collection);
                 //($template, $template_collection);
