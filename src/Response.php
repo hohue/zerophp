@@ -19,7 +19,7 @@ class Response {
     public $output_type = 'normal';
     
     private $js = array(
-        'inline' => '',
+        'inline' => array(),
         'settings' => array(),
     );
 
@@ -29,7 +29,7 @@ class Response {
      * @param string $page_title // tieu de cua trang
      * @param array $data // du lieu truyen vao view
      */
-    function addContent($content, $page_title = null) {
+    public function addContent($content, $page_title = null) {
         if ($page_title) {
             $this->setPageTitle($page_title);
         }
@@ -56,7 +56,7 @@ class Response {
                 $this->data['closure'][] = '<script type="text/javascript">jQuery.extend(FW.settings, ' . json_encode(array_filter($this->js['settings'])) . ');</script>';
             }
             if ($this->js['inline']) {
-                $this->data['closure'][] = $this->js['inline'];
+                $this->data['closure'][] = implode('', $this->js['inline']);
             }
 
             $this->data['title'] = implode('', $this->getTitle());
@@ -156,7 +156,7 @@ class Response {
         return $this->data['header'];
     }
 
-    function addClosure($item, $key = '') {
+    public function addClosure($item, $key = '') {
         if ($key) {
             $this->data['closure'][$key] = $item;
         }
@@ -165,11 +165,11 @@ class Response {
         }
     }
 
-    function getClosure() {
+    public function getClosure() {
         return $this->data['closure'];
     }
 
-    function addMessage($message = null, $type = 'success') {
+    public function addMessage($message = null, $type = 'success') {
         // Set message
         if ($message) {
             $messages = \Session::get(__METHOD__, array());
@@ -190,19 +190,19 @@ class Response {
         }
     }
 
-    function getMessage() {
+    public function getMessage() {
         return $this->addMessage();
     }
 
-    function addContentJSON($data = array()) {
+    public function addContentJSON($data = array()) {
         $this->data['content'] = array_merge($this->data['content'], $data);
     }
 
-    function getOutputType() {
+    public function getOutputType() {
         return $this->output_type;
     }
 
-    function setOutputType($type) {
+    public function setOutputType($type) {
         $this->output_type = $type;
     }
 
@@ -280,7 +280,7 @@ class Response {
      *      )
      *  );
      */
-    function setBreadcrumb($items = array()) {
+    public function setBreadcrumb($items = array()) {
         $this->data['breadcrumb'] = $items;
 
         array_unshift($this->data['breadcrumb'], array(
@@ -288,14 +288,18 @@ class Response {
         ));
     }
 
-    function getBreadcrumb() {
+    public function getBreadcrumb() {
         return $this->data['breadcrumb'];
     }
 
-    function showMessage($zerophp) {
+    public function showMessage($zerophp) {
         $vars = array(
             'messages' => zerophp_message(),
         );
         $zerophp->response->addContent(zerophp_view('response_message', $vars));
+    }
+
+    public function addJS($data, $type = 'inline') {
+        $this->js[$type] = array_merge($this->js[$type], $data);
     }
 }
