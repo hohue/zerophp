@@ -252,7 +252,7 @@ function zerophp_get_calling_function() {
   return $r;
 }
 
-function zerophp_form_render($key, &$form) {
+function zerophp_form_render($key, &$form, $subkey = null) {
     //zerophp_devel_print($key, $form);
     if (substr($key, 0, 1) != '#') {
         if (isset($form[$key])) {
@@ -262,6 +262,10 @@ function zerophp_form_render($key, &$form) {
         elseif (isset($form['#actions'][$key])) {
             $item = $form['#actions'][$key];
             unset($form['#actions'][$key]);
+        }
+        elseif (!empty($form['#table'][$key][$subkey])) {
+            $item = $form['#table'][$key][$subkey];
+            unset($form['#table'][$key][$subkey]);
         }
 
         if (isset($item)) {

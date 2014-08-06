@@ -29,6 +29,8 @@ class Form {
                     '#value' => $form_id,
                 );
 
+                //zerophp_devel_print($form);
+
                 // Call form_alter functions
                 self::_alter($form_id, $form);
 
@@ -132,10 +134,19 @@ class Form {
                     $form[$key][$k] = self::buildItem($v);
                 }
             }
+            elseif ($key == '#table') {
+                foreach ($value as $k => $v) {
+                    foreach ($v as $k1 => $v1) {
+                        $form[$key][$k][$k1] = self::buildItem($v1);
+                    }
+                }
+            }
         }
     }
 
     public static function buildItem($item) {
+        if (empty($item['#name'])) zerophp_devel_print($item);
+
         // Normal field
         $item['#id'] = isset($item['#id']) ? $item['#id'] : 'fii_' . $item['#name']; // fii = form item id
         $item['#class'] = 'form_item form_item_' . $item['#type'] . ' form_item_' . $item['#name'] . (isset($item['#class']) ? ' ' . $item['#class'] : '');
