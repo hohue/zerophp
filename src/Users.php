@@ -129,16 +129,21 @@ class Users extends Entity implements  EntityInterface {
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
                 ),
-                /*'roles' => array(
+                'roles' => array(
                     '#name' => 'roles',
                     '#title' => zerophp_lang('Roles'),
                     '#type' => 'checkboxes',
                     '#reference' => array(
                         'name' => 'role',
-                        'class' => 'ZeroPHP\ZeroPHP\Role',
+                        'class' => '\ZeroPHP\ZeroPHP\Role',
+                        'internal' => false,
+                        'options' => array(
+                            'class' => '\ZeroPHP\ZeroPHP\Role',
+                            'method' => 'loadOptionsAll',
+                        ),
                     ),
                     '#display_hidden' => 1,
-                ),*/
+                ),
             ),
             '#can_not_delete' => array(1),
         );
