@@ -115,6 +115,7 @@ class Profile extends Entity implements EntityInterface  {
 
         $profile = $this->loadEntity($userid);
         $form_values = is_object($profile) ? zerophp_object_to_array($profile) : array();
+        $form_values['district_id_value'] = isset($form_values['district_id']) ? $form_values['district_id'] : 0;
 
         $profile = $user->loadEntity($userid);
         $form_values['email'] = '<font>' . $profile->email . '</font>';
@@ -145,6 +146,11 @@ class Profile extends Entity implements EntityInterface  {
         // From Profile vendors
         $form = array_merge($form, $this->crudCreateForm());
         unset($form['id']);
+
+        $form['district_id_value'] = array(
+            '#name' => 'district_id_value',
+            '#type' => 'hidden',
+        );
 
         $form['#actions']['reset'] = array(
             '#name' => 'reset',

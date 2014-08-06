@@ -15,6 +15,7 @@ class Location {
     public function getDistrict($zerophp) {
         $parent = $zerophp->request->query('province_id');
         $parent = $parent ? $parent : 0;
+        $value = $zerophp->request->query('district_id_value');
 
         $form = array();
         $form['district_id'] = array(
@@ -29,6 +30,7 @@ class Location {
                     'select_text' => '--- District ---',
                 ),
             ),
+            '#value' => $value,
         );
         $form['district_id'] = Form::buildItem($form['district_id']);
 
