@@ -560,7 +560,6 @@ class Users extends Entity implements  EntityInterface {
         $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
         $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
         $form['password_confirm']['#error_messages'] = zerophp_lang('Password confirmation is not match with password');
-        $form['password_confirm']['#description'] = zerophp_lang('Send a confirmation email to register for an account at ChoVip.vn');
 
         $form['#actions']['submit'] = array(
             '#name' => 'submit',
@@ -673,17 +672,38 @@ class Users extends Entity implements  EntityInterface {
 
     function lst($zerophp) {}
 
+    function read($zerophp) {}
+
     function create($zerophp) {
         $form = array(
             'class' => '\ZeroPHP\ZeroPHP\Users',
-            'method' => 'crudCreateForm',
+            'method' => 'createForm',
         );
+
         $zerophp->response->addContent(Form::build($form));
-    } 
+     } 
 
-    function read($zerophp) {}
+     function createForm(){
+        $form = $this->crudCreateForm();
 
-    function update($zerophp, $userid) {
+        $temp = $form['active'];
+        unset($form['active']);
+
+        $form['password_confirm'] = $form['password'];
+        $form['password_confirm']['#name'] = 'password_confirm';
+        $form['password_confirm']['#title'] = zerophp_lang('Password confirmation');
+        $form['password_confirm']['#attributes']['data-validate'] = 'password_confirm';
+        $form['password_confirm']['#error_messages'] = zerophp_lang('Password confirmation is not match with password');
+
+        $form['active'] = $temp;
+
+        //zerophp_devel_print($form);
+        return $form;
+     }
+
+
+
+     function update($zerophp, $userid) {
         $form_values = $this->loadEntity($userid);
 
         $form = array(
@@ -693,27 +713,23 @@ class Users extends Entity implements  EntityInterface {
         $zerophp->response->addContent(Form::build($form, $form_values));
     }
 
-    function updateForm() {
+     function updateForm() {
         $form = $this->crudCreateForm();
 
         $form['email']['#disabled'] = true;
         $form['email']['#attributes']['disabled'] = 'disabled';
+        unset($form['email']['#description']);
 
-        unset($form['password']['#required']);
-        /*unset($form['password']['#required']);
-        unset($form['password']['#required']);*/
-        zerophp_devel_print($form);
+        $form['username']['#disabled'] = true;
+        $form['username']['#attributes']['disabled'] = 'disabled';
+
+        unset($form['password']);
+
+        //zerophp_devel_print($form);
 
         return $form;
     }
 
-    function delete($zerophp) {
-        $form = array(
-            'class' => '\ZeroPHP\ZeroPHP\Users',
-            'method' => 'crudDeleteForm',
-        );
-        $zerophp->response->addContent(Form::build($form));
-    }
 
    
 
