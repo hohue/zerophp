@@ -34,12 +34,23 @@ class Entity {
         }
     }
 
-    function loadEntityAll($attributes = array()) {
+    public function loadOptionsAll() {
+        $entities = $this->loadEntityAll();
+
+        $result = array();
+        foreach ($entities as $value) {
+            $result[$value->{$this->structure['#id']}] = isset($value->title) ? $value->title : $value->{$this->structure['#id']};
+        }
+
+        return $result;
+    }
+
+    public function loadEntityAll($attributes = array()) {
         $attributes['load_all'] = true;
         return $this->loadEntityExecutive(null, $attributes);
     }
 
-    function loadEntityExecutive($entity_id = 0, $attributes = array()) {
+    public function loadEntityExecutive($entity_id = 0, $attributes = array()) {
         // Get from cache
         if (!isset($attributes['cache']) || $attributes['cache']) {
             $cache_name = __METHOD__ . $entity_id . $this->structure['#name'];
@@ -100,7 +111,7 @@ class Entity {
         return $entity;
     }
 
-    function buildEntityReference($entity, $field, $attributes = array()) {
+    public function buildEntityReference($entity, $field, $attributes = array()) {
         $entity_id = $entity->{$this->structure['#id']};
 
         // Get from cache
@@ -152,7 +163,7 @@ class Entity {
         return $result;
     }
 
-    function loadEntity($entity_id, $attributes = array(), $check_active = false) {
+    public function loadEntity($entity_id, $attributes = array(), $check_active = false) {
         // entity load default
         $cached = false;
         if (is_numeric($entity_id) && !count($attributes)) {
@@ -182,16 +193,18 @@ class Entity {
         return $result;
     }
 
-    function saveEntity($entity) {
+    public function saveEntity($entity) {
+        //zerophp_devel_print($entity);
         $reference = array();
         foreach ($this->structure['#fields'] as $field) {
             // Save Reference fields to temp
-            if (!empty($field['#reference']) && isset($entity->{$field['#name']})) {
-                $reference[$field['#name']] = array_filter((array) $entity->{$field['#name']});
-
-                if (empty($field['#reference']['type']) || $field['#reference']['type'] != 'internal') {
-                    unset($entity->{$field['#name']});
-                }
+            if (isset($field['#reference'])
+                && isset($field['#reference']['internal'])
+                && ! $field['#reference']['internal']
+                && isset($entity->{$field['#name']})
+            ) {
+                $reference[$field['#name']] = array_filter($entity->{$field['#name']});
+                unset($entity->{$field['#name']});
             }
         }
 
@@ -226,11 +239,11 @@ class Entity {
         return $entity_id;
     }
 
-    function saveEntityReference($reference, $entity_id) {
+    public function saveEntityReference($reference, $entity_id) {
         EntityModel::saveReference($reference, $entity_id, $this->structure);
     }
 
-    function crudCreateForm() {
+    public function crudCreateForm() {
         $form = $this->structure['#fields'];
         $form['#form'] = array();
 
@@ -238,8 +251,15 @@ class Entity {
             if (!empty($value['#form_hidden'])) {
                 unset($form[$key]);
             }
-            elseif(!empty($value['#default'])) {
-                $form[$key]['#value'] = $value['#default'];
+            else {
+                if(!empty($value['#default'])) {
+                    $form[$key]['#value'] = $value['#default'];
+                }
+
+                if (!empty($value['#reference']['options'])) {
+                    $arguments = isset($value['#reference']['options']['arguments']) ? (array) $value['#reference']['options']['arguments'] : array();
+                    $form[$key]['#options'] = call_user_func_array(array(new $value['#reference']['options']['class'], $value['#reference']['options']['method']), $arguments);
+                }
             }
 
             if (isset($value['#type']) && $value['#type'] == 'file') {
@@ -258,10 +278,11 @@ class Entity {
             }
         }
 
-        $form['entity_name'] = array(
-            '#name' => 'entity_name',
+        $form['entity'] = array(
+            '#name' => 'entity',
             '#type' => 'hidden',
-            '#value' => $this->structure['#name'],
+            '#value' => $this->structure['#class'],
+            '#disabled' => true,
         );
 
         $form['#actions']['submit'] = array(
@@ -284,10 +305,12 @@ class Entity {
             $form['#redirect'] = $this->structure['#links']['list'];
         }
 
+        //zerophp_devel_print($form);
+
         return $form;
     }
 
-    function crudCreateFormValidate($form_id, $form, &$form_values) {
+    public function crudCreateFormValidate($form_id, $form, &$form_values) {
         $result = true;
         foreach ($this->structure['#fields'] as $key => $value) {
             // Textarea clean
@@ -347,7 +370,7 @@ class Entity {
         return $result;
     }
 
-    function crudCreateFormSubmit($form_id, $form, &$form_values) {
+    public function crudCreateFormSubmit($form_id, $form, &$form_values) {
         $entity = new \stdClass();
 
         // Fetch via structure to skip unexpected fields (alter form another modules)
