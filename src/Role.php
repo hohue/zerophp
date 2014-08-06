@@ -8,7 +8,7 @@ class Role extends Entity implements  EntityInterface {
     public function __config() {
         return array(
             '#name' => 'role',
-            '#class' => 'ZeroPHP\ZeroPHP\Role',
+            '#class' => '\ZeroPHP\ZeroPHP\Role',
             '#title' => zerophp_lang('Roles'),
             '#id' => 'role_id',
             '#fields' => array(
@@ -21,7 +21,7 @@ class Role extends Entity implements  EntityInterface {
                     '#name' => 'title',
                     '#title' => zerophp_lang('Role title'),
                     '#type' => 'text',
-                    '#validate' => 'required|max_length[80]'
+                    '#validate' => 'required|max:80'
                 ),
                 'active' => array(
                     '#name' => 'active',
@@ -44,9 +44,13 @@ class Role extends Entity implements  EntityInterface {
                     '#fast_edit' => 1,
                 ),
             ),
-            '#can_not_delete' => array(1, 2, 3, 4),
+            '#can_not_delete' => array(1, 2, 3),
         );
     }
+
+
+
+
 
     function permissions_form($roles, $permissions, $access) {
         $form = array();
