@@ -50,12 +50,14 @@ class Article extends Entity implements EntityInterface {
                     '#title' => zerophp_lang('Created by'),
                     '#type' => 'text',
                     '#form_hidden' => true,
+                    '#display_hidden' => true,
                 ),
                 'updated_by' => array(
                     '#name' => 'updated_by',
                     '#title' => zerophp_lang('Updated by'),
                     '#type' => 'text',
                     '#form_hidden' => true,
+                    '#display_hidden' => true,
                 ),
                 'created_at' => array(
                     '#name' => 'created_at',
@@ -70,6 +72,7 @@ class Article extends Entity implements EntityInterface {
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => true,
+                    '#display_hidden' => true,
                 ),
                 'active' => array(
                     '#name' => 'active',
@@ -118,7 +121,9 @@ class Article extends Entity implements EntityInterface {
         $zerophp->response->addContent(Form::build($form, $article));
     }
 
-    function lst($zerophp) {}
+    function lst($zerophp) {
+        $zerophp->response->addContent($this->crudList($zerophp));
+    }
 
     function delete($zerophp) {}
 }

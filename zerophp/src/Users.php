@@ -13,23 +13,11 @@ class Users extends Entity implements  EntityInterface {
             '#class' => 'ZeroPHP\ZeroPHP\Users',
             '#title' => zerophp_lang('Users'),
             '#links' => array(
-                'list' => 'user/list',
-                'create' => 'user/create',
-                'read' => 'user/%',
-                'update' => 'user/%/update',
-                'delete' => 'user/%/delete',
-
-                'register' => 'user/register',
-                'register_success' => 'user/register/success',
-                'login' => 'user/login',
-                'logout' => 'user/logout',
-                'activation' => 'user/activation/%',
-                'activation_resend' => 'user/activation/resend',
-                'changepass' => 'user/changepass',
-                'forgotpass' => 'user/forgotpass',
-                'forgotpass_success' => 'user/forgotpass/success',
-                'resetpass' => 'user/resetpass/%',
-                'resetpass_success' => 'user/resetpass/success',
+                'list' => 'admin/user/list',
+                'create' => 'admin/user/create',
+                'read' => 'admin/user/%',
+                'update' => 'admin/user/%/update',
+                'delete' => 'admin/user/%/delete',
             ),
             '#fields' => array(
                 'id' => array(

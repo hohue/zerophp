@@ -431,13 +431,27 @@ class Entity {
             }
         }
 
+        // Add Operations column
         $tmp = new \stdClass;
         $tmp->title = zerophp_lang('Operations');
         $columns[] = $tmp;
-        $data->add_column('operations',
-            '<a href="{{ URL::to( \'admin.post\', array( \'edit\',$id )) }}">edit</a>
-            <a href="{{ URL::to( \'admin.post\', array( \'delete\',$id )) }}">delete</a>
-        ');
+
+        zerophp_static('ZeroPHP-Entity-crudList', isset($this->structure['#links']) ? $this->structure['#links'] : array());
+        $data->add_column('operations', function($entity) {
+            $links = zerophp_static('ZeroPHP-Entity-crudList', array());
+
+            $item = array();
+
+            if (!empty($links['update'])) {
+                $item[] = zerophp_anchor(str_replace('%', $entity->id, $links['update']), zerophp_lang('Edit'));
+            }
+
+            if (!empty($links['delete'])) {
+                $item[] = zerophp_anchor(str_replace('%', $entity->id, $links['delete']), zerophp_lang('Del'));
+            }
+
+            return implode(', ', $item);
+        });
 
         $data = json_decode($data->make()->getContent());
         $data = array(
@@ -470,46 +484,5 @@ class Entity {
         }
 
         return zerophp_view('entity_read', $data);
-    }
-
-
-
-
-
-
-
-
-
-    
-
-    
-
-    //@todo 9 Hard-core, tao chuc nang add icon cho tabs & link action
-    function link_action($entity_id, $url_prefix = '', $type = 'list') {
-        $item = array();
-
-        $url_prefix = $url_prefix ? $url_prefix : 'up';
-
-        if ($link = fw_anchor($url_prefix . "e/preview/" . $this->structure['#name'] . "/$entity_id", '<i class="icon_view_large"></i>' . zerophp_lang('View'))) {
-            $item['preview'] = $link;
-        }
-
-        if ($type != 'list') {
-            if ($link = fw_anchor($url_prefix . "e/duplicate/". $this->structure['#name'] . "/$entity_id", '<i class="icon_postsimalar"></i>' . zerophp_lang('Clone'))) {
-                $item['duplicate'] = $link;
-            }
-        }
-
-        if ($link = fw_anchor($url_prefix . "e/update/". $this->structure['#name'] . "/$entity_id", '<i class="icon_editlarge"></i>' . zerophp_lang('Edit'))) {
-            $item['update'] = $link;
-        }
-
-        if (!in_array($entity_id, $this->structure->can_not_delete)
-            && $link = fw_anchor($url_prefix . "e/delete/" . $this->structure['#name'] . "/$entity_id", zerophp_lang('Del'))
-        ) {
-            $item['delete'] = $link;
-        }
-
-        return $item;
     }
 }
