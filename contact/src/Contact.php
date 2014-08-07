@@ -86,7 +86,12 @@ class Contact extends Entity implements EntityInterface {
 
         unset($form['contact_id']);
 
+        $success = array(
+            'message' => zerophp_lang('Thank you for your message. We will contact you soon.'),
+        );
+
         $form['#theme'] = 'form-popup';
+        $form['#success'] = zerophp_view('form_success', $success);
 
         return $form;
     }

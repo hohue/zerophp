@@ -3,6 +3,7 @@ namespace ZeroPHP\ZeroPHP;
 
 class Request {
     private $path_prefix = array(
+        'modal',
         'ajax',
         'json',
         'esi',

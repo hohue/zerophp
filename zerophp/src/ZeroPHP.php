@@ -60,7 +60,10 @@ class ZeroPHP {
             foreach($controller->arguments as $value) {
                 $arguments[] = is_numeric($value) ? $this->request->segment($value) : $value;
             }
-            call_user_func_array(array(new $controller->class, $controller->method), $arguments);
+            
+            if ($return = call_user_func_array(array(new $controller->class, $controller->method), $arguments)) {
+                return $return;
+            }
         }
 
         // Hack for Responsive File Manager

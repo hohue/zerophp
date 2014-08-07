@@ -178,6 +178,10 @@ class Entity {
         return $entity_id;
     }
 
+    public function deleteEntity($entity_id) {
+        EntityModel::deleteEntity($entity_id, $this->structure);
+    }
+
     public function saveEntityReference($reference, $entity_id) {
         EntityModel::saveReference($reference, $entity_id, $this->structure);
     }
@@ -411,7 +415,7 @@ class Entity {
     }
 
     function crudList() {
-        $entities = $this->loadEntityAll();
+        /*$entities = $this->loadEntityAll();
         $form = array();
 
         foreach ($entities as $key => $value) {
@@ -426,9 +430,16 @@ class Entity {
             }
         }
         
-        return $form;
+        return $form;*/
 
-        return 'abc';
+        $posts = \DB::table('users')->select();
+
+        //zerophp_devel_print($posts);
+
+        $data = \Datatables::of($posts)->make();
+        //zerophp_devel_print($data);
+
+        return $data;
     }
 
     function crudRead($id){
