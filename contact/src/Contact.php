@@ -12,6 +12,11 @@ class Contact extends Entity implements EntityInterface {
             '#name' => 'contact',
             '#class' => 'ZeroPHP\Contact\Contact',
             '#title' => zerophp_lang('Contact Us'),
+            '#links' => array(
+                'list' => 'admin/contact/list',
+                'read' => 'admin/contact/%',
+                'delete' => 'admin/contact/%/delete',
+            ),
             '#fields' => array(
                 'contact_id' => array(
                     '#name' => 'contact_id',
