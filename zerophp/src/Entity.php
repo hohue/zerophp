@@ -46,11 +46,10 @@ class Entity {
     }
 
     public function loadEntityAll($attributes = array()) {
-        $attributes['load_all'] = true;
         return $this->loadEntityExecutive(null, $attributes);
     }
 
-    public function loadEntityExecutive($entity_id = 0, $attributes = array()) {
+    public function loadEntityExecutive($entity_id = null, $attributes = array()) {
         // Get from cache
         if (!isset($attributes['cache']) || $attributes['cache']) {
             $cache_name = __METHOD__ . $entity_id . $this->structure['#name'];
@@ -63,16 +62,7 @@ class Entity {
         }
 
         // Get from database
-        $entities = array();
-
-        if ($entity_id === 0 && empty($attributes['load_all'])) {
-            $entities[0] = new \stdClass();
-            $entities[0]->{$this->structure['#id']} = 0;
-        }
-        else {
-            $entities = EntityModel::loadEntity($entity_id, $this->structure, $attributes);
-        }
-
+        $entities = EntityModel::loadEntity($entity_id, $this->structure, $attributes);
         foreach ($entities as $entity_key => $entity) {
             $entities[$entity_key] = $this->buildEntity($entity, $attributes);
         }
@@ -85,21 +75,29 @@ class Entity {
         return $entities;
     }
 
-    public function buildEntity($entity, $attributes = false) {
-        foreach ($this->structure['#fields'] as $value) {
+    public function buildEntity($entity, $attributes = array()) {
+        foreach ($this->structure['#fields'] as $key => $value) {
             if ((!isset($attributes['load_hidden']) || !$attributes['load_hidden'])
                  && (isset($value['#load_hidden']) && $value['#load_hidden']) ) {
-                $entity->{$value['#name']} = '';
+                $entity->$key = '';
                 continue;
             }
 
             if (empty($entity->{$this->structure['#id']})) {
-                if ($value['#name'] == $this->structure['#id']) {
-                    $entity->{$value['#name']} = 0;
+                if ($key == $this->structure['#id']) {
+                    $entity->$key = 0;
                 }
                 else {
-                    $entity->{$value['#name']} = '';
+                    $entity->$key = '';
                 }
+            }
+
+            if (isset($value['#reference'])
+                && isset($value['#reference']['internal'])
+                && !$value['#reference']['internal']
+            ) {
+                $ref = new $value['#reference']['class'];
+                $entity->$key = EntityModel::loadReference($key, $entity->{$this->structure['#id']}, $this->structure, $ref->getStructure());
             }
         }
 
@@ -125,9 +123,7 @@ class Entity {
             }
         }
 
-        $attributes['load_all'] = false;
         $entity = $this->loadEntityExecutive($entity_id, $attributes);
-
         $result = reset($entity);
 
         if ($cached) {
@@ -142,9 +138,9 @@ class Entity {
         foreach ($this->structure['#fields'] as $field) {
             // Save Reference fields to temp
             if (isset($field['#reference'])
+                && isset($entity->{$field['#name']})
                 && isset($field['#reference']['internal'])
                 && ! $field['#reference']['internal']
-                && isset($entity->{$field['#name']})
             ) {
                 $reference[$field['#name']] = array_filter($entity->{$field['#name']});
                 unset($entity->{$field['#name']});
@@ -414,11 +410,9 @@ class Entity {
         return $form;
     }
 
-    function crudListForm() {
+    function crudList() {
         $entities = $this->loadEntityAll();
         $form = array();
-
-        //zerophp_devel_print($entities);
 
         foreach ($entities as $key => $value) {
             foreach ($this->structure['#fields'] as $k => $v) {
@@ -433,12 +427,19 @@ class Entity {
         }
         
         return $form;
+
+        return 'abc';
     }
 
     function crudRead($id){
+        $data = array();
+
         $entity = $this->loadEntity($id);
 
-        $data = array();
+        if (!$entity) {
+            \App::abort(404);
+        }
+
         foreach ($this->structure['#fields'] as $key => $val) {
             if (!isset($val['#display_hidden']) || !$val['#display_hidden']) {
                 $data['element'][$key] = array(
