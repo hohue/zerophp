@@ -444,18 +444,22 @@ class Entity {
         $tmp = new \stdClass;
         $tmp->title = zerophp_lang('Operations');
         $columns[] = $tmp;
-        zerophp_static('ZeroPHP-Entity-crudList', isset($this->structure['#links']) ? $this->structure['#links'] : array());
+        zerophp_static('ZeroPHP-Entity-crudList', isset($this->structure) ? $this->structure : array());
         $data->add_column('operations', function($entity) {
-            $links = zerophp_static('ZeroPHP-Entity-crudList', array());
+            $structure = zerophp_static('ZeroPHP-Entity-crudList', array());
 
             $item = array();
 
-            if (!empty($links['update'])) {
-                $item[] = zerophp_anchor(str_replace('%', $entity->id, $links['update']), zerophp_lang('Edit'));
+            if (!empty($structure['#links']['read'])) {
+                $item[] = zerophp_anchor(str_replace('%', $entity->{$structure['#id']}, $structure['#links']['read']), zerophp_lang('View'));
             }
 
-            if (!empty($links['delete'])) {
-                $item[] = zerophp_anchor(str_replace('%', $entity->id, $links['delete']), zerophp_lang('Del'));
+            if (!empty($structure['#links']['update'])) {
+                $item[] = zerophp_anchor(str_replace('%', $entity->{$structure['#id']}, $structure['#links']['update']), zerophp_lang('Edit'));
+            }
+
+            if (!empty($structure['#links']['delete'])) {
+                $item[] = zerophp_anchor(str_replace('%', $entity->{$structure['#id']}, $structure['#links']['delete']), zerophp_lang('Del'));
             }
 
             return implode(', ', $item);

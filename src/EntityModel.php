@@ -129,7 +129,7 @@ class EntityModel {
         }
     }
 
-    /*public static function loadReference($field, $entity_id, $structure, $ref_structure) {
+    public static function loadReference($field, $entity_id, $structure, $ref_structure) {
         $db = \DB::table($structure['#name'] . '_' . $ref_structure['#name']);
 
         $db->where('field', $field);
@@ -142,7 +142,7 @@ class EntityModel {
         }
 
         return $reference;
-    }*/
+    }
 }
 
 // CHECKED
