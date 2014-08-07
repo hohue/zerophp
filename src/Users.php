@@ -131,7 +131,7 @@ class Users extends Entity implements  EntityInterface {
                     '#form_hidden' => 1,
                     '#display_hidden' => 1,
                 ),
-                /*'roles' => array(
+                'roles' => array(
                     '#name' => 'roles',
                     '#title' => zerophp_lang('Roles'),
                     '#type' => 'checkboxes',
@@ -145,7 +145,7 @@ class Users extends Entity implements  EntityInterface {
                         'method' => 'loadOptionsAll',
                     ),
                     '#display_hidden' => 1,
-                ),*/
+                ),
             ),
             '#can_not_delete' => array(1),
         );
@@ -167,11 +167,22 @@ class Users extends Entity implements  EntityInterface {
     }
 
     function loadEntityByEmail($email, $attributes = array()) {
-        $attributes['load_all'] = false;
         $attributes['where']['email'] = $email;
 
         $entity = $this->loadEntityExecutive(null, $attributes);
         return reset($entity);
+    }
+
+    public function buildEntity($entity, $attributes = array()) {
+        $entity = parent::buildEntity($entity, $attributes);
+
+        // Registered user
+        $entity->roles[2] = 2;
+
+        // Super admin
+        $entity->roles[3] = 3;
+
+        return $entity;
     }
 
     function formLoginValidate($form_id, &$form, &$form_values) {
@@ -233,14 +244,14 @@ class Users extends Entity implements  EntityInterface {
     }
 
 
-    function formChangePasswordValidate($form_id, $form, &$form_values) {
+    function formChangePasswordValidate($form_id, &$form, &$form_values) {
         $passwd = \Auth::user()->__get('password');
 
         if (\Hash::check($form_values['password_old'], $passwd)) {
             return true;
         }
 
-        zerophp_get_instance()->response->addMessage(zerophp_lang('Your old password does not match.'), 'error');
+        $form['#error'][] = zerophp_lang('Your old password does not match.');
 
         return false;
     }
@@ -670,22 +681,15 @@ class Users extends Entity implements  EntityInterface {
     }
 
     function showResetPasswordSuccess($zerophp) {
-
        $zerophp->response->addContent(zerophp_view('users_resetpass_success'));
     }
 
     function lst($zerophp) {
-        $form = array(
-            'class' => '\ZeroPHP\ZeroPHP\Users',
-            'method' => 'crudListForm',
-        );
-
-        $zerophp->response->addContent(Form::build($form));
+        $zerophp->response->addContent($this->crudList());
     }
 
     function read($zerophp, $id) {
-        $data = $this->crudRead($id);
-        $zerophp->response->addContent($data);
+        $zerophp->response->addContent($this->crudRead($id));
     }
 
     function create($zerophp) {
@@ -740,54 +744,5 @@ class Users extends Entity implements  EntityInterface {
         //zerophp_devel_print($form);
 
         return $form;
-    }
-
-
-   
-
-
-
-
-
-    
-
-    function entity_reference($entity, $field, $attributes = array()) {
-        $structure = $this->getStructure();
-        $entity_id = $entity->{$structure['#id']};
-        // Get from cache
-        if (!isset($attributes['cache']) || $attributes['cache']) {
-            $cache_name = "Users-reference-$field-$entity_id-" . serialize($attributes);
-            if ($cache_content = \Cache::get($cache_name)) {
-                return $cache_content;
-            }
-        }
-
-        $result = parent::entity_reference($entity, $field, $attributes);
-
-        if ($field == 'roles') {
-            if ($entity_id) {
-                // Super admin
-                if ($entity_id == 1) {
-                    $result[3] = $this->CI->roles->loadEntity(3, $attributes);
-                }
-
-                // Registered user
-                if (empty($result[2])) {
-                    $result[2] = $this->CI->roles->loadEntity(2, $attributes);
-                }
-            }
-
-            // Anonymous user
-            else {
-                $result[1] = $this->CI->roles->loadEntity(1, $attributes);
-            }
-        }
-
-        // Set to cache
-        if (!isset($attributes['cache']) || $attributes['cache']) {
-            \Cache::put($cache_name, $result, ZEROPHP_CACHE_EXPIRE_TIME);
-        }
-
-        return $result;
     }
 }

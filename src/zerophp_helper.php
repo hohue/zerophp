@@ -143,9 +143,13 @@ function zerophp_user() {
 
     $user = new \stdClass();
 
-    if ($userid= zerophp_userid()) {
+    if ($userid = zerophp_userid()) {
         $user_obj = new \ZeroPHP\ZeroPHP\Users;
         $user = $user_obj->loadEntity($userid);
+    }
+    else {
+        $user->id = 0;
+        $user->roles[] = 1; // Anonymous user role
     }
 
     return zerophp_static(__FUNCTION__, $user);

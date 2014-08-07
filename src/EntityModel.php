@@ -32,8 +32,7 @@ class EntityModel {
 
         ##### PAGINATION setting #####
         if (isset($attributes['page'])) {
-            //@todo 6 Lay data tu file cau hinh
-            $pager_items_per_page = 15;
+            $pager_items_per_page = zerophp_variable_get('pagination items per page', 15);
             $pager_page = intval($attributes['page']);
             $pager_page = $pager_page > 0 ? ($pager_page - 1) : 0;
             $pager_page = $pager_page * $pager_items_per_page;
@@ -78,7 +77,7 @@ class EntityModel {
             }
         }
 
-        if (empty($attributes['load_all']) && $entity_id) {
+        if ($entity_id) {
             $db->where($structure['#id'], '=', $entity_id);
         }
 
@@ -163,7 +162,7 @@ class EntityModel {
 
         $reference = array();
         foreach ($query as $row) {
-            $reference[$row->{$ref_structure['#id']}] = $row;
+            $reference[$row->{$ref_structure['#id']}] = $row->{$ref_structure['#id']};
         }
 
         return $reference;
