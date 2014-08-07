@@ -414,32 +414,41 @@ class Entity {
         return $form;
     }
 
-    function crudList() {
-        /*$entities = $this->loadEntityAll();
-        $form = array();
+    function crudList($zerophp) {
+        $entities = \DB::table($this->structure['#name'])->select();
+        $data = \Datatables::of($entities);
 
-        foreach ($entities as $key => $value) {
-            foreach ($this->structure['#fields'] as $k => $v) {
-                if (!isset($v['#display_hidden']) || !$v['#display_hidden']) {
-                    $form['#table'][$key][$k] = array(
-                        '#name' => $k,
-                        '#type' => 'markup',
-                        '#value' => $value->{$k},
-                    );
-                }
+        $columns = array();
+        foreach ($this->structure['#fields'] as $key => $value) {
+            if (!empty($value['#display_hidden'])) {
+                $data->remove_column($key);
+            }
+            else {
+                $tmp = new \stdClass;
+                $tmp->title = $value['#title'];
+
+                $columns[] = $tmp;
             }
         }
-        
-        return $form;*/
 
-        $posts = \DB::table('users')->select();
+        $tmp = new \stdClass;
+        $tmp->title = zerophp_lang('Operations');
+        $columns[] = $tmp;
+        $data->add_column('operations',
+            '<a href="{{ URL::to( \'admin.post\', array( \'edit\',$id )) }}">edit</a>
+            <a href="{{ URL::to( \'admin.post\', array( \'delete\',$id )) }}">delete</a>
+        ');
 
-        //zerophp_devel_print($posts);
+        $data = json_decode($data->make()->getContent());
+        $data = array(
+            'datatables' => array(
+                'data' => $data->aaData,
+                'columns' => $columns,
+            ),
+        );
+        $zerophp->response->addJS($data, 'settings');
 
-        $data = \Datatables::of($posts)->make();
-        //zerophp_devel_print($data);
-
-        return $data;
+        return zerophp_view('entity_list');
     }
 
     function crudRead($id){

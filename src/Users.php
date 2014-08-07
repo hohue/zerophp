@@ -55,6 +55,7 @@ class Users extends Entity implements  EntityInterface {
                     '#type' => 'text',
                     '#validate' => 'required',
                     '#required' => true,
+                    '#display_hidden' => true,
                 ),
                 'email' => array(
                     '#name' => 'email',
@@ -122,6 +123,7 @@ class Users extends Entity implements  EntityInterface {
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
+                    '#display_hidden' => true,
                 ),
                 'deleted_at' => array(
                     '#name' => 'updated_at',
@@ -687,7 +689,7 @@ class Users extends Entity implements  EntityInterface {
     }
 
     function lst($zerophp) {
-        $zerophp->response->addContent($this->crudList());
+        $zerophp->response->addContent($this->crudList($zerophp));
     }
 
     function read($zerophp, $id) {
