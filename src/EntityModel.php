@@ -103,7 +103,9 @@ class EntityModel {
             $entity_ids = array($entity_ids);
         }
 
-        $entity_ids = array_diff($entity_ids, $structure->can_not_delete);
+        if (isset($structure['#can_not_delete'])) {
+            $entity_ids = array_diff($entity_ids, $structure['#can_not_delete']);
+        }
 
         $db->whereIn($structure['#id'], $entity_ids);
         $db->delete();

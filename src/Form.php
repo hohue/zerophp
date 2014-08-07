@@ -85,14 +85,20 @@ class Form {
         $form['#error'] = isset($form['#error']) ? zerophp_object_to_array($form['#error']) :  array();
         $form['#message'] = isset($form['#message']) ? $form['#message'] :  array();
 
-        if (zerophp_get_instance()->response->getOutputType() == 'ajax') {
+        // $form['#success'] is highest priority
+        if (isset($form['#success'])) {
+            $form['#success_message'] = '';
+        }
+
+        // Add class "modal" for modal form
+        if (zerophp_get_instance()->response->getOutputType() == 'modal') {
             if (!isset($form['#form']['class'])) {
                 $form['#form']['class'] = '';
             }
-            $form['#form']['class'] .= ' ajax';
+            $form['#form']['class'] .= ' modal';
         }
         elseif (isset($form['#form']['class'])) {
-            $form['#form']['class'] = str_replace(' ajax', '', $form['#form']['class']);
+            $form['#form']['class'] = str_replace(' modal', '', $form['#form']['class']);
 
             if (empty($form['#form']['class'])) {
                 unset($form['#form']['class']);
@@ -313,11 +319,23 @@ class Form {
             \Cache::put($cache_name, $form, ZEROPHP_CACHE_EXPIRE_TIME);
         }
 
+        //Close modal after submit
+        if (isset($form['#success'])) {
+            if (is_array($form['#success'])) {
+                $form['#success']['arguments'] = isset($form['#success']['arguments']) ? (array) $form['#success']['arguments'] : array();
+                $form['#success'] = call_user_func_array(array(new $form['#success']['class'], $form['#success']['method']), $form['#success']['arguments']);
+            }
+
+            $zerophp->response->addContent($form['#success']);
+            return false;
+        }
+
         // Redirect after submit finalize
         if ($redirect) {
             switch ($zerophp->response->getOutputType()) {
                 case 'json':
                 case 'ajax':
+                case 'modal':
                     $data = array(
                         'form_redirect' => $redirect,
                     );

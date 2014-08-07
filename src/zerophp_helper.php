@@ -164,7 +164,7 @@ function zerophp_anchor_shop($url, $title, $attributes = array()) {
         return zerophp_anchor($url, $title, $attributes);
     }
 
-    return zerophp_anchor_popup("ajax/user/login?destination=$url", $title, $attributes);
+    return zerophp_anchor_popup("modal/user/login?destination=$url", $title, $attributes);
 }
 
 function zerophp_anchor_popup($url, $title, $attributes = array()) {
@@ -315,6 +315,7 @@ function zerophp_url($path, $attributes = array(), $secure = false) {
 
 function zerophp_redirect($url = '') {
     $url = trim(zerophp_redirect_get_path($url), '/');
+    $url = $url ? $url : '/';
     return \Redirect::to($url);
 }
 

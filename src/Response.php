@@ -227,14 +227,18 @@ class Response {
         $output = '';
 
         switch ($this->getOutputType()) {
-            case 'ajax':
-                $output = '<div class="ajax_html_return">' . implode('', $this->getContent()) . '</div>';
+            case 'modal':
+                $output = '<div class="modal_html_return">
+                              <div class="overlay"><div class="spinner"></div></div>'
+                              . implode('', $this->getContent())
+                          . '</div>';
                 break;
 
             case 'json':
                 $output = \Response::json($this->getContent());
                 break;
-                
+            
+            case 'ajax':
             case 'esi':
                 $output = implode('', $this->getContent());
                 break;

@@ -230,7 +230,7 @@ class Users extends Entity implements  EntityInterface {
 
             $vars = array(
                 'email' => $form_values['email'],
-                'link' => url("user/activation/" . $hash->hash),
+                'link' => zerophp_url("user/activation/" . $hash->hash),
                 'expired' => $hash->expired,
             );
 
@@ -285,7 +285,7 @@ class Users extends Entity implements  EntityInterface {
 
             $vars = array(
                 'title' => $user->title,
-                'link' => url("user/resetpass/" . $hash->hash),
+                'link' => zerophp_url("user/resetpass/" . $hash->hash),
             );
 
             zerophp_mail($form_values['email'], 
@@ -650,7 +650,7 @@ class Users extends Entity implements  EntityInterface {
 
             $vars = array(
                 'email' => $form_values['email'],
-                'link' => url("user/activation/" . $hash->hash),
+                'link' => zerophp_url("user/activation/" . $hash->hash),
                 'expired' => $hash->expired,
             );
 
@@ -671,13 +671,15 @@ class Users extends Entity implements  EntityInterface {
             $user->active = 1;
             $this->saveEntity($user);
 
+            $activation->deleteEntity($hash->activation_id);
+
             $zerophp->response->addMessage(zerophp_lang('Your account was successfully activated.'));
         }
         else {
             $zerophp->response->addMessage(zerophp_lang('Your activation link has expired. Please use activation resend feature.'));
         }
 
-        zerophp_redirect();
+        return zerophp_redirect();
     }
 
     function showResetPasswordSuccess($zerophp) {
