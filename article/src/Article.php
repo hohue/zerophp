@@ -13,11 +13,11 @@ class Article extends Entity implements EntityInterface {
             '#class' => 'ZeroPHP\Article\Article',
             '#title' => zerophp_lang('Article'),
             '#links' => array(
-                'list' => 'article/list',
-                'create' => 'article/create',
+                'list' => 'admin/article/list',
+                'create' => 'admin/article/create',
                 'read' => 'article/%',
-                'update' => 'article/%/update',
-                'delete' => 'article/%/delete',
+                'update' => 'admin/article/%/update',
+                'delete' => 'admin/article/%/delete',
             ),
             '#fields' => array(
                 'article_id' => array(

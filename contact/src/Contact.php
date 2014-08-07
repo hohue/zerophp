@@ -96,5 +96,7 @@ class Contact extends Entity implements EntityInterface {
         return $form;
     }
 
-    function lst($zerophp) {}
+    function lst($zerophp) {
+        $zerophp->response->addContent($this->crudList($zerophp));
+    }
 }

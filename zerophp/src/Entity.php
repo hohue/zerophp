@@ -415,9 +415,18 @@ class Entity {
     }
 
     function crudList($zerophp) {
+        // Load from DB with paganitation
         $entities = \DB::table($this->structure['#name'])->select();
+        $pager_items_per_page = zerophp_variable_get('datatables items per page', 100);
+        $pager_page = intval($zerophp->request->query('page'));
+        $pager_page = $pager_page > 0 ? ($pager_page - 1) : 0;
+        $pager_page = $pager_page * $pager_items_per_page;
+        $entities->skip($pager_page)->take($pager_items_per_page);
+
+        // Parse data to datatables
         $data = \Datatables::of($entities);
 
+        // Build columns
         $columns = array();
         foreach ($this->structure['#fields'] as $key => $value) {
             if (!empty($value['#display_hidden'])) {
@@ -435,7 +444,6 @@ class Entity {
         $tmp = new \stdClass;
         $tmp->title = zerophp_lang('Operations');
         $columns[] = $tmp;
-
         zerophp_static('ZeroPHP-Entity-crudList', isset($this->structure['#links']) ? $this->structure['#links'] : array());
         $data->add_column('operations', function($entity) {
             $links = zerophp_static('ZeroPHP-Entity-crudList', array());
@@ -453,6 +461,7 @@ class Entity {
             return implode(', ', $item);
         });
 
+        // Return to browser
         $data = json_decode($data->make()->getContent());
         $data = array(
             'datatables' => array(
@@ -461,7 +470,6 @@ class Entity {
             ),
         );
         $zerophp->response->addJS($data, 'settings');
-
         return zerophp_view('entity_list');
     }
 
