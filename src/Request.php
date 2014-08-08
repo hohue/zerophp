@@ -13,7 +13,7 @@ class Request {
 
     public $data = array(
         'alias' => '',
-        'prefix' => 'normal',
+        'prefix' => '',
         'url' => '',
         'segment' => array(),
         'filter' => array(),
@@ -98,12 +98,12 @@ class Request {
 
     private function _parseFilter($filter) {
         $result = array();
-        $filter = explode('-', $filter);
+        $filter = explode('|', $filter);
         if (count($filter)) {
             foreach ($filter as $value) {
-                $value = explode('.', $value);
+                $value = explode('~', $value);
                 if (isset($value[0]) && isset($value[1])) {
-                    $result[zerophp_uri_validate($value[0])] = zerophp_uri_validate($value[1]);
+                    $result[zerophp_uri_validate($value[0])] = $value[1];
                 }
             }
         }
