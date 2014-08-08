@@ -28,11 +28,11 @@ class Category extends Entity implements EntityInterface {
                     '#name' => 'category_group_id',
                     '#title' => zerophp_lang('Category group'),
                     '#type' => 'select',
-                    /*'#reference' => array(
+                    '#reference' => array(
                         'name' => 'category_group',
-                        'type' => 'internal',
+                        'class' => '\ZeroPHP\Category\CategoryGroup',
                     ),
-                    '#ajax' => array(
+                    /*'#ajax' => array(
                         'path' => 'category/parent_get_from_group',
                         'wrapper' => 'fii_parent_content select',
                     ),*/
@@ -41,18 +41,18 @@ class Category extends Entity implements EntityInterface {
                     '#name' => 'parent',
                     '#title' => zerophp_lang('Parent category'),
                     '#type' => 'select',
-                    /*'#reference' => array(
+                    '#reference' => array(
                         'name' => 'category',
-                        'type' => 'internal',
-                        'options' => array(
+                        'class' => '\ZeroPHP\Category\Category',
+                        /*'options' => array(
                             'class' => 'category',
                             'method' => 'parent_get_from_group',
                             'arguments' => array(
                                 'group' => 0,
                                 'load_children' => false,
                             ),
-                        ),
-                    ),*/
+                        ),*/
+                    ),
                     '#attributes' => array(
                         'size' => 10,
                     ),
@@ -123,10 +123,6 @@ class Category extends Entity implements EntityInterface {
 
         $entities = $this->loadEntityAll($attributes);
 
-        foreach ($entities as $key => $value) {
-            $entities[$key]->children_count = count($this->loadEntityAllByParent($key));
-        }
-
         \Cache::forever($cache_name, $entities);
         return $entities;
     }
@@ -140,10 +136,6 @@ class Category extends Entity implements EntityInterface {
         $attributes['where']['parent'] = $parent;
 
         $entities = $this->loadEntityAll($attributes);
-
-        foreach ($entities as $key => $value) {
-            $entities[$key]->children_count = count($this->loadEntityAllByParent($key));
-        }
 
         \Cache::forever($cache_name, $entities);
         return $entities;

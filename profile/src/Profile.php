@@ -10,7 +10,7 @@ class Profile extends Entity implements EntityInterface  {
         return array(
             '#id' => 'id',
             '#name' => 'profile', //ten bang
-            '#class' => 'ZeroPHP\Profile\Profile',
+            '#class' => '\ZeroPHP\Profile\Profile',
             '#title' => zerophp_lang('Users profile'),
             '#fields' => array(
                 'id' => array(
@@ -23,7 +23,7 @@ class Profile extends Entity implements EntityInterface  {
                     '#title' => zerophp_lang('Address'),
                     '#type' => 'text',
                     '#attributes' => array(
-                        'placeholder' => '123 Phường Chánh Nghĩa',
+                        'placeholder' => zerophp_lang('123 Binh Duong avenue'),
                     ),
                     '#required' => true,
                 ),
@@ -64,7 +64,7 @@ class Profile extends Entity implements EntityInterface  {
                         'wrapper' => 'fii_district_id',
                         'autoload' => 1,
                     ),
-                    '#display_hidden' => 1,
+                    '#list_hidden' => true,
                 ),
                 'district_id' => array(
                     '#name' => 'district_id',
@@ -74,7 +74,7 @@ class Profile extends Entity implements EntityInterface  {
                         'class' => '\ZeroPHP\Category\Category',
                     ),
                     '#options' => array('' => zerophp_lang('--- District ---')),
-                    '#display_hidden' => 1,
+                    '#list_hidden' => true,
                 ),
                 'mobile' => array(
                     '#name' => 'mobile',
@@ -86,15 +86,15 @@ class Profile extends Entity implements EntityInterface  {
                     '#name' => 'created_by',
                     '#title' => zerophp_lang('Created by'),
                     '#type' => 'text',
-                    '#form_hidden' => 1,
-                    '#display_hidden' => 1,
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
                 ),
                 'updated_by' => array(
                     '#name' => 'updated_by',
                     '#title' => zerophp_lang('Updated by'),
                     '#type' => 'text',
-                    '#form_hidden' => 1,
-                    '#display_hidden' => 1,
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
                 ),
             ),
         );

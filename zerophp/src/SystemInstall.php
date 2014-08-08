@@ -269,7 +269,7 @@ class SystemInstall {
                 'path' => 'user/list',
                 'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'lst',
+                'method' => 'crudList',
             ),
             array(
                 'title' => 'User create',
@@ -283,7 +283,7 @@ class SystemInstall {
                 'path' => 'user/%',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'read',
+                'method' => 'crudRead',
             ),
             array(
                 'title' => 'User update',
@@ -305,6 +305,13 @@ class SystemInstall {
                 'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
                 'method' => 'showResetPasswordSuccess',
+            ),
+            array(
+                'title' => 'User preview',
+                'path' => 'user/%/preview',
+                'arguments' => '1',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'crudPreview',
             ),
         ));
 
@@ -357,6 +364,97 @@ class SystemInstall {
                 'type' => 'scale',
             ),
         ));
+
+        if (!\DB::table('variable')->where('variable_key', 'activation expired')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'activation expired',
+                'variable_value' => 172800,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'image lazy load')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'image lazy load',
+                'variable_value' => 1,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'datatables items per page')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'datatables items per page',
+                'variable_value' => 25,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'datatables config searching')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'datatables config searching',
+                'variable_value' => 1,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'datatables config ordering')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'datatables config ordering',
+                'variable_value' => 0,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'datatables config paging')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'datatables config paging',
+                'variable_value' => 0,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'datatables config info')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'datatables config info',
+                'variable_value' => 0,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'form error message show in field')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'form error message show in field',
+                'variable_value' => 1,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'users register email validation')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'users register email validation',
+                'variable_value' => 1,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'user activation email subject')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'user activation email subject',
+                'variable_value' => 'Activation your account',
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'user forgotpass email subject')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'user forgotpass email subject',
+                'variable_value' => 'Reset your password',
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'ZEROPHP_CACHE_EXPIRE_TIME')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'ZEROPHP_CACHE_EXPIRE_TIME',
+                'variable_value' => 10,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'paganization items')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'paganization items',
+                'variable_value' => 5,
+            ));
+        }
     }
 
     private static function down_0_01() {

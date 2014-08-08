@@ -100,7 +100,7 @@ class ShopTopic extends Entity implements EntityInterface {
                     '#title' => 'Ảnh đại diện',
                     '#type' => 'upload',
                     '#widget' => 'image',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                     '#description' => 'Không chèn quảng cáo, Số điện thoại, Địa chỉ, Tên web... lên ảnh đại diện'
                 ),
                 'created_at' => array(

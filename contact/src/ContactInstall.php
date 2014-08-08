@@ -32,14 +32,23 @@ class ContactInstall {
             array(
                 'title' => 'Contact Us',
                 'path' => 'contact',
+                'arguments' => '',
                 'class' => '\ZeroPHP\Contact\Contact',
                 'method' => 'create',
             ),
             array(
                 'title' => 'Contact List',
                 'path' => 'contact/list',
+                'arguments' => '',
                 'class' => '\ZeroPHP\Contact\Contact',
-                'method' => 'lst',
+                'method' => 'crudList',
+            ),
+            array(
+                'title' => 'Contact Read',
+                'path' => 'contact/%',
+                'arguments' => '1',
+                'class' => '\ZeroPHP\Contact\Contact',
+                'method' => 'crudRead',
             ),
         ));
     }

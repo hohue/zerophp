@@ -31,13 +31,13 @@ class Metadata extends Entity implements EntityInterface {
                     '#name' => 'keywords',
                     '#title' => zerophp_lang('Keywords'),
                     '#type' => 'textarea',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'description' => array(
                     '#name' => 'description',
                     '#title' => zerophp_lang('Description'),
                     '#type' => 'textarea',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at',

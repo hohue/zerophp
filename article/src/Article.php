@@ -35,29 +35,32 @@ class Article extends Entity implements EntityInterface {
                     '#title' => zerophp_lang('Image'),
                     '#type' => 'file',
                     '#widget' => 'image',
-                    '#display_hidden' => true,
+                    '#list_hidden' => true,
                     '#validate' => 'image|mimes:jpeg,png,gif',
+                ),
+                'summary' => array(
+                    '#name' => 'summary',
+                    '#title' => zerophp_lang('Summary'),
+                    '#type' => 'textarea',
+                    '#list_hidden' => true,
                 ),
                 'content' => array(
                     '#name' => 'content',
                     '#title' => zerophp_lang('Content'),
                     '#type' => 'textarea',
                     '#rte_enable' => true,
-                    '#display_hidden' => true,
+                    '#list_hidden' => true,
                 ),
-                'created_by' => array(
-                    '#name' => 'created_by',
-                    '#title' => zerophp_lang('Created by'),
-                    '#type' => 'text',
-                    '#form_hidden' => true,
-                    '#display_hidden' => true,
-                ),
-                'updated_by' => array(
-                    '#name' => 'updated_by',
-                    '#title' => zerophp_lang('Updated by'),
-                    '#type' => 'text',
-                    '#form_hidden' => true,
-                    '#display_hidden' => true,
+                'active' => array(
+                    '#name' => 'active',
+                    '#title' => zerophp_lang('Active'),
+                    '#type' => 'radios',
+                    '#options' => array(
+                        1 => zerophp_lang('Enable'),
+                        0 => zerophp_lang('Disable'),
+                    ),
+                    '#validate' => 'required|numeric',
+                    '#default' => 1,
                 ),
                 'created_at' => array(
                     '#name' => 'created_at',
@@ -72,18 +75,21 @@ class Article extends Entity implements EntityInterface {
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => true,
-                    '#display_hidden' => true,
+                    '#list_hidden' => true,
                 ),
-                'active' => array(
-                    '#name' => 'active',
-                    '#title' => zerophp_lang('Active'),
-                    '#type' => 'radios',
-                    '#options' => array(
-                        1 => zerophp_lang('Enable'),
-                        0 => zerophp_lang('Disable'),
-                    ),
-                    '#validate' => 'required|numeric',
-                    '#default' => 1,
+                'created_by' => array(
+                    '#name' => 'created_by',
+                    '#title' => zerophp_lang('Created by'),
+                    '#type' => 'text',
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
+                ),
+                'updated_by' => array(
+                    '#name' => 'updated_by',
+                    '#title' => zerophp_lang('Updated by'),
+                    '#type' => 'text',
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
                 ),
             ),
         );
@@ -119,10 +125,6 @@ class Article extends Entity implements EntityInterface {
             'method' => 'crudCreateForm',
         );
         $zerophp->response->addContent(Form::build($form, $article));
-    }
-
-    function lst($zerophp) {
-        $zerophp->response->addContent($this->crudList($zerophp));
     }
 
     function delete($zerophp) {}

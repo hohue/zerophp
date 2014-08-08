@@ -14,6 +14,7 @@ class UrlAlias extends Entity implements  EntityInterface {
         return array(
             '#id' => 'urlalias_id',
             '#name' => 'urlalias',
+            '#class' => '\ZeroPHP\ZeroPHP\UrlAlias',
             '#title' => zerophp_lang('URL alias'),
             '#fields' => array(
                 'urlalias_id' => array(
@@ -35,15 +36,15 @@ class UrlAlias extends Entity implements  EntityInterface {
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created At'),
                     '#type' => 'text',
-                    '#widget' => 'date_timestamp',
-                    '#form_hidden' => 1,
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at',
                     '#title' => zerophp_lang('Updated At'),
                     '#type' => 'text',
-                    '#widget' => 'date_timestamp',
-                    '#form_hidden' => 1,
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
                 ),
             ),
         );
