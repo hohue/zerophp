@@ -329,7 +329,7 @@ function zerophp_redirect($url = '') {
     $url = trim(zerophp_redirect_get_path($url), '/');
     $url = $url ? $url : '/';
 
-    return \Redirect::to("/$url");
+    return \Redirect::to($url);
 }
 
 function zerophp_redirect_get_path($url = '') {
