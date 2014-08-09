@@ -197,7 +197,7 @@ class Entity {
     }
 
     public function deleteEntity($entity_ids) {
-        $entity_ids = (array) $entity_id;
+        $entity_ids = (array) $entity_ids;
 
         if (isset($this->structure['#can_not_delete'])) {
             foreach ($entity_ids as $key => $value) {
@@ -631,7 +631,7 @@ class Entity {
         $title = isset($entity->title) ? $entity->title : $entity_id;
 
         $form_values['notice'] = zerophp_lang('Do you really want to delete: :title?', array(':title' => $title));
-        $form['entity_id'] = $entity_id;
+        $form_values['entity_id'] = $entity_id;
 
         $zerophp->response->addContent(Form::build($form, $form_values));
     }

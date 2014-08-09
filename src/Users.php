@@ -214,8 +214,8 @@ class Users extends Entity implements  EntityInterface {
             'method' => 'showRegisterFormValidate',
         );
 
-        $form['remember_me'] = array(
-            '#name' => 'remember_me',
+        $form['accepted'] = array(
+            '#name' => 'accepted',
             '#type' => 'checkbox',
             '#value' => 1,
             '#title' => zerophp_lang('I agree to the :term and :policy', array(
@@ -223,6 +223,9 @@ class Users extends Entity implements  EntityInterface {
                     ':policy' => zerophp_anchor('article/4', zerophp_lang('Privacy Policy'), array('target' => '_blank')),
                 )),
             '#validate' => 'accepted',
+            '#attributes' => array(
+                'required' => '',
+            ),
         );
 
          $form['#actions']['reset'] = array(
@@ -351,7 +354,7 @@ class Users extends Entity implements  EntityInterface {
                 'email' => $form_values['email'], 
                 'password' => $form_values['password'],
                 'active' => 1,
-            ), $form_values['remember_me'] == 1 ? true : false)
+            ), $form_values['remember_me'] == 1 ? true : false, true)
         ) {
             $user = $this->loadEntityByEmail($form_values['email']);
 
