@@ -249,17 +249,21 @@ function zerophp_object_to_array($object) {
 /**
 * Returns the calling function through a backtrace
 */
-function zerophp_get_calling_function() {
+/*function zerophp_get_calling_function() {
   // a funciton x has called a function y which called this
   // see stackoverflow.com/questions/190421
   $caller = debug_backtrace();
+
+  zerophp_devel_print($caller);
+
+
   $caller = $caller[2];
   $r = $caller['function'];
   if (isset($caller['class'])) {
     $r = $caller['class'] . '::' . $r;
   }
   return $r;
-}
+}*/
 
 function zerophp_form_render($key, &$form, $subkey = null) {
     //zerophp_devel_print($key, $form);
@@ -324,7 +328,8 @@ function zerophp_url($path = '', $query = '', $attributes = array(), $secure = f
 function zerophp_redirect($url = '') {
     $url = trim(zerophp_redirect_get_path($url), '/');
     $url = $url ? $url : '/';
-    return \Redirect::to($url);
+
+    return \Redirect::to("/$url");
 }
 
 function zerophp_redirect_get_path($url = '') {

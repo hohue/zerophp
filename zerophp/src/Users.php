@@ -632,8 +632,7 @@ class Users extends Entity implements  EntityInterface {
             'method' => 'showActivationResendFormSubmit',
         );
 
-        $form['#redirect'] = 'user/activation/resend';
-        $form['#success_message'] = zerophp_lang('confirmation email has been sent successfully');
+        $form['#redirect'] = 'user/activation/resend/success';
 
         $form['#theme'] = 'form-popup';
 
@@ -660,6 +659,10 @@ class Users extends Entity implements  EntityInterface {
             );
 
             \Session::put('user activation resend email', $form_values['email']);
+    }
+
+    function showActivationResendSuccess($zerophp) {
+        $zerophp->response->addContent(zerophp_view('users_activation_resend_success'));
     }
 
     function showActivation($zerophp, $hash) {
