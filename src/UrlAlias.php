@@ -151,7 +151,7 @@ class UrlAlias extends Entity implements  EntityInterface {
         }
     }
 
-    function crud_create_form_submit($form_id, $form, &$form_values, $message = '') {
+    function show_create_form_submit($form_id, $form, &$form_values, $message = '') {
         $new = true;
         // Create url alias cache file
         if (!empty($form_values['alias_id'])) {
@@ -166,10 +166,10 @@ class UrlAlias extends Entity implements  EntityInterface {
         $message = $message ? $message : zerophp_lang('Your data was updated successfully.');
         zerophp_get_instance()->response->addMessage($message, 'success');
 
-        $this->crud_create_form_submit_hook();
+        $this->show_create_form_submit_hook();
     }
 
-    function crud_delete_form_submit($form_id, $form, &$form_values, $message = '') {
+    function show_delete_form_submit($form_id, $form, &$form_values, $message = '') {
         // Delete url alias cache file
         foreach ($form_values['#delete'] as $url_id) {
             $url = $this->loadEntity($url_id, array('cache' => false));
@@ -177,7 +177,7 @@ class UrlAlias extends Entity implements  EntityInterface {
             @$this->CI->cachef->del_real($url->real);
         }
 
-        parent::crud_delete_form_submit($form_id, $form, $form_values, $message);
+        parent::show_delete_form_submit($form_id, $form, $form_values, $message);
     }
 
     function alias_form_alter($form_id, &$form) {
@@ -198,7 +198,7 @@ class UrlAlias extends Entity implements  EntityInterface {
             '#description' => zerophp_lang('Example:') . ' ' . zerophp_lang('female-fashion'),
         );
 
-        if (substr($form_id, 0, 19) == 'entity_crud_update_') {
+        if (substr($form_id, 0, 19) == 'entity_show_update_') {
             $form['alias']['#disabled'] = 'disabled';
             $form['alias']['#item']['disabled'] = 'disabled';
         }
