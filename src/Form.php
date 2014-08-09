@@ -5,7 +5,7 @@ use ZeroPHP\ZeroPHP\Entity;
 
 class Form {
     public static function build($form = array(), $form_values = array()) {
-        $form_id = zerophp_uri_validate(zerophp_get_calling_function());
+        $form_id = zerophp_uri_validate($form['class'] . $form['method']);
         $form_url = \Input::get('_form_url', md5(time() . csrf_token() . zerophp_get_instance()->request->url()));
 
         // Rebuild from error form
@@ -195,7 +195,7 @@ class Form {
                 break;
         }
 
-        //Reference Options
+        //Options callback
         if (!empty($item['#options_callback'])) {
             $item['#options_callback']['arguments'] = isset($item['#options_callback']['arguments']) ? (array) $item['#options_callback']['arguments'] : array();
             $item['#options'] = call_user_func_array(array(new $item['#options_callback']['class'], $item['#options_callback']['method']), $item['#options_callback']['arguments']);
