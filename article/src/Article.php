@@ -76,7 +76,6 @@ class Article extends Entity implements EntityInterface {
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => true,
-                    '#list_hidden' => true,
                 ),
                 'created_by' => array(
                     '#name' => 'created_by',
