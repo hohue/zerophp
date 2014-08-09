@@ -77,7 +77,7 @@ class Shop extends Entity implements EntityInterface {
                             ),
                         ),
                     ),
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'address' => array(
                     '#name' => 'address',
@@ -88,19 +88,19 @@ class Shop extends Entity implements EntityInterface {
                     '#attributes' => array(
                         'placeholder' => "123 Chánh Nghĩa",
                     ),
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'website' => array(
                     '#name' => 'website',
                     '#title' => zerophp_lang('Website'),
                     '#type' => 'text',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'homephone' => array(
                     '#name' => 'homephone',
                     '#title' => zerophp_lang('Homephone'),
                     '#type' => 'text',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'mobile' => array(
                     '#name' => 'mobile',
@@ -108,7 +108,7 @@ class Shop extends Entity implements EntityInterface {
                     '#type' => 'text',
                     '#required' =>true,
                     '#validate' => 'required|integer',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                     '#attributes' => array(
                         'placeholder' => '0912345678',
                     ),
@@ -118,21 +118,21 @@ class Shop extends Entity implements EntityInterface {
                     '#title' => zerophp_lang('Avatar Shop'),
                     '#type' => 'upload',
                     '#widget' => 'image',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'created_by' => array(
                     '#name' => 'created_by',
                     '#title' => zerophp_lang('Created by'),
                     '#type' => 'text',
                     '#form_hidden' => 1,
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'updated_by' => array(
                     '#name' => 'updated_by',
                     '#title' => zerophp_lang('Updated by'),
                     '#type' => 'text',
                     '#form_hidden' => 1,
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'created_at' => array(
                     '#name' => 'created_at',
@@ -164,14 +164,14 @@ class Shop extends Entity implements EntityInterface {
                     '#title' => 'Phương thức thanh toán',
                     '#type' => 'textarea',
                     '#rte_enable' => 1,
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'shipmenth_method' => array(
                     '#name' => 'shipmenth_method',
                     '#title' => 'Phương thức giao hàng',
                     '#type' => 'textarea',
                     '#rte_enable' => 1,
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
             ),
         );

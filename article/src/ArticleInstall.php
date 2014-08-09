@@ -32,6 +32,13 @@ class ArticleInstall {
             });
         }
 
+        if (\Schema::hasColumn('article', 'category_id')) {
+            \Schema::table('article', function($table){
+                $table->dropForeign('article_category_id_foreign');
+                $table->dropColumn('category_id');
+            });
+        }
+
         // Insert Default Data
         \DB::table('menu')->insert(array(
             array(
@@ -39,7 +46,7 @@ class ArticleInstall {
                 'path' => 'article/list',
                 'arguments' => '',
                 'class' => '\ZeroPHP\Article\Article',
-                'method' => 'lst',
+                'method' => 'crudList',
             ),
             array(
                 'title' => 'Article create',

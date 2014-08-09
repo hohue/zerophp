@@ -10,7 +10,7 @@ class Contact extends Entity implements EntityInterface {
         return array(
             '#id' => 'contact_id',
             '#name' => 'contact',
-            '#class' => 'ZeroPHP\Contact\Contact',
+            '#class' => '\ZeroPHP\Contact\Contact',
             '#title' => zerophp_lang('Contact Us'),
             '#links' => array(
                 'list' => 'admin/contact/list',
@@ -58,20 +58,29 @@ class Contact extends Entity implements EntityInterface {
                     '#type' => 'textarea',
                     '#validate' => 'required',
                     '#required' => true,
+                    '#list_hidden' => true,
                 ),
                 'created_at' => array(
                     '#name' => 'created_at',
                     '#title' => zerophp_lang('Created date'),
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
-                    '#form_hidden' => 1,
+                    '#form_hidden' => true,
                 ),
                 'updated_at' => array(
                     '#name' => 'updated_at',
                     '#title' => zerophp_lang('Updated date'),
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
-                    '#form_hidden' => 1,
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
+                ),
+                'created_by' => array(
+                    '#name' => 'created_by',
+                    '#title' => zerophp_lang('Created by'),
+                    '#type' => 'text',
+                    '#form_hidden' => true,
+                    '#list_hidden' => true,
                 ),
             ),
         );
@@ -99,9 +108,5 @@ class Contact extends Entity implements EntityInterface {
         $form['#success'] = zerophp_view('form_success', $success);
 
         return $form;
-    }
-
-    function lst($zerophp) {
-        $zerophp->response->addContent($this->crudList($zerophp));
     }
 }

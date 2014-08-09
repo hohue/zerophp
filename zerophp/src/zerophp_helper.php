@@ -175,7 +175,12 @@ function zerophp_anchor_popup($url, $title, $attributes = array()) {
 }
 
 function zerophp_url_current() {
-    return zerophp_get_instance()->request->url();
+    $zerophp = zerophp_get_instance();
+    
+    $prefix = $zerophp ->request->prefix();
+    $url = $zerophp->request->url();
+    $url = $prefix ? "$prefix/$url" : $url;
+    return $url;
 }
 
 function zerophp_is_frontpage() {
@@ -309,7 +314,10 @@ function zerophp_form_render_all(&$form) {
     return $result;
 }
 
-function zerophp_url($path, $attributes = array(), $secure = false) {
+function zerophp_url($path = '', $query = '', $attributes = array(), $secure = false) {
+    $path = $path ? $path : zerophp_url_current();
+    $path .= $query ? "?$query" : '';
+
     return \URL::to($path, $attributes, $secure);
 }
 
@@ -575,4 +583,21 @@ function zerophp_form_content($element) {
         default:
             return \Form::{$element['#type']}($element['#name'], $element['#value'], $element['#attributes']);
     }
+}
+
+function zerophp_paganization($current, $sum) {
+    $prev = max(1, $current - 1);
+    $next = min($sum, $current + 1);
+
+    $data = array(
+        'current' => $current,
+        'first' => 1,
+        'prev' => $prev,
+        'next' => $next,
+        'last' => $sum,
+        'sum' => $sum,
+        'item' => zerophp_variable_get('paganization items', 5),
+    );
+
+    return zerophp_view('paganization', $data);
 }

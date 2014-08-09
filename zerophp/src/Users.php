@@ -16,6 +16,7 @@ class Users extends Entity implements  EntityInterface {
                 'list' => 'admin/user/list',
                 'create' => 'admin/user/create',
                 'read' => 'admin/user/%',
+                'preview' => 'admin/user/%/preview',
                 'update' => 'admin/user/%/update',
                 'delete' => 'admin/user/%/delete',
             ),
@@ -43,7 +44,7 @@ class Users extends Entity implements  EntityInterface {
                     '#type' => 'text',
                     '#validate' => 'required',
                     '#required' => true,
-                    '#display_hidden' => true,
+                    '#list_hidden' => true,
                 ),
                 'email' => array(
                     '#name' => 'email',
@@ -66,7 +67,7 @@ class Users extends Entity implements  EntityInterface {
                     '#attributes' => array(
                         'data-validate' => 'password',
                     ),
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                     '#load_hidden' => 1,
                     '#description' => zerophp_lang('Must contain at least <font>8 characters</font>'),
                     '#error_messages' => zerophp_lang('Invalid password'),
@@ -89,7 +90,8 @@ class Users extends Entity implements  EntityInterface {
                     '#title' => zerophp_lang('Remember token'),
                     '#type' => 'text',
                     '#form_hidden' => 1,
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
+                    '#load_hidden' => 1,
                 ),
                 'last_activity' => array(
                     '#name' => 'last_activity',
@@ -111,7 +113,7 @@ class Users extends Entity implements  EntityInterface {
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
-                    '#display_hidden' => true,
+                    '#list_hidden' => true,
                 ),
                 'deleted_at' => array(
                     '#name' => 'updated_at',
@@ -119,7 +121,7 @@ class Users extends Entity implements  EntityInterface {
                     '#type' => 'text',
                     '#widget' => 'date_timestamp',
                     '#form_hidden' => 1,
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'roles' => array(
                     '#name' => 'roles',
@@ -135,6 +137,7 @@ class Users extends Entity implements  EntityInterface {
                         'internal' => false,
                     ),
                     '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
             ),
             '#can_not_delete' => array(1),
@@ -279,7 +282,7 @@ class Users extends Entity implements  EntityInterface {
             );
 
             zerophp_mail($form_values['email'], 
-                zerophp_lang(zerophp_variable_get('user forgotpass email sRubject', 'Reset your password')),
+                zerophp_lang(zerophp_variable_get('user forgotpass email subject', 'Reset your password')),
                 zerophp_view('email_user_reset_pass', $vars)
             );
 
@@ -674,14 +677,6 @@ class Users extends Entity implements  EntityInterface {
 
     function showResetPasswordSuccess($zerophp) {
        $zerophp->response->addContent(zerophp_view('users_resetpass_success'));
-    }
-
-    function lst($zerophp) {
-        $zerophp->response->addContent($this->crudList($zerophp));
-    }
-
-    function read($zerophp, $id) {
-        $zerophp->response->addContent($this->crudRead($id));
     }
 
     function create($zerophp) {

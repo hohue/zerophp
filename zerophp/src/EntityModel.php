@@ -4,8 +4,8 @@ namespace ZeroPHP\ZeroPHP;
 class EntityModel {
     public static function loadEntity($entity_id = null, $structure, $attributes = array()) {
         $db = \DB::table($structure['#name']);
-        self::_buildLoadEntityWhere($db, $entity_id, $structure, $attributes);
-        self::_buildLoadEntityOrder($db, $structure, $attributes);
+        self::buildLoadEntityWhere($db, $entity_id, $structure, $attributes);
+        self::buildLoadEntityOrder($db, $structure, $attributes);
 
         //@todo 6 Hack for old code
         // Ra soat lai code de remove doan code nay
@@ -17,17 +17,20 @@ class EntityModel {
         return $db->get();
     }
 
-    private static function _buildLoadEntityWhere(&$db, $entity_id = 0, $structure, $attributes = array()) {
-        // Filter
+    public static function buildLoadEntityWhere(&$db, $entity_id = null, $structure, $attributes = array()) {
+        $attributes['where'] = isset($attributes['where']) ? $attributes['where'] : array();
+        
+        // Get Filter
         $zerophp =& zerophp_get_instance();
+        // When load language translate, we didn't load request method
         if (isset($zerophp->request)) {
             $filter = $zerophp->request->filter();
             if ((!isset($attributes['filter']) || $attributes['filter'] == true)
-                && count($filter) > 1 && !empty($filter['name']) && $filter['name'] == $structure['#name']) {
+                && count($filter)
+                //&& (!empty($filter['name']) && $filter['name'] == $structure['#name'])
+            ) {
                 foreach ($filter as $key => $value) {
-                    if (isset($structure['#fields'][$key])) {
-                        $attributes['where'][$key] = $value;
-                    }
+                    $attributes['where'][$key] = $value;
                 }
             }
         }
@@ -38,35 +41,40 @@ class EntityModel {
 
         if (isset($attributes['where']) && count($attributes['where'])) {
             foreach ($attributes['where'] as $key => $value) {
-                $key = explode(' ', $key);
-                $key[1] = isset($key[1]) ? $key[1] : '=';
+                if (isset($structure['#fields'][$key])) {
+                    $key = explode(' ', $key);
+                    $key[1] = isset($key[1]) ? $key[1] : '=';
 
-                $db->where($key[0], $key[1], $value);
+                    $db->where($key[0], $key[1], $value);
+                }
             }
         }
     }
 
-    private static function _buildLoadEntityOrder($db, $structure, $attributes) {
-        $order = isset($attributes['order']) ? $attributes['order'] : array();
-        if (count($order)) {
-            foreach ($order as $key => $value) {
+    public static function buildLoadEntityOrder(&$db, $structure, $attributes = array()) {
+        $attributes['order'] = isset($attributes['order']) ? $attributes['order'] : array();
+        if (count($attributes['order'])) {
+            foreach ($attributes['order'] as $key => $value) {
                 $db->orderBy($key, $value);
             }
         }
 
-        if (!isset($order['weight']) && isset($structure['#fields']['weight'])) {
+        if (!isset($attributes['order']['weight']) && isset($structure['#fields']['weight'])) {
             $db->orderBy('weight', 'ASC');
         }
 
-        if (!isset($order['updated_at']) && isset($structure['#fields']['updated_at'])) {
-            $db->orderBy('updated_at', 'DESC');
-        }
-        elseif (!isset($order['created_at']) && isset($structure['#fields']['created_at'])) {
-            $db->orderBy('created_at', 'DESC');
+        if (!isset($structure['#order'])) {
+            $structure['#order'] = array(
+                'updated_at' => 'desc',
+                'created_at' => 'desc',
+                'title' => 'asc',
+            );
         }
 
-        if (!isset($order['title']) && isset($structure['#fields']['title'])) {
-            $db->orderBy('title', 'ASC');
+        foreach ($structure['#order'] as $key => $value) {
+            if (!isset($attributes['order'][$key]) && isset($structure['#fields'][$key])) {
+                $db->orderBy($key, $value);
+            }
         }
     }
 
