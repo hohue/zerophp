@@ -530,13 +530,15 @@ class Entity {
 
             switch ($key) {
                 case 'created_by':
-                    if (empty($entity->{$key})) {
+                    if (empty($entity->{$key}) && zerophp_userid()) {
                         $entity->{$key} = zerophp_userid();
                     }
                     break;
 
                 case 'updated_by':
-                    $entity->{$key} = zerophp_userid();
+                    if (zerophp_userid()) {
+                        $entity->{$key} = zerophp_userid();
+                    }
                     break;
 
                 case 'created_at':
