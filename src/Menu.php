@@ -37,19 +37,19 @@ class Menu extends Entity implements  EntityInterface {
                     '#name' => 'class',
                     '#title' => zerophp_lang('Class'),
                     '#type' => 'text',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'method' => array(
                     '#name' => 'method',
                     '#title' => zerophp_lang('Method'),
                     '#type' => 'text',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'access' => array(
                     '#name' => 'access',
                     '#title' => zerophp_lang('Access'),
                     '#type' => 'textarea',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'weight' => array(
                     '#name' => 'weight',

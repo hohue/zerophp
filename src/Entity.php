@@ -52,6 +52,7 @@ class Entity {
     public function loadEntityExecutive($entity_id = null, $attributes = array()) {
         // Get from cache
         if (!isset($attributes['cache']) || $attributes['cache']) {
+            if (!is_string($entity_id) && !is_null($entity_id)) zerophp_devel_print($entity_id, $attributes);
             $cache_name = __METHOD__ . $entity_id . $this->structure['#name'];
             $cache_name .= serialize($attributes);
 
@@ -114,13 +115,20 @@ class Entity {
                 if(!$check_active) {
                     return $cache;
                 }
-                elseif (!empty($cache->active)) {
+                elseif (!isset($this->structure['#fields']['active']) || !empty($cache->active)) {
                     return $cache;
                 }
                 else {
                     return array();
                 }
             }
+        }
+
+        if ($check_active) {
+            if (!isset($attributes['where'])) {
+                $attributes['where'] = array();
+            }
+            $attributes['where']['active'] = 1;
         }
 
         $entity = $this->loadEntityExecutive($entity_id, $attributes);
@@ -415,13 +423,20 @@ class Entity {
     }
 
     function crudList($zerophp) {
-        // Load from DB with paganitation
-        $entities = \DB::table($this->structure['#name'])->select();
-        $pager_items_per_page = zerophp_variable_get('datatables items per page', 100);
+        // Load from DB with paganition
+        $entities = \DB::table($this->structure['#name']);
+        EntityModel::buildLoadEntityWhere($entities, null, $this->structure, array());
+        EntityModel::buildLoadEntityOrder($entities, $this->structure, array());
+        $total = $entities->count();
+        $pager_items_per_page = zerophp_variable_get('datatables items per page', 20);
         $pager_page = intval($zerophp->request->query('page'));
-        $pager_page = $pager_page > 0 ? ($pager_page - 1) : 0;
-        $pager_page = $pager_page * $pager_items_per_page;
-        $entities->skip($pager_page)->take($pager_items_per_page);
+        $pager_from = $pager_page > 0 ? ($pager_page - 1) : 0;
+        $pager_from = $pager_from * $pager_items_per_page;
+        $entities->skip($pager_from)->take($pager_items_per_page);
+        $entities->select();
+
+        // Use in datatables callback functions
+        zerophp_static('ZeroPHP-Entity-crudList', isset($this->structure) ? $this->structure : array());
 
         // Parse data to datatables
         $data = \Datatables::of($entities);
@@ -429,14 +444,27 @@ class Entity {
         // Build columns
         $columns = array();
         foreach ($this->structure['#fields'] as $key => $value) {
-            if (!empty($value['#display_hidden'])) {
-                $data->remove_column($key);
-            }
-            else {
+            if (empty($value['#list_hidden'])) {
+                switch ($key) {
+                    case 'active':
+                        $data->edit_column('active', function($entity){
+                            $structure = zerophp_static('ZeroPHP-Entity-crudList');
+
+                            if (!empty($structure['#fields']['active']['#options'][$entity->active])) {
+                                return $structure['#fields']['active']['#options'][$entity->active];
+                            }
+
+                            return $entity->active;
+                        });
+                        break;
+                }
+
                 $tmp = new \stdClass;
                 $tmp->title = $value['#title'];
-
                 $columns[] = $tmp;
+            }
+            else {
+                $data->remove_column($key);
             }
         }
 
@@ -444,15 +472,22 @@ class Entity {
         $tmp = new \stdClass;
         $tmp->title = zerophp_lang('Operations');
         $columns[] = $tmp;
-        zerophp_static('ZeroPHP-Entity-crudList', isset($this->structure) ? $this->structure : array());
         $data->add_column('operations', function($entity) {
-            $structure = zerophp_static('ZeroPHP-Entity-crudList', array());
+            $structure = zerophp_static('ZeroPHP-Entity-crudList');
 
             $item = array();
 
-            if (!empty($structure['#links']['read'])) {
+            if (!empty($structure['#links']['read']) 
+                && (!isset($entity->active) || $entity->active == 1)
+            ) {
                 $item[] = zerophp_anchor(str_replace('%', $entity->{$structure['#id']}, $structure['#links']['read']), zerophp_lang('View'));
             }
+
+            if (!empty($structure['#links']['preview']) 
+                && (isset($entity->active) && $entity->active != 1)
+            ) {
+                $item[] = zerophp_anchor(str_replace('%', $entity->{$structure['#id']}, $structure['#links']['preview']), zerophp_lang('Preview'));
+            } 
 
             if (!empty($structure['#links']['update'])) {
                 $item[] = zerophp_anchor(str_replace('%', $entity->{$structure['#id']}, $structure['#links']['update']), zerophp_lang('Edit'));
@@ -465,36 +500,78 @@ class Entity {
             return implode(', ', $item);
         });
 
-        // Return to browser
+        // Save datatables config to JS settings
+        $searching = zerophp_variable_get('datatables config searching', 1);
+        $ordering = zerophp_variable_get('datatables config ordering', 0);
+        $paging = zerophp_variable_get('datatables config paging', 0);
+        $info = zerophp_variable_get('datatables config info', 0);
         $data = json_decode($data->make()->getContent());
         $data = array(
             'datatables' => array(
                 'data' => $data->aaData,
                 'columns' => $columns,
+                'searching' => $searching ? true : false,
+                'ordering' => $ordering ? true : false,
+                'paging' => $paging ? true : false,
+                'info' => $info ? true : false,
             ),
         );
         $zerophp->response->addJS($data, 'settings');
-        return zerophp_view('entity_list');
+
+        // Return to browser
+        $vars = array(
+            'pager_items_per_page' => $pager_items_per_page,
+            'pager_page' => $pager_page,
+            'pager_total' => $total,
+            'pager_from' => $pager_from + 1,
+            'pager_to' => min($total, $pager_from + $pager_items_per_page),
+        );
+        $template = 'entity_list-' . $this->structure['#name'];
+        if(!\View::exists($template)) {
+            $template = 'entity_list';
+        }
+        return $zerophp->response->addContent(zerophp_view($template, $vars));
     }
 
-    function crudRead($id){
-        $data = array();
+    function crudRead($zerophp, $id){
+        $entity = $this->loadEntity($id, array(), true);
 
+        if (!$entity) {
+            \App::abort(404);
+        }
+
+        $this->_crudRead($zerophp, $entity);
+    }
+
+    function crudPreview($zerophp, $id){
         $entity = $this->loadEntity($id);
 
         if (!$entity) {
             \App::abort(404);
         }
 
+        $this->_crudRead($zerophp, $entity);
+    }
+
+    function _crudRead($zerophp, $entity){
+        $data = array();
         foreach ($this->structure['#fields'] as $key => $val) {
-            if (!isset($val['#display_hidden']) || !$val['#display_hidden']) {
-                $data['element'][$key] = array(
-                    'title' => $val['#title'],
-                    'value' => $entity->$key,
-                );
+            if (!is_array($entity->$key)) {
+                if (isset($val['#options']) && $val['#options'][$entity->$key]) {
+                    $entity->$key = $val['#options'][$entity->$key];
+                }
             }
+
+            $data['element'][$key] = array(
+                'title' => $val['#title'],
+                'value' => $entity->$key,
+            );
         }
 
-        return zerophp_view('entity_read', $data);
+        $template = 'entity_read-' . $this->structure['#name'];
+        if(!\View::exists($template)) {
+            $template = 'entity_read';
+        }
+        $zerophp->response->addContent(zerophp_view($template, $data));
     }
 }

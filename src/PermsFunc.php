@@ -32,7 +32,7 @@ class PermsFunc extends Entity implements  EntityInterface {
                     '#name' => 'function',
                     '#title' => zerophp_lang('Method'),
                     '#type' => 'text',
-                    '#display_hidden' => 1,
+                    '#list_hidden' => 1,
                 ),
                 'active' => array(
                     '#name' => 'active',

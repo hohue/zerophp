@@ -9,7 +9,6 @@ use ZeroPHP\ZeroPHP\Form;
 class ZeroPHP {
 
     private static $instance;
-    public $entity = array();
 
     public function __construct() {
         self::$instance = & $this;

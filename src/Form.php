@@ -112,18 +112,8 @@ class Form {
         }
 
         foreach ($form as $key => $value) {
-            if (substr($key, 0, 1) == '_') {
-                \App::error(function(InvalidUserException $exception) {
-                    $message = zerophp_lang('Field name must not start with "_". Log in "zerophp\zerophp\Form::_build"');
-                    \Log::error($message);
-
-                    return $message;
-                });
-            }
-
             // Don't care with #validate, #submit...
             if (substr($key, 0, 1) != '#') {
-
                 if (isset($form['#error'][$key]) && zerophp_variable_get('form error message show in field', 1)) {
                     if (!isset($value['#error_messages'])) {
                         $value['#error_messages'] = '';
@@ -159,7 +149,6 @@ class Form {
     }
 
     public static function buildItem($item) {
-        if (empty($item['#name'])) zerophp_devel_print($item);
 
         // Normal field
         $item['#id'] = isset($item['#id']) ? $item['#id'] : 'fii_' . $item['#name']; // fii = form item id
