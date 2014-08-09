@@ -160,7 +160,7 @@ class Entity {
                 && isset($field['#reference']['internal'])
                 && ! $field['#reference']['internal']
             ) {
-                $reference[$field['#name']] = array_filter($entity->{$field['#name']});
+                $reference[$field['#name']] = is_array($entity->{$field['#name']}) ? array_filter($entity->{$field['#name']}) : array();
                 unset($entity->{$field['#name']});
             }
         }

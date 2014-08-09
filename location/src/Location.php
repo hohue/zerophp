@@ -16,6 +16,7 @@ class Location {
         $parent = $zerophp->request->query('province_id');
         $parent = $parent ? $parent : 0;
         $value = $zerophp->request->query('district_id_value');
+        $value = $value ? $value : 0;
 
         $form = array();
         $form['district_id'] = array(
@@ -31,7 +32,12 @@ class Location {
                 ),
             ),
             '#value' => $value,
+            '#attributes' => array(
+                'required' => '',
+            ),
+            '#validate' => 'required|numeric',
         );
+
         $form['district_id'] = Form::buildItem($form['district_id']);
 
         $zerophp->response->addContent(zerophp_form_render('district_id', $form));

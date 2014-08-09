@@ -1,6 +1,9 @@
 <?php
 namespace ZeroPHP\ZeroPHP;
 
+use ZeroPHP\ZeroPHP\UrlAlias;
+use ZeroPHP\ZeroPHP\Menu;
+
 class Request {
     private $path_prefix = array(
         'modal',
@@ -26,7 +29,7 @@ class Request {
 
     //@todo 3 Get controller from DB
     public function getController() {
-        $menus = new \ZeroPHP\ZeroPHP\Menu;
+        $menus = new Menu;
         $menus = $menus->loadEntityAll();
         $ancestors = $this->_getMenuAncestors($this->segment());
         
@@ -65,9 +68,10 @@ class Request {
 
     private function _parseURI() {
         $uri = \Request::path();
+        $filter = \Request::query();
 
         // Get URL real from url alias
-        $alias = new \ZeroPHP\ZeroPHP\UrlAlias;
+        $alias = new UrlAlias;
         $alias = $alias->loadEntityByAlias($uri);
         if (isset($alias->real)) {
             $this->data['alias'] = $uri;
@@ -86,8 +90,6 @@ class Request {
 
         $this->data['url'] = implode('/', $uri);
         $this->data['url'] = $this->data['url'] ? $this->data['url'] : '/';
-
-        $filter = \Request::query();
         if (isset($filter['f'])) {
             $this->data['filter'] = $this->_parseFilter($filter['f']);
             unset($filter['f']);

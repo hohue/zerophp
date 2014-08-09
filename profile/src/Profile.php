@@ -65,6 +65,11 @@ class Profile extends Entity implements EntityInterface  {
                         'autoload' => 1,
                     ),
                     '#list_hidden' => true,
+                    '#required' => true,
+                    '#attributes' => array(
+                        'required' => '',
+                    ),
+                    '#validate' => 'required|numeric',
                 ),
                 'district_id' => array(
                     '#name' => 'district_id',
@@ -75,6 +80,11 @@ class Profile extends Entity implements EntityInterface  {
                     ),
                     '#options' => array('' => zerophp_lang('--- District ---')),
                     '#list_hidden' => true,
+                    '#required' => true,
+                    '#attributes' => array(
+                        'required' => '',
+                    ),
+                    '#validate' => 'required|numeric',
                 ),
                 'mobile' => array(
                     '#name' => 'mobile',
