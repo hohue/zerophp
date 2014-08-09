@@ -170,23 +170,18 @@ class Response {
     }
 
     public function addMessage($message = null, $type = 'success') {
+        $messages = \Session::get(__METHOD__, array());
+
         // Set message
         if ($message) {
-            $messages = \Session::get(__METHOD__, array());
-
-            if (!count($messages)) {
-                $messages = array();
-            }
-
             $messages[$type][] = $message;
             \Session::put(__METHOD__, $messages);
         }
         // Get message
         else {
-            $message = \Session::get(__METHOD__, array());
-            \Session::forget(__METHOD__);
-
-            return $message;
+            \Session::put(__METHOD__, array());
+            //\Session::forget(__METHOD__);
+            return $messages;
         }
     }
 
@@ -296,14 +291,14 @@ class Response {
         return $this->data['breadcrumb'];
     }
 
-    public function showMessage($zerophp) {
-        $vars = array(
-            'messages' => zerophp_message(),
-        );
-        $zerophp->response->addContent(zerophp_view('response_message', $vars));
-    }
-
     public function addJS($data, $type = 'inline') {
         $this->js[$type] = array_merge($this->js[$type], $data);
+    }
+
+    public function showMessage($zerophp) {
+        $vars = array(
+            'messages' => $this->getMessage(),
+        );
+        $zerophp->response->addContent(zerophp_view('response_message', $vars));
     }
 }
