@@ -170,17 +170,26 @@ class Response {
     }
 
     public function addMessage($message = null, $type = 'success') {
-        $messages = \Session::get(__METHOD__, array());
+        //$messages = \Session::get(__METHOD__, array());
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+        $messages = isset($_SESSION[__METHOD__]) ? $_SESSION[__METHOD__] : array();
 
         // Set message
         if ($message) {
             $messages[$type][] = $message;
-            \Session::put(__METHOD__, $messages);
+
+            //\Session::put(__METHOD__, $messages);
+            $_SESSION[__METHOD__] = $messages;
         }
         // Get message
         else {
-            \Session::put(__METHOD__, array());
             //\Session::forget(__METHOD__);
+            if (isset($_SESSION[__METHOD__])) {
+                unset($_SESSION[__METHOD__]);
+            }
+
             return $messages;
         }
     }
