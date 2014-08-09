@@ -375,7 +375,7 @@ class Users extends Entity implements  EntityInterface {
 
     function showLogout($zerophp) {
         \Auth::logout();
-        zerophp_get_instance()->response->addMessage(zerophp_lang('You are successfully logout.'));
+        $zerophp->response->addMessage(zerophp_lang('You are successfully logout.'));
 
         return zerophp_redirect();
     }

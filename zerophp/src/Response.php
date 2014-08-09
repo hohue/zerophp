@@ -296,9 +296,13 @@ class Response {
     }
 
     public function showMessage($zerophp) {
-        $vars = array(
-            'messages' => $this->getMessage(),
-        );
-        $zerophp->response->addContent(zerophp_view('response_message', $vars));
+        $message = $this->getMessage();
+
+        if($message) {
+            $vars = array(
+                'messages' => $message,
+            );
+            $zerophp->response->addContent(zerophp_view('response_message', $vars));
+        }
     }
 }
