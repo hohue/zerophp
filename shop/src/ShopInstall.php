@@ -29,7 +29,8 @@ class ShopInstall {
                 $table->string('mobile', 32)->nullable();
                 $table->string('website', 128)->nullable();
                 $table->string('image', 256)->nullable();
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->integer('created_by')->unsigned()->nullable();
                 $table->integer('updated_by')->unsigned()->nullable();
                 $table->boolean('active')->default(0);
@@ -51,7 +52,8 @@ class ShopInstall {
                 $table->increments('shop_cart_id');
                 $table->string('session_id', 256)->nullable();
                 $table->integer('shop_id')->unsigned()->nullable();
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->integer('created_by')->unsigned()->nullable();
                 $table->integer('updated_by')->unsigned()->nullable();
                 $table->boolean('active')->default(1);
@@ -75,12 +77,13 @@ class ShopInstall {
                 $table->integer('price')->default(0)->unsigned();
                 $table->integer('promotion')->default(0)->unsigned();
                 $table->string('promotion_type', 32)->nullable();
-                $table->timestamp('promotion_start')->nullable();
-                $table->timestamp('promotion_end')->nullable();
+                $table->dateTime('promotion_start')->nullable();
+                $table->dateTime('promotion_end')->nullable();
                 $table->string('image', 256)->nullable();
                 $table->integer('created_by')->unsigned()->nullable();
                 $table->integer('updated_by')->unsigned()->nullable();
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
 
@@ -119,7 +122,8 @@ class ShopInstall {
                 $table->string('ship_phone', 32)->nullable();
                 $table->string('ship_address', 256)->nullable();
                 $table->text('note')->nullable();
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->integer('created_by')->unsigned()->nullable();
                 $table->integer('updated_by')->unsigned()->nullable();
                 $table->boolean('active')->default(1);
@@ -146,13 +150,14 @@ class ShopInstall {
                 $table->boolean('is_promotion')->default(0);
                 $table->integer('promotion')->default(0)->unsigned();
                 $table->string('promotion_type', 32)->nullable();
-                $table->timestamp('promotion_start')->nullable();
-                $table->timestamp('promotion_end')->nullable();
+                $table->dateTime('promotion_start')->nullable();
+                $table->dateTime('promotion_end')->nullable();
                 $table->integer('category_id')->unsigned()->nullable();
                 $table->integer('created_by')->unsigned()->nullable();
                 $table->integer('updated_by')->unsigned()->nullable();
                 $table->string('image', 256)->nullable();
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->boolean('active')->default(1);
                 $table->softDeletes();
 

@@ -20,7 +20,8 @@ class ContactInstall {
                 $table->string('email', 128)->nullable();
                 $table->string('title', 256)->nullable();
                 $table->text('content');
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->integer('created_by')->nullable()->unsigned();
 
                 $table->foreign('created_by')->references('id')->on('users')->onDelete('SET NULL');
@@ -30,25 +31,32 @@ class ContactInstall {
         // Insert Default Data
         \DB::table('menu')->insert(array(
             array(
+                'title' => 'Contact list',
+                'path' => 'contact/list',
+                'arguments' => '',
+                'class' => '\ZeroPHP\Contact\Contact',
+                'method' => 'showList',
+            ),
+            array(
                 'title' => 'Contact Us',
                 'path' => 'contact',
                 'arguments' => '',
                 'class' => '\ZeroPHP\Contact\Contact',
-                'method' => 'create',
+                'method' => 'showCreate',
             ),
             array(
-                'title' => 'Contact List',
-                'path' => 'contact/list',
-                'arguments' => '',
-                'class' => '\ZeroPHP\Contact\Contact',
-                'method' => 'crudList',
-            ),
-            array(
-                'title' => 'Contact Read',
+                'title' => 'Contact read',
                 'path' => 'contact/%',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\Contact\Contact',
-                'method' => 'crudRead',
+                'method' => 'showRead',
+            ),
+            array(
+                'title' => 'Contact delete',
+                'path' => 'contact/%/delete',
+                'arguments' => '1',
+                'class' => '\ZeroPHP\Contact\Contact',
+                'method' => 'showDelete',
             ),
         ));
     }

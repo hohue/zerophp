@@ -24,7 +24,8 @@ class MetadataInstall {
                 $table->string('path_title', 256)->nullable();
                 $table->text('keywords')->nullable();
                 $table->text('description')->nullable();
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->boolean('active')->default(1);
 
                 $table->index('path');

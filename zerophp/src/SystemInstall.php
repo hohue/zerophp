@@ -53,7 +53,8 @@ class SystemInstall {
                 $table->increments('urlalias_id');
                 $table->string('real', 256);
                 $table->string('alias', 256);
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
 
                 $table->index('real');
                 $table->index('alias');
@@ -77,8 +78,9 @@ class SystemInstall {
                 $table->string('password', 128)->nullable();
                 $table->boolean('active')->default(0);
                 $table->rememberToken();
-                $table->timestamp('last_activity')->nullable();
-                $table->timestamps();
+                $table->dateTime('last_activity')->nullable();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->softDeletes();
 
                 $table->index('email');
@@ -90,7 +92,7 @@ class SystemInstall {
                 $table->increments('activation_id');
                 $table->string('hash', 128);
                 $table->integer('destination_id')->unsigned()->nullable();
-                $table->timestamp('expired')->nullable();
+                $table->dateTime('expired')->nullable();
                 $table->string('type', 32)->nullable();
 
                 $table->index('hash');
@@ -269,35 +271,35 @@ class SystemInstall {
                 'path' => 'user/list',
                 'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'crudList',
+                'method' => 'showList',
             ),
             array(
                 'title' => 'User create',
                 'path' => 'user/create',
                 'arguments' => '',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'create',
+                'method' => 'showCreate',
             ),
             array(
                 'title' => 'User read',
                 'path' => 'user/%',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'crudRead',
+                'method' => 'showRead',
             ),
             array(
                 'title' => 'User update',
                 'path' => 'user/%/update',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'update',
+                'method' => 'showUpdate',
             ),
             array(
                 'title' => 'User delete',
                 'path' => 'user/%/delete',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'delete',
+                'method' => 'showDelete',
             ),
             array(
                 'title' => 'Reset Password success',
@@ -311,7 +313,7 @@ class SystemInstall {
                 'path' => 'user/%/preview',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\ZeroPHP\Users',
-                'method' => 'crudPreview',
+                'method' => 'showPreview',
             ),
         ));
 
@@ -453,6 +455,34 @@ class SystemInstall {
             \DB::table('variable')->insert(array(
                 'variable_key' => 'paganization items',
                 'variable_value' => 5,
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'file image rule')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'file image rule',
+                'variable_value' => 'mimes:jpeg,png,gif',
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'file path')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'file path',
+                'variable_value' => '/files',
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'file image background')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'file image background',
+                'variable_value' => '#ffffff',
+            ));
+        }
+
+        if (!\DB::table('variable')->where('variable_key', 'file image quality')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'file image quality',
+                'variable_value' => '70',
             ));
         }
     }

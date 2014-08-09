@@ -61,7 +61,7 @@ class ImageStyle extends Entity implements  EntityInterface {
             );
         }
         else {
-            $path_file = \Config::get('file.path');
+            $path_file = zerophp_variable_get('file path', '/files');
             $path_style = "$path_file/styles/$style";
             $file_style = "$path_style/" . str_replace("$path_file/images/", '', $file_original);
 
@@ -76,7 +76,7 @@ class ImageStyle extends Entity implements  EntityInterface {
                         });
                         $img->crop($image_style->width, $image_style->height);
 
-                        $img->fill(\Config::get('file.image_background', '#ffffff'), 0, 0);
+                        $img->fill(zerophp_variable_get('file image background', '#ffffff'), 0, 0);
 
                         break;
 
@@ -99,7 +99,7 @@ class ImageStyle extends Entity implements  EntityInterface {
                         break;
                 }
 
-                $img->save(MAIN . $file_style, \Config::get('file.image_quality', 90));
+                $img->save(MAIN . $file_style, zerophp_variable_get('file image quality', 70));
             }
             else {
                 $img = Image::make(MAIN . $file_style);

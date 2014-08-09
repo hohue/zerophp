@@ -15,6 +15,7 @@ class Article extends Entity implements EntityInterface {
             '#links' => array(
                 'list' => 'admin/article/list',
                 'create' => 'admin/article/create',
+                'clone' => 'admin/article/%/clone',
                 'read' => 'article/%',
                 'update' => 'admin/article/%/update',
                 'delete' => 'admin/article/%/delete',
@@ -94,38 +95,4 @@ class Article extends Entity implements EntityInterface {
             ),
         );
     }
-
-    function create($zerophp) {
-        $form = array(
-            'class' => '\ZeroPHP\Article\Article',
-            'method' => 'crudCreateForm',
-        );
-        $zerophp->response->addContent(Form::build($form));
-    }
-
-    function read($zerophp, $article_id){
-        $article = $this->loadEntity($article_id, array(), true);
-
-        if(!isset($article->article_id)) {
-            \App::abort(404);
-        }
-
-        $zerophp->response->addContent(zerophp_view('article_read', zerophp_object_to_array($article)));
-    }
-
-    function update($zerophp, $article_id) {
-        $article = $this->loadEntity($article_id);
-
-        if(!isset($article->article_id)) {
-            \App::abort(404);
-        }
-
-        $form = array(
-            'class' => '\ZeroPHP\Article\Article',
-            'method' => 'crudCreateForm',
-        );
-        $zerophp->response->addContent(Form::build($form, $article));
-    }
-
-    function delete($zerophp) {}
 }

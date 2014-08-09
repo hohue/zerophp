@@ -9,8 +9,12 @@ class Hook extends Entity implements  EntityInterface {
         return array(
             '#id' => 'hook_id',
             '#name' => 'hook',
-            '#class' => 'ZeroPHP\ZeroPHP\Hook',
+            '#class' => '\ZeroPHP\ZeroPHP\Hook',
             '#title' => zerophp_lang('Hook'),
+            '#order' => array(
+                'weight' => 'asc',
+                'id' => 'asc',
+            ),
             '#fields' => array(
                 'hook_id' => array(
                     '#name' => 'hook_id',
@@ -26,8 +30,8 @@ class Hook extends Entity implements  EntityInterface {
                 'hook_type' => array(
                     '#name' => 'hook_type',
                     '#title' => zerophp_lang('Hook type'),
-                    '#type' => 'radios',
-                    '#options' => $this->hook_types(),
+                    '#type' => 'select',
+                    '#options' => $this->getTypes(),
                     '#validate' => 'required',
                 ),
                 'hook_condition' => array(
@@ -68,31 +72,21 @@ class Hook extends Entity implements  EntityInterface {
         );
     }
 
-    function loadEntityAll($attributes = array()) {
+    // Define hook types
+    private function getTypes() {
+        return array(
+            'entity_structure_alter' => 'entity_structure_alter', //Alter a entity structure
+            'form_alter' => 'form_alter', //Alter a form
+            'form_value_alter' => 'form_value_alter', //Alter values of a form
+            'init' => 'init', // Call at initial application
+        );
+    }
+
+    public function loadEntityAll($attributes = array()) {
         $cache_name = __METHOD__ . serialize($attributes);
 
         if ($cache = \Cache::get($cache_name)) {
             return $cache;
-        }
-
-        if (!isset($attributes['order'])) {
-            $attributes['order'] = array();
-        }
-
-        if (!isset($attributes['order']['hook_type'])) {
-            $attributes['order']['hook_type'] = 'ASC';
-        }
-
-        if (!isset($attributes['order']['hook_condition'])) {
-            $attributes['order']['hook_condition'] = 'ASC';
-        }
-
-        if (!isset($attributes['order']['class'])) {
-            $attributes['order']['class'] = 'ASC';
-        }
-
-        if (!isset($attributes['order']['method'])) {
-            $attributes['order']['method'] = 'ASC';
         }
 
         $hooks = parent::loadEntityAll($attributes);
@@ -109,37 +103,31 @@ class Hook extends Entity implements  EntityInterface {
         return $result;
     }
 
-    function loadEntityAllByHookType($hook_type, $hook_condition = '#all') {
+    public function loadEntityAllByHookType($hook_type, $hook_condition = '') {
         $hooks = $this->loadEntityAll();
 
-        if (isset($hooks[$hook_type]) && isset($hooks[$hook_type][$hook_condition])) {
-            return $hooks[$hook_type][$hook_condition];
+        $result = array();
+
+        if (isset($hooks[$hook_type])) {
+            if (isset($hooks[$hook_type]['#all'])) {
+                $result = array_merge($result, $hooks[$hook_type]['#all']);
+            }
+
+            if (isset($hooks[$hook_type][$hook_condition])) {
+                $result = array_merge($result, $hooks[$hook_type][$hook_condition]);
+            }
         }
 
-        return array();
+        return $result;
     }
 
-
-
-
-
-
-
-    // Define hook type
-    private function hook_types() {
-        return array(
-            'init' => 'init', //Call at Hook_general->hook_general_post_controller_constructor
-            'entity_structure_alter' => 'entity_structure_alter', //Call at Entity->structure_set
-            'entity_create_submit' => 'entity_create_submit', // Call at Entity->crud_create_form_submit
-            'form_alter' => 'form_alter', //Call at Form->form_build
-            'form_value_alter' => 'form_value_alter', //Cal at Form->form_build
-        );
-    }
-
-    function run($hooks, $arguments) {
+    public function run($hooks) {
+        $arguments = func_get_args();
+        unset($arguments[0]);
         foreach ($hooks as $hook) {
-            $entity = new $hook['class'];;
-            $this->CI->{$hook['library']}->{$hook['function']}($arguments);
+            call_user_func_array(array(new $hook['class'], $hook['method']), $arguments);
         }
     }
 }
+
+// Checked

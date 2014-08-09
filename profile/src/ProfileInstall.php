@@ -24,7 +24,7 @@ class ProfileInstall {
                 $table->integer('province_id')->unsigned()->nullable();
                 $table->integer('district_id')->unsigned()->nullable();
                 $table->string('mobile', 32)->nullable();
-                $table->timestamp('birthday')->nullable();
+                $table->dateTime('birthday')->nullable();
                 $table->integer('created_by')->unsigned()->nullable();
                 $table->integer('updated_by')->unsigned()->nullable();
 

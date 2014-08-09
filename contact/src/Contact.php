@@ -14,6 +14,7 @@ class Contact extends Entity implements EntityInterface {
             '#title' => zerophp_lang('Contact Us'),
             '#links' => array(
                 'list' => 'admin/contact/list',
+                'create' => 'admin/contact',
                 'read' => 'admin/contact/%',
                 'delete' => 'admin/contact/%/delete',
             ),
@@ -86,19 +87,8 @@ class Contact extends Entity implements EntityInterface {
         );
     }
 
-    function create($zerophp) {
-        $form = array(
-            'class' => '\ZeroPHP\Contact\Contact',
-            'method' => 'createForm',
-        );
-
-        $zerophp->response->addContent(Form::build($form));
-    }
-
-    function createForm() {
-        $form = $this->crudCreateForm();
-
-        unset($form['contact_id']);
+    function showCreateForm() {
+        $form = parent::showCreateForm();
 
         $success = array(
             'message' => zerophp_lang('Thank you for your message. We will contact you soon.'),

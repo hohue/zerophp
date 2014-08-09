@@ -204,7 +204,7 @@ class Shop extends Entity implements EntityInterface {
     }
 
     function shop_create_form_alter($form_id, &$form) {
-        if ($form_id == 'entity_crud_create_shop') {
+        if ($form_id == 'entity_show_create_shop') {
             // Check shop registered
             $shop = $this->loadEntityByUser(zerophp_userid());
             if (!empty($shop->shop_id)) {
@@ -242,7 +242,7 @@ class Shop extends Entity implements EntityInterface {
 
         $form_value['alias'] = uri_validate($form_value['alias']);
 
-        if ($form_id == 'entity_crud_create_shop') {
+        if ($form_id == 'entity_show_create_shop') {
             //@todo 9 Hack for value changed
             $_POST = $form_value;
 
@@ -288,7 +288,7 @@ class Shop extends Entity implements EntityInterface {
         unset($form['#redirect']);
     }
 
-    function crud_views($attributes = array()) {
+    function show_views($attributes = array()) {
         if (isset($attributes['entity_id']) && $attributes['entity_id'] == 'me') {
             $attributes['entity_id'] = 0;
 
@@ -298,7 +298,7 @@ class Shop extends Entity implements EntityInterface {
             }
         }
 
-        parent::crud_views($attributes);
+        parent::show_views($attributes);
     }
 
 

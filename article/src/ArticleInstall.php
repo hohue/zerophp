@@ -22,7 +22,8 @@ class ArticleInstall {
                 $table->text('summary')->nullable();
                 $table->longText('content')->nullable();
                 $table->boolean('active')->default(1);
-                $table->timestamps();
+                $table->dateTime('created_at')->nullable();
+                $table->dateTime('updated_at')->nullable();
                 $table->integer('created_by')->nullable()->unsigned();
                 $table->integer('updated_by')->nullable()->unsigned();
 
@@ -46,35 +47,35 @@ class ArticleInstall {
                 'path' => 'article/list',
                 'arguments' => '',
                 'class' => '\ZeroPHP\Article\Article',
-                'method' => 'crudList',
+                'method' => 'showList',
             ),
             array(
                 'title' => 'Article create',
                 'path' => 'article/create',
                 'arguments' => '',
                 'class' => '\ZeroPHP\Article\Article',
-                'method' => 'create',
+                'method' => 'showCreate',
             ),
             array(
                 'title' => 'Article read',
                 'path' => 'article/%',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\Article\Article',
-                'method' => 'read',
+                'method' => 'showRead',
             ),
             array(
                 'title' => 'Article update',
                 'path' => 'article/%/update',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\Article\Article',
-                'method' => 'update',
+                'method' => 'showUpdate',
             ),
             array(
                 'title' => 'Article delete',
                 'path' => 'article/%/delete',
                 'arguments' => '1',
                 'class' => '\ZeroPHP\Article\Article',
-                'method' => 'delete',
+                'method' => 'showDelete',
             ),
         ));
     }

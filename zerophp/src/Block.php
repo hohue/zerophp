@@ -13,7 +13,7 @@ class Block extends Entity implements  EntityInterface {
         return array(
             '#id' => 'block_id',
             '#name' => 'block',
-            '#class' => 'ZeroPHP\ZeroPHP\Block',
+            '#class' => '\ZeroPHP\ZeroPHP\Block',
             '#title' => zerophp_lang('Block'),
             '#fields' => array(
                 'block_id' => array(
