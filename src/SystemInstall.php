@@ -309,6 +309,13 @@ class SystemInstall {
                 'method' => 'showResetPasswordSuccess',
             ),
             array(
+                'title' => 'User activation resend success',
+                'path' => 'user/activation/resend/success',
+                'arguments' => '',
+                'class' => '\ZeroPHP\ZeroPHP\Users',
+                'method' => 'showActivationResendSuccess',
+            ),
+            array(
                 'title' => 'User preview',
                 'path' => 'user/%/preview',
                 'arguments' => '1',
