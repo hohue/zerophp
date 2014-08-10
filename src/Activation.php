@@ -9,7 +9,7 @@ class Activation extends Entity implements  EntityInterface {
         return array(
             '#id' => 'activation_id',
             '#name' => 'activation',
-            '#class' => 'ZeroPHP\ZeroPHP\Activation',
+            '#class' => '\ZeroPHP\ZeroPHP\Activation',
             '#title' => zerophp_lang('Activation'),
             '#fields' => array(
                 'activation_id' => array(
