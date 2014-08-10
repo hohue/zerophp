@@ -191,6 +191,4 @@ class Profile extends Entity implements EntityInterface  {
         // Update to Profile Vendor
         $form_values['id'] = zerophp_userid();
     }
-
-    public function read($zerophp) {}
 }

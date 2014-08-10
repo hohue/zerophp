@@ -1,8 +1,8 @@
 <?php 
 namespace ZeroPHP\Contact;
 
-use ZeroPHP\ZeroPHP\Entity;
 use ZeroPHP\ZeroPHP\EntityInterface;
+use ZeroPHP\ZeroPHP\Entity;
 use ZeroPHP\ZeroPHP\Form;
 
 class Contact extends Entity implements EntityInterface {

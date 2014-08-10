@@ -1,8 +1,8 @@
 <?php 
 namespace ZeroPHP\Category;
 
-use ZeroPHP\ZeroPHP\Entity;
 use ZeroPHP\ZeroPHP\EntityInterface;
+use ZeroPHP\ZeroPHP\Entity;
 
 class Category extends Entity implements EntityInterface {
     public function __config() {
