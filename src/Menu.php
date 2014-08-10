@@ -9,7 +9,7 @@ class Menu extends Entity implements  EntityInterface {
         return array(
             '#id' => 'menu_id',
             '#name' => 'menu',
-            '#class' => 'ZeroPHP\ZeroPHP\Menu',
+            '#class' => '\ZeroPHP\ZeroPHP\Menu',
             '#title' => zerophp_lang('Menu'),
             '#fields' => array(
                 'menu_id' => array(
