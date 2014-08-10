@@ -1,0 +1,25 @@
+{
+    "name": "zerophp/article",
+    "type": "library",
+    "description": "Article bundle for ZeroPHP CMS",
+    "keywords": ["article", "zerophp cms", "zerophp"],
+    "homepage": "http://github.com/zerophp/article",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yago Leal",
+            "email": "yagoleal.php@gmail.com",
+            "homepage": "http://yago-leal.tumblr.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+
+        "zerophp/zerophp": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZeroPHP\\Article\\": "src",
+        }
+    }
+}
