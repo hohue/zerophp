@@ -10,7 +10,7 @@ class Article extends Entity implements EntityInterface {
         return array(
             '#id' => 'article_id',
             '#name' => 'article',
-            '#class' => 'ZeroPHP\Article\Article',
+            '#class' => '\ZeroPHP\Article\Article',
             '#title' => zerophp_lang('Article'),
             '#links' => array(
                 'list' => 'admin/article/list',
