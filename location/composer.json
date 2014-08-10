@@ -15,7 +15,7 @@
     "require": {
         "php": ">=5.4.0",
 
-        "zerophp/location": "dev-master"
+        "zerophp/zerophp": "dev-master"
     },
     "autoload": {
         "psr-4": {
