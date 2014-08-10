@@ -10,7 +10,7 @@ class ImageStyle extends Entity implements  EntityInterface {
         return array(
             '#id' => 'style',
             '#name' => 'image_style',
-            '#class' => 'ZeroPHP\ZeroPHP\ImageStyle',
+            '#class' => '\ZeroPHP\ZeroPHP\ImageStyle',
             '#title' => zerophp_lang('Image style'),
             '#fields' => array(
                 'style' => array(
