@@ -1,0 +1,25 @@
+{
+    "name": "zerophp/category",
+    "type": "library",
+    "description": "Category bundle for ZeroPHP CMS",
+    "keywords": ["category", "zerophp cms", "zerophp"],
+    "homepage": "http://github.com/zerophp/category",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yago Leal",
+            "email": "yagoleal.php@gmail.com",
+            "homepage": "http://yago-leal.tumblr.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+
+        "zerophp/category": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZeroPHP\\Category\\": "src",
+        }
+    }
+}

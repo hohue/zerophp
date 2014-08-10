@@ -1,0 +1,30 @@
+{
+    "name": "zerophp/zerophp",
+    "type": "library",
+    "description": "A Laravel 4 Based CMS Built With Entity",
+    "keywords": ["cms", "laravel cms", "zerophp cms", "zerophp"],
+    "homepage": "http://github.com/Seldaek/monolog",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yago Leal",
+            "email": "yagoleal.php@gmail.com",
+            "homepage": "http://yago-leal.tumblr.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+
+        "kriswallsmith/assetic": "1.1.*",
+        "intervention/image": "2.*",
+        "bllim/datatables": "*"
+    },
+    "autoload": {
+        "files": [
+            "src/zerophp_helper.php"
+        ],
+        "psr-4": {
+            "ZeroPHP\\ZeroPHP\\": "src",
+        }
+    }
+}

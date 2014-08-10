@@ -1,0 +1,25 @@
+{
+    "name": "zerophp/metadata",
+    "type": "library",
+    "description": "Metadata bundle for ZeroPHP CMS",
+    "keywords": ["metadata", "zerophp cms", "zerophp"],
+    "homepage": "http://github.com/zerophp/metadata",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yago Leal",
+            "email": "yagoleal.php@gmail.com",
+            "homepage": "http://yago-leal.tumblr.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+
+        "zerophp/metadata": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZeroPHP\\Metadata\\": "src",
+        }
+    }
+}

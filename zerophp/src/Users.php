@@ -504,20 +504,10 @@ class Users extends Entity implements  EntityInterface {
             zerophp_mail($form_values['email'], 
                 zerophp_lang(zerophp_variable_get('user forgotpass email subject', 'Reset your password')),
                 zerophp_view('email_user_reset_pass', $vars)
-            );
-
-            \Session::put('user forgotpass email', $form_values['email']);
-            
+            );            
     }
 
     function showForgotPasswordSuccess($zerophp) {
-        $email = \Session::get('user forgotpass email');
-        \Session::forget('user forgotpass email');
-
-        if (empty($email)) {
-            \App::abort(404);
-        }
-
         $items = array(
             array(
                 '#item' => zerophp_lang('User forgotpass')
@@ -525,12 +515,7 @@ class Users extends Entity implements  EntityInterface {
         );
         $zerophp->response->setBreadcrumb($items);
 
-        $vars = array(
-            'email' => $email,
-        );
-
-        $zerophp->response->addContent(zerophp_view('users_forgotpass_success', $vars));
-
+        $zerophp->response->addContent(zerophp_view('users_forgotpass_success'));
     }
 
     function showResetPassword($zerophp, $hash) {
@@ -645,8 +630,6 @@ class Users extends Entity implements  EntityInterface {
             $activation = new \ZeroPHP\ZeroPHP\Activation;
             $hash = $activation->setHash($user->id, 'user_activation_resend');
 
-            //zerophp_devel_print($hash);
-
             $vars = array(
                 'email' => $form_values['email'],
                 'link' => zerophp_url("user/activation/" . $hash->hash),
@@ -657,8 +640,6 @@ class Users extends Entity implements  EntityInterface {
                 zerophp_lang(zerophp_variable_get('user activation email subject', 'Activation your account')),
                 zerophp_view('email_user_activation_resend', $vars)
             );
-
-            \Session::put('user activation resend email', $form_values['email']);
     }
 
     function showActivationResendSuccess($zerophp) {

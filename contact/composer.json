@@ -1,0 +1,25 @@
+{
+    "name": "zerophp/contact",
+    "type": "library",
+    "description": "Contact bundle for ZeroPHP CMS",
+    "keywords": ["contact", "zerophp cms", "zerophp"],
+    "homepage": "http://github.com/zerophp/contact",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yago Leal",
+            "email": "yagoleal.php@gmail.com",
+            "homepage": "http://yago-leal.tumblr.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+
+        "zerophp/contact": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZeroPHP\\Contact\\": "src",
+        }
+    }
+}

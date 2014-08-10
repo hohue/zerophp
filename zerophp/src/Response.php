@@ -171,12 +171,10 @@ class Response {
 
     public function addMessage($message = null, $type = 'success') {
         //$messages = \Session::get(__METHOD__, array());
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
+        if (session_status() == PHP_SESSION_NONE) session_start();
         $messages = isset($_SESSION[__METHOD__]) ? $_SESSION[__METHOD__] : array();
 
-        // Set message
+        // Add message
         if ($message) {
             $messages[$type][] = $message;
 
@@ -186,9 +184,7 @@ class Response {
         // Get message
         else {
             //\Session::forget(__METHOD__);
-            if (isset($_SESSION[__METHOD__])) {
-                unset($_SESSION[__METHOD__]);
-            }
+            if (isset($_SESSION[__METHOD__])) unset($_SESSION[__METHOD__]);
 
             return $messages;
         }
