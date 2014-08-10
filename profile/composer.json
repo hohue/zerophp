@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ZeroPHP\\Profile\\": "src",
+            "ZeroPHP\\Profile\\": "src"
         }
     }
 }

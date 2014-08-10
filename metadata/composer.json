@@ -19,7 +19,7 @@
     },
     "autoload": {
         "psr-4": {
-            "ZeroPHP\\Metadata\\": "src",
+            "ZeroPHP\\Metadata\\": "src"
         }
     }
 }
