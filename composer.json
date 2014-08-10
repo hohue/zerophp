@@ -24,7 +24,7 @@
             "src/zerophp_helper.php"
         ],
         "psr-4": {
-            "ZeroPHP\\ZeroPHP\\": "src",
+            "ZeroPHP\\ZeroPHP\\": "src"
         }
     }
 }
