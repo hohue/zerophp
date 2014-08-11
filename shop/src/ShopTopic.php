@@ -9,7 +9,7 @@ class ShopTopic extends Entity implements EntityInterface {
         return array(
             '#id' => 'shop_topic_id',
             '#name' => 'shop_topic',
-            '#class' => 'ZeroPHP\Shop\ShopTopic',
+            '#class' => '\ZeroPHP\Shop\ShopTopic',
             '#title' => 'Shop topic',
             '#fields' => array(
                 'shop_topic_id' => array(

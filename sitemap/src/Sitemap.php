@@ -2,11 +2,7 @@
 namespace ZeroPHP\Sitemap;
 
 class Sitemap {
-
-
-
-    
-    function category_product() {
+    function showProductList() {
     
             $this->load->library('category');
             $level1 = $this->category->loadEntityAll_from_group(1);

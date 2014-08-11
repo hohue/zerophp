@@ -9,7 +9,7 @@ class Metadata extends Entity implements EntityInterface {
         return array(
             '#id' => 'metadata_id',
             '#name' => 'metadata',
-            '#class' => 'ZeroPHP\Metadata\Metadata',
+            '#class' => '\ZeroPHP\Metadata\Metadata',
             '#title' => zerophp_lang('Metadata'),
             '#fields' => array(
                 'metadata_id' => array(

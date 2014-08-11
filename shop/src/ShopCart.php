@@ -9,7 +9,7 @@ class ShopCart extends Entity implements EntityInterface {
         return array(
             '#id' => 'shop_cart_id',
             '#name' => 'shop_cart',
-            '#class' => 'ZeroPHP\Shop\ShopCart',
+            '#class' => '\ZeroPHP\Shop\ShopCart',
             '#title' => 'Shop cart',
             '#fields' => array(
                 'shop_cart_id' => array(

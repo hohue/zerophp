@@ -9,7 +9,7 @@ class LanguageTranslate extends Entity implements  EntityInterface {
         return array(
             '#id' => 'language_translate_id',
             '#name' => 'language_translate',
-            '#class' => 'ZeroPHP\ZeroPHP\LanguageTranslate',
+            '#class' => '\ZeroPHP\ZeroPHP\LanguageTranslate',
             '#title' => zerophp_lang('Language Translate'),
             '#fields' => array(
                 'language_translate_id' => array(

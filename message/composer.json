@@ -1,0 +1,25 @@
+{
+    "name": "zerophp/message",
+    "type": "library",
+    "description": "Personal Message bundle for ZeroPHP CMS",
+    "keywords": ["message", "zerophp cms", "zerophp"],
+    "homepage": "http://github.com/zerophp/message",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yago Leal",
+            "email": "yagoleal.php@gmail.com",
+            "homepage": "http://yago-leal.tumblr.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+
+        "zerophp/zerophp": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "ZeroPHP\\Message\\": "src"
+        }
+    }
+}

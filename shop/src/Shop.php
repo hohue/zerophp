@@ -9,7 +9,7 @@ class Shop extends Entity implements EntityInterface {
         return array(
             '#id' => 'shop_id',
             '#name' => 'shop',
-            '#class' => 'ZeroPHP\Shop\Shop',
+            '#class' => '\ZeroPHP\Shop\Shop',
             '#title' => zerophp_lang('Shop'),
             '#fields' => array(
                 'shop_id' => array(
