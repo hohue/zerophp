@@ -57,6 +57,13 @@ class ArticleInstall {
                 'method' => 'showCreate',
             ),
             array(
+                'title' => 'Article clone',
+                'path' => 'article/clone',
+                'arguments' => '',
+                'class' => '\ZeroPHP\Article\Article',
+                'method' => 'showClone',
+            ),
+            array(
                 'title' => 'Article read',
                 'path' => 'article/%',
                 'arguments' => '1',

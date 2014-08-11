@@ -45,6 +45,12 @@ class Menu extends Entity implements  EntityInterface {
                     '#type' => 'text',
                     '#list_hidden' => 1,
                 ),
+                'arguments' => array(
+                    '#name' => 'arguments',
+                    '#title' => zerophp_lang('Arguments'),
+                    '#type' => 'text',
+                    '#list_hidden' => 1,
+                ),
                 'access' => array(
                     '#name' => 'access',
                     '#title' => zerophp_lang('Access'),

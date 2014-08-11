@@ -3,7 +3,6 @@ namespace ZeroPHP\Article;
 
 use ZeroPHP\ZeroPHP\EntityInterface;
 use ZeroPHP\ZeroPHP\Entity;
-use ZeroPHP\ZeroPHP\Form;
 
 class Article extends Entity implements EntityInterface {
     function __config() {
