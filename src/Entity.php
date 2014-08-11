@@ -458,10 +458,7 @@ class Entity {
             if ($value['#type'] == 'textarea' && !empty($form_values[$key])) {
                 if (!empty($value['#rte_enable'])) {
                     // Make safe and standard html document
-                    require_once ROOT . '/libraries/htmlpurifier/library/HTMLPurifier.auto.php';
-                    $config = \HTMLPurifier_Config::createDefault();
-                    $purifier = new \HTMLPurifier($config);
-                    $form_values[$key] = $purifier->purify($form_values[$key]);
+                    $form_values[$key] = \Purifier::clean($form_values[$key]);
 
                     //@todo 9 Hack for SEO ---------------------------
                     $text = new \DOMDocument();
