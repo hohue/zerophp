@@ -575,6 +575,15 @@ class Entity {
             \App::abort(404);
         }
 
+        if (!empty($entity->title)) {
+            $breadcrumb = array(
+                array(
+                    '#item' => $entity->title
+                )
+            );
+            $zerophp->response->setBreadcrumb($breadcrumb);
+        }
+
         $this->showReadExecutive($zerophp, $entity);
     }
 
