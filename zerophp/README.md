@@ -15,4 +15,3 @@ A Content Management System was built on [Laravel 4](http://laravel.com)
 ```
 
 * Update your packages with ```composer update``` or install with ```composer install```.
-* 
