@@ -569,6 +569,7 @@ class Users extends Entity implements  EntityInterface {
 
         $form['#theme'] = 'form-popup';
         $form['#redirect'] = 'user/resetpass/success';
+        $form['#success_message'] = '';
 
         return $form;
     }
