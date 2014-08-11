@@ -332,6 +332,13 @@ class Entity {
     }
 
     public function showCreate($zerophp) {
+        $items = array(
+            array(
+                '#item' => $this->structure['#title'] . ' ' . zerophp_lang('create')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
         $form = array(
             'class' => $this->structure['#class'],
             'method' => 'showCreateForm',
@@ -341,6 +348,13 @@ class Entity {
     }
     
     public function showUpdate($zerophp, $entity_id) {
+        $items = array(
+            array(
+                '#item' => $this->structure['#title'] . ' ' . zerophp_lang('update')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
         $form = array(
             'class' => $this->structure['#class'],
             'method' => 'showCreateForm',
@@ -352,6 +366,13 @@ class Entity {
     }
 
     public function showClone($zerophp, $entity_id) {
+        $items = array(
+            array(
+                '#item' => $this->structure['#title'] . ' ' . zerophp_lang('clone')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
         $form = array(
             'class' => $this->structure['#class'],
             'method' => 'showCloneForm',
@@ -575,6 +596,15 @@ class Entity {
             \App::abort(404);
         }
 
+        if (!empty($entity->title)) {
+            $breadcrumb = array(
+                array(
+                    '#item' => $entity->title
+                )
+            );
+            $zerophp->response->setBreadcrumb($breadcrumb);
+        }
+
         $this->showReadExecutive($zerophp, $entity);
     }
 
@@ -583,6 +613,15 @@ class Entity {
 
         if (!$entity) {
             \App::abort(404);
+        }
+
+        if (!empty($entity->title)) {
+            $breadcrumb = array(
+                array(
+                    '#item' => $entity->title
+                )
+            );
+            $zerophp->response->setBreadcrumb($breadcrumb);
         }
 
         $this->showReadExecutive($zerophp, $entity);
@@ -622,6 +661,15 @@ class Entity {
 
     // Create & Update
     public function showDelete($zerophp, $entity_id) {
+        if (!empty($entity->title)) {
+            $breadcrumb = array(
+                array(
+                    '#item' => $this->structure['#title'] . ' ' . zerophp_lang('delete'),
+                )
+            );
+            $zerophp->response->setBreadcrumb($breadcrumb);
+        }
+
         $form = array(
             'class' => $this->structure['#class'],
             'method' => 'showDeleteForm',

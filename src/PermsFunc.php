@@ -9,7 +9,7 @@ class PermsFunc extends Entity implements  EntityInterface {
         return array(
             '#id' => 'perms_func_id',
             '#name' => 'perms_func',
-            '#class' => 'ZeroPHP\ZeroPHP\PermsFunc',
+            '#class' => '\ZeroPHP\ZeroPHP\PermsFunc',
             '#title' => zerophp_lang('Permissions function'),
             '#fields' => array(
                 'perm_id' => array(

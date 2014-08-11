@@ -3,7 +3,7 @@
     "type": "library",
     "description": "A Laravel 4 Based CMS Built With Entity",
     "keywords": ["cms", "laravel cms", "zerophp cms", "zerophp"],
-    "homepage": "http://github.com/Seldaek/monolog",
+    "homepage": "https://github.com/zerophp/zerophpcms",
     "license": "MIT",
     "authors": [
         {
@@ -24,7 +24,7 @@
             "src/zerophp_helper.php"
         ],
         "psr-4": {
-            "ZeroPHP\\ZeroPHP\\": "src",
+            "ZeroPHP\\ZeroPHP\\": "src"
         }
     }
 }

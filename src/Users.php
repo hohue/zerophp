@@ -510,7 +510,7 @@ class Users extends Entity implements  EntityInterface {
     function showForgotPasswordSuccess($zerophp) {
         $items = array(
             array(
-                '#item' => zerophp_lang('User forgotpass')
+                '#item' => zerophp_lang('User forgot password')
             )
         );
         $zerophp->response->setBreadcrumb($items);
@@ -569,6 +569,7 @@ class Users extends Entity implements  EntityInterface {
 
         $form['#theme'] = 'form-popup';
         $form['#redirect'] = 'user/resetpass/success';
+        $form['#success_message'] = '';
 
         return $form;
     }
@@ -587,7 +588,14 @@ class Users extends Entity implements  EntityInterface {
     }
 
     function showResetPasswordSuccess($zerophp) {
-       $zerophp->response->addContent(zerophp_view('users_resetpass_success'));
+        $items = array(
+            array(
+                '#item' => zerophp_lang('User reset password')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
+        $zerophp->response->addContent(zerophp_view('users_resetpass_success'));
     }
 
     function showActivationResend($zerophp) {
@@ -643,6 +651,13 @@ class Users extends Entity implements  EntityInterface {
     }
 
     function showActivationResendSuccess($zerophp) {
+        $items = array(
+            array(
+                '#item' => zerophp_lang('User activation resend')
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
         $zerophp->response->addContent(zerophp_view('users_activation_resend_success'));
     }
 
