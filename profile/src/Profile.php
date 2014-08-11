@@ -124,6 +124,13 @@ class Profile extends Entity implements EntityInterface  {
             \App::abort(403);
         }
 
+        $items = array(
+            array(
+                '#item' => zerophp_lang('User profile update'),
+            )
+        );
+        $zerophp->response->setBreadcrumb($items);
+
         $profile = $this->loadEntity($userid);
         $form_values = is_object($profile) ? zerophp_object_to_array($profile) : array();
         $form_values['district_id_value'] = isset($form_values['district_id']) ? $form_values['district_id'] : 0;
