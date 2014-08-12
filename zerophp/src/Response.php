@@ -79,7 +79,7 @@ class Response {
     }
 
     private function _loadRegion() {
-        $regions = \Config::get('theme.regions', array());
+        $regions = zerophp_config_get('theme.regions', array());
 
         if (count($regions)) {
             $block = new \ZeroPHP\ZeroPHP\Block;
