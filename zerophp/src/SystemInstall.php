@@ -160,7 +160,7 @@ class SystemInstall {
             array(
                 'title' => 'Admin Menus', 
                 'cache_type' => 'full',
-                'region' => 'admin left sidebar',
+                'region' => 'admin menu',
                 'class' => '\ZeroPHP\ZeroPHP\BlockDefault',
                 'method' => 'admin_menu', 
                 'access' => 'admin_menu_access',

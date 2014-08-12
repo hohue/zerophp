@@ -5,7 +5,7 @@ A Content Management System was built on [Laravel 4](http://laravel.com)
 ## Installation
 
 * Install fresh Laravel project:
-``` laravel create your_project_name ```
+``` laravel new your_project_name ```
 
 * Update `composer.json` file:
 

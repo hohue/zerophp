@@ -1,0 +1,36 @@
+{
+  "name": "jquery-once",
+  "description": "jQuery Once Plugin.",
+  "version": "1.2.6",
+  "keywords": [
+    "jquery"
+  ],
+  "homepage": "http://github.com/robloach/jquery-once",
+  "author": "Rob Loach (http://robloach.net)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RobLoach/jquery-once.git"
+  },
+  "licenses": [
+    {
+      "type": "GPL-2.0",
+      "url": "http://opensource.org/licenses/gpl-2.0.php"
+    },
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "dependencies": {
+    "jquery": "~1.8.0"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-qunit": "~0.2.1",
+    "grunt-contrib-jshint": "~0.4.3",
+    "grunt-contrib-uglify": "~0.1.1"
+  },
+  "scripts": {
+    "test": "grunt jshint qunit"
+  }
+}

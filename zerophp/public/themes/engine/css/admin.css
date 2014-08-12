@@ -1,0 +1,39 @@
+body {
+  padding-top: 70px;
+}
+
+.tab_poup_theme {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.form_item_content{
+    padding: 5px 30px 10px 20px;
+
+}
+
+.error-messages {
+    display: none;
+}
+.form_item_label{
+   float: left;
+  
+}
+.form_description{
+    display: block;
+    padding-left: 30px;
+    margin-top: 0px;
+    margin-bottom: 20px;
+    line-height: 16px;
+    width: 420px;
+}
+
+.entity_read_value,
+.entity_read_title {
+    float: left;
+    width: 200px;
+}
+
+.entity_read_row {
+    clear: both;
+}
