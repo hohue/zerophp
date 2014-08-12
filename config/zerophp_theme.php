@@ -1,0 +1,1 @@
+/home/ak/www/thpthoabinh/app/config/theme.php
