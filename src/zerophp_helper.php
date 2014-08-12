@@ -2,6 +2,10 @@
 
 use ZeroPHP\ZeroPHP\Entity;
 
+function zerophp_config_get($key, $default_value = '') {
+    return \Config::get("packages/zerophp/zerophp/$key", $default_value);
+}
+
 function zerophp_devel_print($args) {
     $args = func_get_args();
     print '<pre>';
@@ -159,7 +163,7 @@ function zerophp_anchor($url, $title, $attributes = array()) {
     return '<a href="'.zerophp_url($url).'" ' . \HTML::attributes($attributes) . '>'.$title.'</a>';
 }
 
-function zerophp_anchor_shop($url, $title, $attributes = array()) {
+function zerophp_anchor_login($url, $title, $attributes = array()) {
     if (zerophp_userid()) {
         return zerophp_anchor($url, $title, $attributes);
     }
@@ -171,7 +175,7 @@ function zerophp_anchor_popup($url, $title, $attributes = array()) {
     $class= 'cboxInline cboxInlineAjax cboxElement';
     $attributes['class'] = isset($attributes['class']) ? $attributes['class'] . ' ' . $class : $class;
 
-    return '<a href="#cboxInlineAjax" data-url="'.zerophp_url($url).'" class="'.$attributes['class'].'">'.$title.'</a>';
+    return '<a href="#cboxInlineAjax" data-url="' . zerophp_url($url) . '" ' . \HTML::attributes($attributes) . '>'.$title.'</a>';
 }
 
 function zerophp_url_current() {

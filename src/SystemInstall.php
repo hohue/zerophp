@@ -492,6 +492,13 @@ class SystemInstall {
                 'variable_value' => '70',
             ));
         }
+
+        if (!\DB::table('variable')->where('variable_key', 'install prev_version_zerophp_zerophp')->first()) {
+            \DB::table('variable')->insert(array(
+                'variable_key' => 'install prev_version_zerophp_zerophp',
+                'variable_value' => 0.01,
+            ));
+        }
     }
 
     private static function down_0_01() {
